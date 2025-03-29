@@ -1,0 +1,386 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "create": "Create",
+    "delete": "Delete",
+    "edit": "Edit",
+    "list": "List",
+    "show": "Show"
+  },
+  "buttons": {
+    "accept": "Accept",
+    "acceptAll": "Accept All",
+    "add": "Add",
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "clone": "Clone",
+    "confirm": "Are you sure?",
+    "create": "Create",
+    "delete": "Delete",
+    "draft": "Draft",
+    "edit": "Edit",
+    "export": "Export",
+    "filter": "Filter",
+    "import": "Import",
+    "logout": "Logout",
+    "nextStep": "Next",
+    "previousStep": "Previous",
+    "refresh": "Refresh",
+    "reject": "Reject",
+    "rejectAll": "Reject All",
+    "save": "Save",
+    "show": "Show",
+    "undo": "Undo"
+  },
+  "categories": {
+    "categories": "Categories",
+    "fields": {
+      "id": "ID",
+      "isActive": {
+        "false": "Invisible",
+        "label": "Status",
+        "true": "Visible"
+      },
+      "products": "Products",
+      "title": "Title"
+    },
+    "titles": {
+      "list": "Categories"
+    }
+  },
+  "dashboard": {
+    "dailyOrders": {
+      "title": "Daily Orders"
+    },
+    "dailyRevenue": {
+      "title": "Daily Revenue"
+    },
+    "deliveryMap": {
+      "title": "Delivery Map"
+    },
+    "filter": {
+      "date": {
+        "lastMonth": "Last Month",
+        "lastWeek": "Last Week",
+        "lastYear": "Last Year"
+      },
+      "title": "Filters"
+    },
+    "newCustomers": {
+      "title": "New Customers"
+    },
+    "orders": {
+      "title": "Orders"
+    },
+    "overview": {
+      "title": "Overview"
+    },
+    "quickStats": {
+      "activeSeasons": "Active Seasons",
+      "cultivatedArea": "Cultivated Area",
+      "estimatedYield": "Estimated Yield",
+      "qualityInspections": "Quality Inspections",
+      "title": "Quick Stats",
+      "value": "Value"
+    },
+    "recentOrders": {
+      "title": "Recent Orders"
+    },
+    "revenue": {
+      "title": "Revenue"
+    },
+    "timeline": {
+      "orderStatuses": {
+        "cancelled": "Order is cancelled",
+        "delivered": "Order is delivered",
+        "on the way": "Order is on the way",
+        "pending": "Preparing order",
+        "ready": "Order is ready"
+      },
+      "title": "Timeline"
+    },
+    "title": "Dashboard",
+    "totalSales": {
+      "title": "Total Sales"
+    },
+    "trendingMenus": {
+      "title": "Daily Trending Menus"
+    },
+    "trendingProducts": {
+      "title": "Trending Products"
+    }
+  },
+  "enum": {
+    "orderStatuses": {
+      "Cancelled": "Cancelled",
+      "Delivered": "Delivered",
+      "On The Way": "On the way",
+      "Pending": "Pending",
+      "Ready": "Ready"
+    }
+  },
+  "loading": "Loading",
+  "notifications": {
+    "createError": "There was an error creating {{resource}} (status code: {{statusCode}})",
+    "createSuccess": "Successfully created {{resource}}",
+    "deleteError": "Error when deleting {{resource}} (status code: {{statusCode}})",
+    "deleteSuccess": "Successfully deleted {{resource}}",
+    "editError": "Error when editing {{resource}} (status code: {{statusCode}})",
+    "editSuccess": "Successfully edited {{resource}}",
+    "error": "Error (status code: {{statusCode}})",
+    "importProgress": "Importing: {{processed}}/{{total}}",
+    "success": "Successful",
+    "undoable": "You have {{seconds}} seconds to undo"
+  },
+  "pages": {
+    "error": {
+      "404": "Sorry, the page you visited does not exist.",
+      "backHome": "Back Home",
+      "info": "You may have forgotten to add the {{action}} component to {{resource}} resource.",
+      "resource404": "Are you sure you have created the {{resource}} resource."
+    },
+    "forgotPassword": {
+      "buttons": {
+        "submit": "Send reset instructions"
+      },
+      "errors": {
+        "validEmail": "Invalid email address"
+      },
+      "fields": {
+        "email": "Email"
+      },
+      "title": "Forgot your password?"
+    },
+    "login": {
+      "buttons": {
+        "forgotPassword": "Forgot password?",
+        "noAccount": "Don’t have an account?",
+        "rememberMe": "Remember me",
+        "submit": "Login"
+      },
+      "divider": "or",
+      "errors": {
+        "validEmail": "Invalid email address"
+      },
+      "fields": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "signin": "Sign in",
+      "signup": "Sign up",
+      "title": "Sign in to your account"
+    },
+    "register": {
+      "buttons": {
+        "haveAccount": "Have an account?",
+        "submit": "Register"
+      },
+      "errors": {
+        "validEmail": "Invalid email address"
+      },
+      "fields": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "title": "Sign up for your account"
+    },
+    "updatePassword": {
+      "buttons": {
+        "submit": "Update"
+      },
+      "errors": {
+        "confirmPasswordNotMatch": "Passwords do not match"
+      },
+      "fields": {
+        "confirmPassword": "Confirm new password",
+        "password": "New Password"
+      },
+      "title": "Update password"
+    }
+  },
+  "plans": {
+    "fields": {
+      "date": "Dates",
+      "description": "Description",
+      "end_date": "End Date",
+      "estimated_product": "Estimated Product",
+      "expert_name": "Expert",
+      "is_approved": "Approved",
+      "plan_name": "Plan Name",
+      "plant": {
+        "label": "Crop",
+        "placeholder": "Select a crop",
+        "required": "Please select a crop"
+      },
+      "plant_name": "Plant",
+      "start_date": "Start Date",
+      "status": "Status",
+      "yield_name": "Land Plot"
+    },
+    "filter": {
+      "allStatus": {
+        "label": "All Status"
+      },
+      "description": {
+        "placeholder": "Search description"
+      },
+      "id": {
+        "placeholder": "Plan ID"
+      },
+      "is_approved": {
+        "placeholder": "Filter by approval"
+      },
+      "plan_name": {
+        "placeholder": "Search plan name"
+      },
+      "plant_name": {
+        "placeholder": "Search plant name"
+      },
+      "status": {
+        "placeholder": "Filter by status"
+      },
+      "yield_name": {
+        "placeholder": "Search land plot"
+      }
+    },
+    "status": {
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "ongoing": "Ongoing",
+      "pending": "Pending"
+    }
+  },
+  "plants": {
+    "available": "Available",
+    "basePrice": "Base price",
+    "clearAllFilters": "Clear all filters",
+    "days": "days",
+    "filterByStatus": "Filter by status",
+    "filterByType": "Filter by type",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "noDescription": "No description",
+    "noStatus": "No status",
+    "noType": "Unknown type",
+    "preservationDays": "Preservation",
+    "quantity": "Quantity",
+    "search": "Search plants...",
+    "select": "Select",
+    "selected": "Selected",
+    "type": "Type"
+  },
+  "search": {
+    "more": "more",
+    "placeholder": "Search..."
+  },
+  "status": {
+    "disable": "Disable",
+    "enable": "Enable"
+  },
+  "table": {
+    "actions": "Actions",
+    "inTotal": "in total"
+  },
+  "tags": {
+    "clone": "Clone"
+  },
+  "users": {
+    "addresses": {
+      "address": "Address",
+      "addresses": "Addresses"
+    },
+    "fields": {
+      "addresses": "Addresses",
+      "avatar": {
+        "description": "Click or drag avatar image to this area to upload.",
+        "label": "Avatar"
+      },
+      "createdAt": "Created At",
+      "firstName": "First Name",
+      "gender": {
+        "Female": "Female",
+        "label": "Gender",
+        "Male": "Male"
+      },
+      "gsm": "Gsm No",
+      "id": "ID",
+      "isActive": {
+        "false": "Idle",
+        "label": "Status",
+        "true": "Active"
+      },
+      "lastName": "Last Name",
+      "name": "Name"
+    },
+    "filter": {
+      "createdAt": {
+        "label": "Created At"
+      },
+      "gender": {
+        "female": "Female",
+        "label": "Gender",
+        "male": "Male",
+        "placeholder": "Gender"
+      },
+      "gsm": {
+        "label": "Gsm",
+        "placeholder": "Search Gsm"
+      },
+      "id": {
+        "label": "ID",
+        "placeholder": "Search ID"
+      },
+      "isActive": {
+        "false": "No",
+        "label": "Active",
+        "placeholder": "Select Status",
+        "true": "Yes"
+      },
+      "name": {
+        "label": "Name",
+        "placeholder": "Search Name"
+      },
+      "search": {
+        "label": "Search",
+        "placeholder": "FirstName, lastName, gsm, etc."
+      },
+      "submit": "Filter",
+      "title": "Filters"
+    },
+    "titles": {
+      "edit": "Edit Customer",
+      "list": "Customers",
+      "show": "Customer Detail"
+    },
+    "users": "Customers"
+  },
+  "warnWhenUnsavedChanges": "Are you sure you want to leave? You have unsaved changes.",
+  "yields": {
+    "area": "Area",
+    "available": "Available",
+    "clearAllFilters": "Clear all filters",
+    "clearSuggest": "Clear suggestions",
+    "filterByStatus": "Filter by status",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "noDescription": "No description",
+    "noSize": "Unknown size",
+    "noStatus": "No status",
+    "noSuggestedYields": "No suggestions found",
+    "noSuggestedYieldsDescription": "No suitable land plots found for the selected crop. Please select a different crop or view all land plots.",
+    "noType": "Unknown type",
+    "search": "Search yields...",
+    "select": "Select",
+    "selected": "Selected",
+    "selectPlantFirst": "Please select a crop first",
+    "selectPlantFirstDescription": "You need to select a crop before receiving suggestions about suitable land plots.",
+    "size": "Size",
+    "suggest": "Suggest",
+    "suggestedSuccess": "Suitable land plots found",
+    "suggestedSuccessDescription": "Found land plots suitable for the selected crop.",
+    "suggestError": "Error retrieving suggestions",
+    "suggestErrorDescription": "An error occurred while retrieving suggestions. Please try again later.",
+    "type": "Type",
+    "unavailable": "Unavailable"
+  }
+}

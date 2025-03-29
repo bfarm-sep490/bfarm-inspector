@@ -1,0 +1,386 @@
+{
+  "actions": {
+    "cancel": "Hủy",
+    "create": "Tạo mới",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "list": "Danh sách",
+    "show": "Xem"
+  },
+  "buttons": {
+    "accept": "Chấp nhận",
+    "acceptAll": "Chấp nhận tất cả",
+    "add": "Thêm",
+    "cancel": "Hủy",
+    "clear": "Xóa",
+    "clone": "Nhân bản",
+    "confirm": "Bạn có chắc không?",
+    "create": "Tạo mới",
+    "delete": "Xóa",
+    "draft": "Nháp",
+    "edit": "Chỉnh sửa",
+    "export": "Xuất khẩu",
+    "filter": "Lọc",
+    "import": "Nhập khẩu",
+    "logout": "Đăng xuất",
+    "nextStep": "Tiếp theo",
+    "previousStep": "Quay lại",
+    "refresh": "Làm mới",
+    "reject": "Từ chối",
+    "rejectAll": "Từ chối tất cả",
+    "save": "Lưu",
+    "show": "Hiển thị",
+    "undo": "Hoàn tác"
+  },
+  "categories": {
+    "categories": "Danh mục",
+    "fields": {
+      "id": "ID",
+      "isActive": {
+        "false": "Ẩn",
+        "label": "Trạng thái",
+        "true": "Hiển thị"
+      },
+      "products": "Sản phẩm",
+      "title": "Tiêu đề"
+    },
+    "titles": {
+      "list": "Danh mục"
+    }
+  },
+  "dashboard": {
+    "dailyOrders": {
+      "title": "Đơn hàng hàng ngày"
+    },
+    "dailyRevenue": {
+      "title": "Doanh thu hàng ngày"
+    },
+    "deliveryMap": {
+      "title": "Bản đồ giao hàng"
+    },
+    "filter": {
+      "date": {
+        "lastMonth": "Tháng trước",
+        "lastWeek": "Tuần trước",
+        "lastYear": "Năm trước"
+      },
+      "title": "Bộ lọc"
+    },
+    "newCustomers": {
+      "title": "Khách hàng mới"
+    },
+    "orders": {
+      "title": "Đơn hàng"
+    },
+    "overview": {
+      "title": "Tổng quan"
+    },
+    "quickStats": {
+      "activeSeasons": "Mùa vụ hoạt động",
+      "cultivatedArea": "Diện tích canh tác",
+      "estimatedYield": "Sản lượng ước tính",
+      "qualityInspections": "Kiểm tra chất lượng",
+      "title": "Thống kê nhanh",
+      "value": "Giá trị"
+    },
+    "recentOrders": {
+      "title": "Đơn hàng gần đây"
+    },
+    "revenue": {
+      "title": "Doanh thu"
+    },
+    "timeline": {
+      "orderStatuses": {
+        "cancelled": "Đơn hàng đã hủy",
+        "delivered": "Đơn hàng đã giao",
+        "on the way": "Đơn hàng đang được giao",
+        "pending": "Đang chuẩn bị đơn hàng",
+        "ready": "Đơn hàng đã sẵn sàng"
+      },
+      "title": "Dòng thời gian"
+    },
+    "title": "Bảng điều khiển",
+    "totalSales": {
+      "title": "Tổng doanh số"
+    },
+    "trendingMenus": {
+      "title": "Thực đơn nổi bật hàng ngày"
+    },
+    "trendingProducts": {
+      "title": "Sản phẩm nổi bật"
+    }
+  },
+  "enum": {
+    "orderStatuses": {
+      "Cancelled": "Đã hủy",
+      "Delivered": "Đã giao",
+      "On The Way": "Đang vận chuyển",
+      "Pending": "Đang chờ xử lý",
+      "Ready": "Sẵn sàng"
+    }
+  },
+  "loading": "Đang tải",
+  "notifications": {
+    "createError": "Lỗi khi tạo {{resource}} (mã trạng thái: {{statusCode}})",
+    "createSuccess": "Đã tạo thành công {{resource}}",
+    "deleteError": "Lỗi khi xóa {{resource}} (mã trạng thái: {{statusCode}})",
+    "deleteSuccess": "Đã xóa thành công {{resource}}",
+    "editError": "Lỗi khi chỉnh sửa {{resource}} (mã trạng thái: {{statusCode}})",
+    "editSuccess": "Đã chỉnh sửa thành công {{resource}}",
+    "error": "Lỗi (mã trạng thái: {{statusCode}})",
+    "importProgress": "Đang nhập: {{processed}}/{{total}}",
+    "success": "Thành công",
+    "undoable": "Bạn có {{seconds}} giây để hoàn tác"
+  },
+  "pages": {
+    "error": {
+      "404": "Xin lỗi, trang bạn tìm kiếm không tồn tại.",
+      "backHome": "Quay lại trang chủ",
+      "info": "Có thể bạn quên thêm thành phần {{action}} vào tài nguyên {{resource}}.",
+      "resource404": "Bạn chắc chắn đã tạo tài nguyên {{resource}}?"
+    },
+    "forgotPassword": {
+      "buttons": {
+        "submit": "Gửi hướng dẫn đặt lại mật khẩu"
+      },
+      "errors": {
+        "validEmail": "Địa chỉ email không hợp lệ"
+      },
+      "fields": {
+        "email": "Email"
+      },
+      "title": "Bạn quên mật khẩu?"
+    },
+    "login": {
+      "buttons": {
+        "forgotPassword": "Quên mật khẩu?",
+        "noAccount": "Chưa có tài khoản?",
+        "rememberMe": "Ghi nhớ đăng nhập",
+        "submit": "Đăng nhập"
+      },
+      "divider": "hoặc",
+      "errors": {
+        "validEmail": "Địa chỉ email không hợp lệ"
+      },
+      "fields": {
+        "email": "Email",
+        "password": "Mật khẩu"
+      },
+      "signin": "Đăng nhập",
+      "signup": "Đăng ký",
+      "title": "Đăng nhập vào tài khoản của bạn"
+    },
+    "register": {
+      "buttons": {
+        "haveAccount": "Đã có tài khoản?",
+        "submit": "Đăng ký"
+      },
+      "errors": {
+        "validEmail": "Địa chỉ email không hợp lệ"
+      },
+      "fields": {
+        "email": "Email",
+        "password": "Mật khẩu"
+      },
+      "title": "Đăng ký tài khoản của bạn"
+    },
+    "updatePassword": {
+      "buttons": {
+        "submit": "Cập nhật"
+      },
+      "errors": {
+        "confirmPasswordNotMatch": "Mật khẩu không khớp"
+      },
+      "fields": {
+        "confirmPassword": "Xác nhận mật khẩu mới",
+        "password": "Mật khẩu mới"
+      },
+      "title": "Cập nhật mật khẩu"
+    }
+  },
+  "plans": {
+    "fields": {
+      "date": "Ngày Tháng",
+      "description": "Mô Tả",
+      "end_date": "Ngày Kết Thúc",
+      "estimated_product": "Sản Lượng Dự Kiến",
+      "expert_name": "Chuyên Gia",
+      "is_approved": "Đã Duyệt",
+      "plan_name": "Tên Kế Hoạch",
+      "plant": {
+        "label": "Cây trồng",
+        "placeholder": "Chọn cây trồng",
+        "required": "Vui lòng chọn cây trồng"
+      },
+      "plant_name": "Cây Trồng",
+      "start_date": "Ngày Bắt Đầu",
+      "status": "Trạng Thái",
+      "yield_name": "Mảnh Đất"
+    },
+    "filter": {
+      "allStatus": {
+        "label": "Tất Cả Trạng Thái"
+      },
+      "description": {
+        "placeholder": "Tìm kiếm mô tả"
+      },
+      "id": {
+        "placeholder": "ID kế hoạch"
+      },
+      "is_approved": {
+        "placeholder": "Lọc theo phê duyệt"
+      },
+      "plan_name": {
+        "placeholder": "Tìm kiếm tên kế hoạch"
+      },
+      "plant_name": {
+        "placeholder": "Tìm kiếm cây trồng"
+      },
+      "status": {
+        "placeholder": "Lọc theo trạng thái"
+      },
+      "yield_name": {
+        "placeholder": "Tìm kiếm mảnh đất"
+      }
+    },
+    "status": {
+      "cancelled": "Đã Hủy",
+      "completed": "Hoàn Thành",
+      "ongoing": "Đang Tiến Hành",
+      "pending": "Chờ Xử Lý"
+    }
+  },
+  "plants": {
+    "available": "Khả dụng",
+    "basePrice": "Giá cơ bản",
+    "clearAllFilters": "Xóa tất cả bộ lọc",
+    "days": "ngày",
+    "filterByStatus": "Lọc theo trạng thái",
+    "filterByType": "Lọc theo loại",
+    "loading": "Đang tải...",
+    "noData": "Không có dữ liệu",
+    "noDescription": "Không có mô tả",
+    "noStatus": "Không có trạng thái",
+    "noType": "Không rõ loại",
+    "preservationDays": "Thời gian bảo quản",
+    "quantity": "Số lượng",
+    "search": "Tìm kiếm cây trồng...",
+    "select": "Chọn",
+    "selected": "Đã chọn",
+    "type": "Loại"
+  },
+  "search": {
+    "more": "thêm",
+    "placeholder": "Tìm kiếm..."
+  },
+  "status": {
+    "disable": "Vô hiệu hóa",
+    "enable": "Kích hoạt"
+  },
+  "table": {
+    "actions": "Hành động",
+    "inTotal": "tổng cộng"
+  },
+  "tags": {
+    "clone": "Nhân bản"
+  },
+  "users": {
+    "addresses": {
+      "address": "Địa chỉ",
+      "addresses": "Địa chỉ"
+    },
+    "fields": {
+      "addresses": "Địa chỉ",
+      "avatar": {
+        "description": "Nhấp hoặc kéo ảnh đại diện vào đây để tải lên.",
+        "label": "Ảnh đại diện"
+      },
+      "createdAt": "Ngày tạo",
+      "firstName": "Tên",
+      "gender": {
+        "Female": "Nữ",
+        "label": "Giới tính",
+        "Male": "Nam"
+      },
+      "gsm": "Số điện thoại",
+      "id": "ID",
+      "isActive": {
+        "false": "Không hoạt động",
+        "label": "Trạng thái",
+        "true": "Hoạt động"
+      },
+      "lastName": "Họ",
+      "name": "Tên"
+    },
+    "filter": {
+      "createdAt": {
+        "label": "Ngày tạo"
+      },
+      "gender": {
+        "female": "Nữ",
+        "label": "Giới tính",
+        "male": "Nam",
+        "placeholder": "Chọn giới tính"
+      },
+      "gsm": {
+        "label": "Số điện thoại",
+        "placeholder": "Tìm kiếm số điện thoại"
+      },
+      "id": {
+        "label": "ID",
+        "placeholder": "Tìm kiếm ID"
+      },
+      "isActive": {
+        "false": "Không",
+        "label": "Hoạt động",
+        "placeholder": "Chọn trạng thái",
+        "true": "Có"
+      },
+      "name": {
+        "label": "Tên",
+        "placeholder": "Tìm kiếm tên"
+      },
+      "search": {
+        "label": "Tìm kiếm",
+        "placeholder": "Tên, họ, số điện thoại, v.v."
+      },
+      "submit": "Áp dụng",
+      "title": "Bộ lọc"
+    },
+    "titles": {
+      "edit": "Chỉnh sửa khách hàng",
+      "list": "Danh sách khách hàng",
+      "show": "Chi tiết khách hàng"
+    },
+    "users": "Khách hàng"
+  },
+  "warnWhenUnsavedChanges": "Bạn có chắc chắn muốn rời đi? Bạn có thay đổi chưa được lưu.",
+  "yields": {
+    "area": "Diện tích",
+    "available": "Khả dụng",
+    "clearAllFilters": "Xóa tất cả bộ lọc",
+    "clearSuggest": "Xóa gợi ý",
+    "filterByStatus": "Lọc theo trạng thái",
+    "loading": "Đang tải...",
+    "noData": "Không có dữ liệu",
+    "noDescription": "Không có mô tả",
+    "noSize": "Không rõ kích thước",
+    "noStatus": "Không có trạng thái",
+    "noSuggestedYields": "Không tìm thấy gợi ý",
+    "noSuggestedYieldsDescription": "Không tìm thấy mảnh đất nào phù hợp với cây trồng đã chọn. Vui lòng chọn cây trồng khác hoặc xem tất cả mảnh đất.",
+    "noType": "Không rõ loại",
+    "search": "Tìm kiếm mảnh đất...",
+    "select": "Chọn",
+    "selected": "Đã chọn",
+    "selectPlantFirst": "Vui lòng chọn cây trồng trước",
+    "selectPlantFirstDescription": "Bạn cần chọn một cây trồng trước khi nhận gợi ý về mảnh đất phù hợp.",
+    "size": "Kích thước",
+    "suggest": "Gợi ý",
+    "suggestedSuccess": "Đã tìm thấy mảnh đất phù hợp",
+    "suggestedSuccessDescription": "Đã tìm thấy các mảnh đất phù hợp với cây trồng đã chọn.",
+    "suggestError": "Lỗi khi lấy gợi ý",
+    "suggestErrorDescription": "Đã xảy ra lỗi khi lấy gợi ý. Vui lòng thử lại sau.",
+    "type": "Loại",
+    "unavailable": "Không khả dụng"
+  }
+}
