@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { axiosInstance, generateSort, generateFilter } from "./utils";
 import { stringify } from "query-string";
 import type { AxiosInstance } from "axios";
@@ -8,8 +9,11 @@ type MethodTypesWithBody = "post" | "put" | "patch";
 
 export const dataProvider = (
   apiUrl: string,
-  httpClient: AxiosInstance = axiosInstance,
-): Omit<Required<DataProvider>, "createMany" | "updateMany" | "deleteMany"> => ({
+  httpClient: AxiosInstance = axiosInstance
+): Omit<
+  Required<DataProvider>,
+  "createMany" | "updateMany" | "deleteMany"
+> => ({
   getList: async ({ resource, pagination, filters, sorters, meta }) => {
     const url = `${apiUrl}/${resource}`;
 
@@ -71,7 +75,7 @@ export const dataProvider = (
 
     const { data } = await httpClient[requestMethod](
       `${apiUrl}/${resource}?${stringify({ id: ids })}`,
-      { headers },
+      { headers }
     );
 
     const responseData = data.data !== undefined ? data.data : data;
@@ -152,7 +156,15 @@ export const dataProvider = (
     return apiUrl;
   },
 
-  custom: async ({ url, method, filters, sorters, payload, query, headers }) => {
+  custom: async ({
+    url,
+    method,
+    filters,
+    sorters,
+    payload,
+    query,
+    headers,
+  }) => {
     let requestUrl = `${url}?`;
 
     if (sorters) {
@@ -178,7 +190,7 @@ export const dataProvider = (
 
     let axiosResponse;
     switch (method) {
-      case "patch":
+      case "put":
       case "post":
       case "put":
         axiosResponse = await httpClient[method](url, payload, {

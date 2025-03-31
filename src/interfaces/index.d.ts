@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import type { Dayjs } from "dayjs";
 
 export interface IIdentity {
@@ -23,6 +24,52 @@ export interface IFarmerPermission {
   farmer_id: number;
   plan_id: number;
   is_active: boolean;
+}
+export interface IInspectingForm {
+  id: number;
+  plan_id: number;
+  plan_name: string;
+  inspector_id: number;
+  inspector_name: string;
+  task_name: string;
+  task_type: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  result_content?: string;
+  number_of_sample?: number | null;
+  sample_weight?: number | null;
+  can_harvest: boolean;
+  complete_date?: string;
+  status: "Draft" | "Pending" | "Ongoing" | "Completed" | "Cancelled";
+  created_at: string;
+  created_by: string;
+  updated_at?: string | null;
+  updated_by?: string | null;
+  evaluated_result: "Pass" | "Fail";
+  inspecting_results: InspectingResult;
+}
+export interface IInspectingResult {
+  id: number;
+  arsen: number;
+  plumbum: number;
+  cadmi: number;
+  hydrargyrum: number;
+  salmonella: number;
+  coliforms: number;
+  ecoli: number;
+  glyphosate_glufosinate: number;
+  sulfur_dioxide: number;
+  methyl_bromide: number;
+  hydrogen_phosphide: number;
+  dithiocarbamate: number;
+  nitrat: number;
+  nano3_kno3: number;
+  chlorate: number;
+  perchlorate: number;
+  evaluated_result: "Pass" | "Fail";
+  inspect_images: string[];
+  result_content: string;
 }
 
 export interface IPlan {
@@ -87,7 +134,12 @@ export interface ICaringTask {
   problem_id?: number;
   task_name: string;
   result_content?: string;
-  task_type: "Planting" | "Nurturing" | "Watering" | "Fertilizing" | "PestControl";
+  task_type:
+    | "Planting"
+    | "Nurturing"
+    | "Watering"
+    | "Fertilizing"
+    | "PestControl";
   start_date: string;
   end_date: string;
   complete_date?: string;

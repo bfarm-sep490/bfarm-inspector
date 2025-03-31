@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   DashboardOutlined,
   ExperimentOutlined,
@@ -31,11 +32,11 @@ import { ConfigProvider } from "./context";
 import { App as AntdApp } from "antd";
 import { AuthPage } from "./pages/auth";
 import { DashboardPage } from "./pages/dashboard";
-import { PlanCreate, PlanEdit, PlanList, PlanShow } from "./pages/plans";
 import { dataProvider } from "./rest-data-provider";
-import { PlantCreate, PlantEdit, PlantList } from "./pages/plants";
+import { InspectionEdit, InspectionShow, InspectionsList } from "./pages/inspections";
 import { liveProvider } from "@refinedev/ably";
 import { ablyClient } from "./utils/ablyClient";
+import { InspectionsShow } from "./components/inspection";
 
 interface TitleHandlerOptions {
   resource?: IResourceItem;
@@ -53,7 +54,7 @@ const App: React.FC = () => {
   // This hook is used to automatically login the user.
   // const { loading } = useAutoLoginForDemo();
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+  const API_URL = import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
 
   const appDataProvider = dataProvider(API_URL);
 
@@ -95,6 +96,16 @@ const App: React.FC = () => {
                     label: "Dashboard",
                     icon: <DashboardOutlined />,
                   },
+                },
+                {
+                  name: "inspection-forms",
+                  list: "/inspection-forms",
+                  edit: "/inspection-forms/edit/:id",
+                  show: "/inspection-forms/show/:id",
+                  meta: {
+                    label: "Inspecting Forms",
+                    icon: <ScheduleOutlined />,
+                  }
                 },
               ]}
             >
@@ -138,7 +149,7 @@ const App: React.FC = () => {
                         type="login"
                         formProps={{
                           initialValues: {
-                            email: "expert@gmail.com",
+                            email: "inspector@gmail.com",
                             password: "1@",
                           },
                         }}
@@ -159,14 +170,8 @@ const App: React.FC = () => {
                       />
                     }
                   />
-                  <Route
-                    path="/forgot-password"
-                    element={<AuthPage type="forgotPassword" />}
-                  />
-                  <Route
-                    path="/update-password"
-                    element={<AuthPage type="updatePassword" />}
-                  />
+                  <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
+                  <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
                 </Route>
 
                 <Route
@@ -181,7 +186,20 @@ const App: React.FC = () => {
                     </Authenticated>
                   }
                 >
-                  <Route path="*" element={<ErrorComponent />} />
+                  <Route
+                    path="/inspection-forms"
+                    element={
+                      <InspectionsList>
+                        <Outlet></Outlet>
+                      </InspectionsList>
+                    }
+                  >
+                    <Route path=":id" element={<InspectionShow />} />
+                  </Route>
+                  <Route path="/inspection-forms/:id" element={<InspectionShow />} />
+                  <Route path="/inspection-forms/edit/:id" element={<InspectionEdit />} />
+
+
                 </Route>
               </Routes>
               <UnsavedChangesNotifier />
@@ -191,7 +209,7 @@ const App: React.FC = () => {
           </RefineKbarProvider>
         </AntdApp>
       </ConfigProvider>
-    </BrowserRouter>
+    </BrowserRouter >
   );
 };
 
