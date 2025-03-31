@@ -44,12 +44,14 @@ export const columns = [
   {
     title: "Chỉ tiêu",
     dataIndex: "label",
+    width: 200,
     key: "label",
     render: (text: string) => <Typography.Text strong>{text}</Typography.Text>,
   },
   {
     title: "Giá trị",
     dataIndex: "value",
+    width: 100,
     key: "value",
     render: (value: number, record: any) => {
       const limit = LIMITS[record.key];

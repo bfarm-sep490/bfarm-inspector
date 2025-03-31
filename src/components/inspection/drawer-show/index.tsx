@@ -1,14 +1,28 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useMemo } from "react";
 import { type HttpError, useShow, useTranslate } from "@refinedev/core";
-import { Button, List, Typography, Spin, Alert, Drawer, Modal } from "antd";
+import {
+  Button,
+  List,
+  Typography,
+  Spin,
+  Alert,
+  Drawer,
+  Modal,
+  Table,
+} from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { IInspectingForm, IInspectingResult } from "@/interfaces";
 import { InspectionModalForm } from "../drawer-form";
 import { InspectionStatusTag } from "../status";
 import { useNavigate, useParams } from "react-router";
 import dayjs from "dayjs";
-import { getChemicalData } from "../chemical/ChemicalConstants";
+import {
+  chemicalGroups,
+  columns,
+  getChemicalData,
+} from "../chemical/ChemicalConstants";
+import { InspectionResultTag } from "../result";
 
 export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -71,7 +85,7 @@ export const InspectionsShow: React.FC = () => {
           : "",
       } as IInspectingForm;
 
-      setSelectedResult({ ...newInspection, id }); // 👈 giữ lại `id` để truyền xuống
+      setSelectedResult({ ...newInspection, id });
       setIsEditing(true);
     }
   };
@@ -114,6 +128,13 @@ export const InspectionsShow: React.FC = () => {
           <Typography.Title level={3} style={{ margin: 0 }}>
             Kết quả
           </Typography.Title>
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            onClick={handleOpenModal}
+          >
+            Xem chi tiết
+          </Button>
         </div>
 
         {inspectionResult ? (
@@ -121,17 +142,22 @@ export const InspectionsShow: React.FC = () => {
             <List
               dataSource={[
                 {
+                  label: "Đánh giá",
+                  value: (
+                    <InspectionResultTag
+                      value={inspectionResult.evaluated_result}
+                    />
+                  ),
+                },
+                {
                   label: "Nội dung",
                   value: inspectionResult.result_content || "N/A",
                 },
                 {
-                  label: "Đánh giá",
-                  value: inspectionResult.evaluated_result || "N/A",
-                },
-                {
                   label: "Ảnh kết quả",
                   value:
-                    inspectionResult.inspect_images?.length > 0
+                    Array.isArray(inspectionResult.inspect_images) &&
+                      inspectionResult.inspect_images.length > 0
                       ? "Có"
                       : "Không có",
                 },
@@ -172,10 +198,9 @@ export const InspectionsShow: React.FC = () => {
 
         <List
           dataSource={[
-            {
-              label: "Loại công việc",
-              value: inspection.task_type || "Không xác định",
-            },
+            { label: "Tên kế hoạch", value: inspection.plan_name || "N/A" },
+            { label: "Trung tâm kiểm định", value: inspection.inspector_name || "N/A" },
+            { label: "Mô tả", value: inspection.description || "N/A" },
             {
               label: "Ngày bắt đầu",
               value: new Date(inspection.start_date).toLocaleDateString(),
@@ -250,6 +275,36 @@ export const InspectionsShow: React.FC = () => {
           )}
         />
       </div>
+      <Modal
+        open={isModalVisible}
+        onCancel={handleCloseModal}
+        footer={null}
+        width={750}
+      >
+        <Typography.Title level={3}>
+          Chi tiết kết quả kiểm nghiệm
+        </Typography.Title>
+        {chemicalGroups.map((group) => {
+          const groupData = chemicalData.filter((item) =>
+            group.keys.includes(item.key)
+          );
+          if (groupData.length === 0) return null;
+
+          return (
+            <div key={group.title} style={{ marginBottom: 24 }}>
+              <Typography.Text strong>{group.title}</Typography.Text>
+              <Table
+                rowKey="key"
+                dataSource={groupData}
+                columns={columns}
+                pagination={false}
+                bordered
+                style={{ marginTop: 8 }}
+              />
+            </div>
+          );
+        })}
+      </Modal>
 
       <Button
         type="primary"

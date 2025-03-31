@@ -10,13 +10,17 @@ export const InspectionResultTag: React.FC<InspectionResultTagProps> = ({ value 
   let text = value || "Unknown";
 
   switch (value) {
-    case "Pass":
+    case "Grade 1":
       color = "green";
-      text = "Pass";
+      text = "Grade 1";
       break;
-    case "Fail":
+    case "Grade 2":
+      color = "yellow";
+      text = "Grade 2";
+      break;
+    case "Grade 3":
       color = "red";
-      text = "Fail";
+      text = "Grade 3";
       break;
     default:
       color = "gray";
