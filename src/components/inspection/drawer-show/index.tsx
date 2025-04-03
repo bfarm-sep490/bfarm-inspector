@@ -134,21 +134,25 @@ export const InspectionsShow: React.FC = () => {
           </Typography.Title>
 
           {inspectionResult && (
-            <Button type="primary" icon={<EyeOutlined />} onClick={handleOpenModal}>
+            <Button
+              type="primary"
+              icon={<EyeOutlined />}
+              onClick={handleOpenModal}
+            >
               Xem chi tiết
             </Button>
           )}
-          {!inspectionResult && (inspection.status === "Pending" || inspection.status === "Ongoing") && (
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={handleCreate}
-            >
-              Hoàn Thành
-            </Button>
-          )}
-
-
+          {!inspectionResult &&
+            (inspection.status === "Pending" ||
+              inspection.status === "Ongoing") && (
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={handleCreate}
+              >
+                Hoàn Thành
+              </Button>
+            )}
         </div>
 
         <Divider style={{ margin: 0 }} />
@@ -166,7 +170,11 @@ export const InspectionsShow: React.FC = () => {
               dataSource={[
                 {
                   label: "Đánh giá",
-                  value: <InspectionResultTag value={inspectionResult.evaluated_result} />,
+                  value: (
+                    <InspectionResultTag
+                      value={inspectionResult.evaluated_result}
+                    />
+                  ),
                 },
                 {
                   label: "Nội dung",
@@ -176,7 +184,7 @@ export const InspectionsShow: React.FC = () => {
                   label: "Ảnh kết quả",
                   value:
                     Array.isArray(inspectionResult.inspect_images) &&
-                      inspectionResult.inspect_images.length > 0
+                    inspectionResult.inspect_images.length > 0
                       ? "Có"
                       : "Không có",
                 },
@@ -196,15 +204,12 @@ export const InspectionsShow: React.FC = () => {
                 </List.Item>
               )}
             />
+          ) : inspection.status === "Cancel" ? (
+            <Typography.Text type="danger">
+              Đợt kiểm nghiệm đã bị hủy. Không thể tạo kết quả.
+            </Typography.Text>
           ) : (
-            inspection.status === "Cancel" ? (
-              <Typography.Text type="danger">
-                Đợt kiểm nghiệm đã bị hủy. Không thể tạo kết quả.
-              </Typography.Text>
-            ) : (
-              <Typography.Text type="secondary">Chưa có kết quả.</Typography.Text>
-            )
-
+            <Typography.Text type="secondary">Chưa có kết quả.</Typography.Text>
           )}
         </div>
       </div>
@@ -223,7 +228,6 @@ export const InspectionsShow: React.FC = () => {
       </div>
       <Divider style={{ marginTop: 0 }} />
 
-
       <div
         style={{
           border: `1px solid ${token.colorBorder}`,
@@ -237,23 +241,49 @@ export const InspectionsShow: React.FC = () => {
           <List
             dataSource={[
               { label: "Tên kế hoạch", value: inspection.plan_name || "N/A" },
-              { label: "Trung tâm kiểm định", value: inspection.inspector_name || "N/A" },
+              {
+                label: "Trung tâm kiểm định",
+                value: inspection.inspector_name || "N/A",
+              },
               { label: "Mô tả", value: inspection.description || "N/A" },
               {
                 label: "Ngày bắt đầu",
-                value: new Date(inspection.start_date).toLocaleDateString(),
+                value: (
+                  <>
+                    {new Date(inspection.start_date).toLocaleDateString()} lúc{" "}
+                    <span style={{ color: "red" }}>
+                      {new Date(inspection.start_date).toLocaleTimeString([], {
+                        hour12: false,
+                      })}
+                    </span>
+                  </>
+                ),
               },
               {
                 label: "Ngày kết thúc",
-                value: new Date(inspection.end_date).toLocaleDateString(),
+                value: (
+                  <>
+                    {new Date(inspection.end_date).toLocaleDateString()} lúc{" "}
+                    <span style={{ color: "red" }}>
+                      {new Date(inspection.end_date).toLocaleTimeString([], {
+                        hour12: false,
+                      })}
+                    </span>
+                  </>
+                ),
               },
+
               {
                 label: "Trạng thái",
                 value: <InspectionStatusTag value={inspection.status} />,
               },
               {
                 label: "Cho thu hoạch",
-                value: inspection.can_harvest ? "Có" : "Không",
+                value: inspection.can_harvest ? (
+                  "Có"
+                ) : (
+                  <span style={{ color: "red" }}>Không</span>
+                ),
               },
             ]}
             renderItem={(item) => (
@@ -274,7 +304,6 @@ export const InspectionsShow: React.FC = () => {
         )}
       </div>
 
-
       <Typography.Title level={3} style={{ marginBottom: 8 }}>
         Thời gian
       </Typography.Title>
@@ -293,11 +322,33 @@ export const InspectionsShow: React.FC = () => {
           dataSource={[
             {
               label: "Hoàn thành",
-              value: inspection.complete_date
-                ? new Date(inspection.complete_date).toLocaleDateString()
-                : "N/A",
+              value: inspection.complete_date ? (
+                <>
+                  {new Date(inspection.complete_date).toLocaleDateString()} lúc{" "}
+                  <span style={{ color: "red" }}>
+                    {new Date(inspection.complete_date).toLocaleTimeString([], {
+                      hour12: false,
+                    })}
+                  </span>
+                </>
+              ) : (
+                "N/A"
+              ),
             },
-            { label: "Tạo lúc", value: new Date(inspection.created_at).toLocaleDateString() },
+            {
+              label: "Tạo lúc",
+              value: (
+                <>
+                  {new Date(inspection.created_at).toLocaleDateString()} lúc{" "}
+                  <span style={{ color: "red" }}>
+                    {new Date(inspection.created_at).toLocaleTimeString([], {
+                      hour12: false,
+                    })}
+                  </span>
+                </>
+              ),
+            },
+
             { label: "Tạo bởi", value: inspection.created_by || "N/A" },
             {
               label: "Cập nhật",
@@ -309,7 +360,13 @@ export const InspectionsShow: React.FC = () => {
           ]}
           renderItem={(data) => (
             <List.Item>
-              <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
                 <Typography.Text strong>{data.label}</Typography.Text>
                 <Typography.Text>{data.value}</Typography.Text>
               </div>
@@ -348,9 +405,6 @@ export const InspectionsShow: React.FC = () => {
           );
         })}
       </Modal>
-
-
-
 
       {isEditing && selectedResult && (
         <InspectionModalForm
