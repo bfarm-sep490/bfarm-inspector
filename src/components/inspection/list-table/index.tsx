@@ -7,6 +7,7 @@ import { EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import { PaginationTotal } from "@/components/paginationTotal";
 import { IInspectingForm } from "@/interfaces";
 import { InspectionStatusTag } from "../status";
+import dayjs from "dayjs";
 
 export const InspectionListTable: React.FC = () => {
   const { token } = theme.useToken();
@@ -55,40 +56,30 @@ export const InspectionListTable: React.FC = () => {
         filterDropdown={(props) => (
           <InputNumber
             style={{ width: "100%" }}
-            placeholder="Search ID"
+            placeholder="Tìm ID"
             onChange={(value) => setFilters([{ field: "id", operator: "eq", value }])}
           />
         )}
       />
 
-      <Table.Column title="Plant Name" dataIndex="plan_name" key="plan_name" />
-      <Table.Column title="Task Name" dataIndex="task_name" key="task_name" />
+      <Table.Column title="Tên kế hoạch" dataIndex="plan_name" key="plan_name" />
+      <Table.Column title="Tên công việc" dataIndex="task_name" key="task_name" />
+      <Table.Column title="Trung tâm kiểm định" dataIndex="inspector_name" key="inspector_name" />
       <Table.Column
-        title="Task Type"
-        dataIndex="task_type"
-        key="task_type"
-        filterIcon={(filtered) => (
-          <SearchOutlined style={{ color: filtered ? token.colorPrimary : undefined }} />
-        )}
-        defaultFilteredValue={getDefaultFilter("task_type", filters, "contains")}
-        filterDropdown={(props) => (
-          <Input
-            style={{ width: "100%" }}
-            placeholder="Search Task Type"
-            onChange={(e) =>
-
-              setFilters([{ field: "task_type", operator: "contains", value: e.target.value }])
-
-            }
-          />
-        )}
+        title="Ngày bắt đầu"
+        dataIndex="start_date"
+        key="start_date"
+        render={(value: string) => dayjs(value).format("DD/MM/YYYY HH:mm")}
       />
 
-      <Table.Column title="Inspector Name" dataIndex="inspector_name" key="inspector_name" />
-      <Table.Column title="Start Date" dataIndex="start_date" key="start_date" />
-      <Table.Column title="End Date" dataIndex="end_date" key="end_date" />
       <Table.Column
-        title="Status"
+        title="Ngày kết thúc"
+        dataIndex="end_date"
+        key="end_date"
+        render={(value: string) => dayjs(value).format("DD/MM/YYYY HH:mm")}
+      />
+      <Table.Column
+        title="Trạng thái"
         dataIndex="status"
         key="status"
         render={(status) => <InspectionStatusTag value={status} />}
@@ -104,11 +95,12 @@ export const InspectionListTable: React.FC = () => {
             {record.id ? (
               <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)} />
             ) : (
-              <Typography.Text type="secondary">N/A</Typography.Text>
+              <Typography.Text type="secondary">Không có</Typography.Text>
             )}
           </Space>
         )}
       />
     </Table>
+
   );
 };

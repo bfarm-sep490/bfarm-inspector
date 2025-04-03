@@ -10,6 +10,9 @@ import {
   Drawer,
   Modal,
   Table,
+  theme,
+  Divider,
+  Tooltip,
 } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { IInspectingForm, IInspectingResult } from "@/interfaces";
@@ -26,6 +29,7 @@ import { InspectionResultTag } from "../result";
 
 export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const { token } = theme.useToken();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(
     null
@@ -120,34 +124,49 @@ export const InspectionsShow: React.FC = () => {
         <div
           style={{
             display: "flex",
-            alignItems: "center",
             justifyContent: "space-between",
+            alignItems: "center",
             marginBottom: 8,
           }}
         >
           <Typography.Title level={3} style={{ margin: 0 }}>
             Kết quả
           </Typography.Title>
-          <Button
-            type="primary"
-            icon={<EyeOutlined />}
-            onClick={handleOpenModal}
-          >
-            Xem chi tiết
-          </Button>
+
+          {inspectionResult && (
+            <Button type="primary" icon={<EyeOutlined />} onClick={handleOpenModal}>
+              Xem chi tiết
+            </Button>
+          )}
+          {!inspectionResult && (inspection.status === "Pending" || inspection.status === "Ongoing") && (
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={handleCreate}
+            >
+              Hoàn Thành
+            </Button>
+          )}
+
+
         </div>
 
-        {inspectionResult ? (
-          <>
+        <Divider style={{ margin: 0 }} />
+
+        <div
+          style={{
+            border: `1px solid ${token.colorBorder}`,
+            borderRadius: 8,
+            padding: 16,
+            background: token.colorBgContainer,
+          }}
+        >
+          {inspectionResult ? (
             <List
               dataSource={[
                 {
                   label: "Đánh giá",
-                  value: (
-                    <InspectionResultTag
-                      value={inspectionResult.evaluated_result}
-                    />
-                  ),
+                  value: <InspectionResultTag value={inspectionResult.evaluated_result} />,
                 },
                 {
                   label: "Nội dung",
@@ -177,67 +196,99 @@ export const InspectionsShow: React.FC = () => {
                 </List.Item>
               )}
             />
-          </>
-        ) : (
-          <Typography.Text type="secondary">Chưa có kết quả.</Typography.Text>
+          ) : (
+            inspection.status === "Cancel" ? (
+              <Typography.Text type="danger">
+                Đợt kiểm nghiệm đã bị hủy. Không thể tạo kết quả.
+              </Typography.Text>
+            ) : (
+              <Typography.Text type="secondary">Chưa có kết quả.</Typography.Text>
+            )
+
+          )}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 8,
+        }}
+      >
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          Thông tin công việc
+        </Typography.Title>
+      </div>
+      <Divider style={{ marginTop: 0 }} />
+
+
+      <div
+        style={{
+          border: `1px solid ${token.colorBorder}`,
+          borderRadius: 8,
+          padding: 16,
+          marginBottom: 32,
+          background: token.colorBgContainer,
+        }}
+      >
+        {inspection && (
+          <List
+            dataSource={[
+              { label: "Tên kế hoạch", value: inspection.plan_name || "N/A" },
+              { label: "Trung tâm kiểm định", value: inspection.inspector_name || "N/A" },
+              { label: "Mô tả", value: inspection.description || "N/A" },
+              {
+                label: "Ngày bắt đầu",
+                value: new Date(inspection.start_date).toLocaleDateString(),
+              },
+              {
+                label: "Ngày kết thúc",
+                value: new Date(inspection.end_date).toLocaleDateString(),
+              },
+              {
+                label: "Trạng thái",
+                value: <InspectionStatusTag value={inspection.status} />,
+              },
+              {
+                label: "Cho thu hoạch",
+                value: inspection.can_harvest ? "Có" : "Không",
+              },
+            ]}
+            renderItem={(item) => (
+              <List.Item>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <Typography.Text strong>{item.label}</Typography.Text>
+                  <Typography.Text>{item.value}</Typography.Text>
+                </div>
+              </List.Item>
+            )}
+          />
         )}
       </div>
-      {/* Chi tiết công việc */}
-      <div style={{ marginBottom: 40 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography.Title level={2} style={{ marginBottom: 8 }}>
-            Chi tiết công việc
-          </Typography.Title>
-        </div>
 
-        <List
-          dataSource={[
-            { label: "Tên kế hoạch", value: inspection.plan_name || "N/A" },
-            { label: "Trung tâm kiểm định", value: inspection.inspector_name || "N/A" },
-            { label: "Mô tả", value: inspection.description || "N/A" },
-            {
-              label: "Ngày bắt đầu",
-              value: new Date(inspection.start_date).toLocaleDateString(),
-            },
-            {
-              label: "Ngày kết thúc",
-              value: new Date(inspection.end_date).toLocaleDateString(),
-            },
-            {
-              label: "Trạng thái",
-              value: <InspectionStatusTag value={inspection?.status} />,
-            },
-            {
-              label: "Cho thu hoạch",
-              value: inspection.can_harvest ? "Có" : "Không",
-            },
-          ]}
-          renderItem={(data) => (
-            <List.Item>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
-                <Typography.Text strong>{data.label}</Typography.Text>
-                <Typography.Text>{data.value}</Typography.Text>
-              </div>
-            </List.Item>
-          )}
-        />
-      </div>
 
-      {/* Thời gian */}
-      <div style={{ marginBottom: 40 }}>
-        <Typography.Title level={2}>Thời gian</Typography.Title>
+      <Typography.Title level={3} style={{ marginBottom: 8 }}>
+        Thời gian
+      </Typography.Title>
+      <Divider style={{ marginTop: 0 }} />
+
+      <div
+        style={{
+          border: `1px solid ${token.colorBorder}`,
+          borderRadius: 8,
+          padding: 16,
+          marginBottom: 32,
+          background: token.colorBgContainer,
+        }}
+      >
         <List
           dataSource={[
             {
@@ -246,10 +297,7 @@ export const InspectionsShow: React.FC = () => {
                 ? new Date(inspection.complete_date).toLocaleDateString()
                 : "N/A",
             },
-            {
-              label: "Tạo lúc",
-              value: new Date(inspection.created_at).toLocaleDateString(),
-            },
+            { label: "Tạo lúc", value: new Date(inspection.created_at).toLocaleDateString() },
             { label: "Tạo bởi", value: inspection.created_by || "N/A" },
             {
               label: "Cập nhật",
@@ -261,13 +309,7 @@ export const InspectionsShow: React.FC = () => {
           ]}
           renderItem={(data) => (
             <List.Item>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
+              <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
                 <Typography.Text strong>{data.label}</Typography.Text>
                 <Typography.Text>{data.value}</Typography.Text>
               </div>
@@ -275,6 +317,7 @@ export const InspectionsShow: React.FC = () => {
           )}
         />
       </div>
+
       <Modal
         open={isModalVisible}
         onCancel={handleCloseModal}
@@ -306,14 +349,8 @@ export const InspectionsShow: React.FC = () => {
         })}
       </Modal>
 
-      <Button
-        type="primary"
-        icon={<EditOutlined />}
-        onClick={handleCreate}
-        disabled={!!inspectionResult}
-      >
-        Hoàn Thành
-      </Button>
+
+
 
       {isEditing && selectedResult && (
         <InspectionModalForm

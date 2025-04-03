@@ -24,7 +24,7 @@ export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({ value 
     case "Completed":
       color = "green";
       break;
-    case "Cancelled":
+    case "Cancel":
       color = "red";
       break;
     default:
