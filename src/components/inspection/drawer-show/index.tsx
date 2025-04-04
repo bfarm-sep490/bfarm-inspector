@@ -129,7 +129,7 @@ export const InspectionsShow: React.FC = () => {
             marginBottom: 8,
           }}
         >
-          <Typography.Title level={3} style={{ margin: 0 }}>
+          <Typography.Title level={5} style={{ margin: 0 }}>
             Kết quả
           </Typography.Title>
 
@@ -154,9 +154,7 @@ export const InspectionsShow: React.FC = () => {
               </Button>
             )}
         </div>
-
-        <Divider style={{ margin: 0 }} />
-
+        <Divider style={{ marginTop: 0 }} />
         <div
           style={{
             border: `1px solid ${token.colorBorder}`,
@@ -222,7 +220,7 @@ export const InspectionsShow: React.FC = () => {
           marginBottom: 8,
         }}
       >
-        <Typography.Title level={3} style={{ margin: 0 }}>
+        <Typography.Title level={5} style={{ margin: 0 }}>
           Thông tin công việc
         </Typography.Title>
       </div>
@@ -244,6 +242,13 @@ export const InspectionsShow: React.FC = () => {
               {
                 label: "Trung tâm kiểm định",
                 value: inspection.inspector_name || "N/A",
+              },
+              {
+                label: "Nhiệm vụ",
+                value: inspection.task_name
+                  ? inspection.task_name.charAt(0).toUpperCase() +
+                    inspection.task_name.slice(1)
+                  : "N/A",
               },
               { label: "Mô tả", value: inspection.description || "N/A" },
               {
@@ -304,7 +309,7 @@ export const InspectionsShow: React.FC = () => {
         )}
       </div>
 
-      <Typography.Title level={3} style={{ marginBottom: 8 }}>
+      <Typography.Title level={5} style={{ marginBottom: 8 }}>
         Thời gian
       </Typography.Title>
       <Divider style={{ marginTop: 0 }} />
