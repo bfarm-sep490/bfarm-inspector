@@ -1,7 +1,13 @@
 /* eslint-disable prettier/prettier */
 import React from "react";
 import { useTable } from "@refinedev/antd";
-import { getDefaultFilter, type HttpError, useGo } from "@refinedev/core";
+import {
+  getDefaultFilter,
+  type HttpError,
+  useGetIdentity,
+  useGo,
+  useList,
+} from "@refinedev/core";
 import { Table, Button, InputNumber, Typography, Space } from "antd";
 import {
   EyeOutlined,
@@ -12,27 +18,20 @@ import {
   CloseCircleOutlined,
   HourglassOutlined,
   PictureOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import { PaginationTotal } from "@/components/paginationTotal";
-import { IInspectingForm } from "@/interfaces";
+import { IIdentity, IInspectingForm } from "@/interfaces";
 import { InspectionStatusTag } from "../status";
 import dayjs from "dayjs";
-import { motion } from "framer-motion"; // Import framer-motion
+import { motion } from "framer-motion";
 
 export const InspectionListTable: React.FC = () => {
   const go = useGo();
-
-  const { tableProps, filters, setFilters } = useTable<
-    IInspectingForm,
-    HttpError
-  >({
+  const { data: user } = useGetIdentity<IIdentity>();
+  const { data, isLoading } = useList<IInspectingForm, HttpError>({
     resource: "inspecting-forms",
-    filters: {
-      initial: [
-        { field: "id", operator: "eq", value: "" },
-        { field: "task_type", operator: "contains", value: "" },
-      ],
-    },
+    filters: [{ field: "inspector_id", operator: "eq", value: user?.id }],
   });
 
   const handleView = (id?: number) => {
@@ -43,15 +42,11 @@ export const InspectionListTable: React.FC = () => {
 
   return (
     <Table
-      {...tableProps}
+      loading={isLoading}
+      dataSource={data?.data?.filter((x=>x.status !== "Draft"))}
+      pagination={{ pageSize: 10 }}
       rowKey="id"
       scroll={{ x: true }}
-      pagination={{
-        ...tableProps.pagination,
-        showTotal: (total) => (
-          <PaginationTotal total={total} entityName="inspections" />
-        ),
-      }}
     >
       <Table.Column
         title="ID"
@@ -61,33 +56,22 @@ export const InspectionListTable: React.FC = () => {
         filterIcon={(filtered) => (
           <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
         )}
-        defaultFilteredValue={getDefaultFilter("id", filters, "eq")}
-        filterDropdown={(props) => (
-          <InputNumber
-            style={{ width: "100%" }}
-            placeholder="Tìm ID"
-            onChange={(value) =>
-              setFilters([{ field: "id", operator: "eq", value }])
-            }
-          />
-        )}
+        // defaultFilteredValue={getDefaultFilter("id", filters, "eq")}
+        // filterDropdown={(props) => (
+        //   <InputNumber
+        //     style={{ width: "100%" }}
+        //     placeholder="Tìm ID"
+        //     onChange={(value) =>
+        //       setFilters([{ field: "id", operator: "eq", value }])
+        //     }
+        //   />
+        // )}
       />
 
       <Table.Column
         title="📋 Tên kế hoạch"
         dataIndex="plan_name"
         key="plan_name"
-      />
-      <Table.Column
-        title="🏬 Trung tâm kiểm định"
-        dataIndex="inspector_name"
-        key="inspector_name"
-        render={(value) => (
-          <span style={{ textTransform: "capitalize" }}>
-            <BankOutlined style={{ color: "#1890ff", marginRight: 5 }} />
-            {value}
-          </span>
-        )}
       />
       <Table.Column
         title="✏️ Nhiệm vụ"
@@ -162,11 +146,16 @@ export const InspectionListTable: React.FC = () => {
               />
             );
             color = "green";
-          } else if (status === "In Progress") {
+          } else if (status === "Pending") {
             icon = (
               <HourglassOutlined style={{ color: "#faad14", marginRight: 5 }} />
             );
             color = "orange";
+          } else if (status === "Ongoing") {
+            icon = (
+              <SettingOutlined style={{ color: "blue", marginRight: 5 }} />
+            );
+            color = "blue";
           } else {
             icon = (
               <CloseCircleOutlined

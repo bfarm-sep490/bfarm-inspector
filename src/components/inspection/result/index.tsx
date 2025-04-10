@@ -5,26 +5,28 @@ interface InspectionResultTagProps {
   value?: "Pass" | "Fail" | string;
 }
 
-export const InspectionResultTag: React.FC<InspectionResultTagProps> = ({ value }) => {
+export const InspectionResultTag: React.FC<InspectionResultTagProps> = ({
+  value,
+}) => {
   let color = "default";
   let text = value || "Unknown";
 
   switch (value) {
     case "Grade 1":
       color = "green";
-      text = "Grade 1";
+      text = "Loại 1";
       break;
     case "Grade 2":
       color = "yellow";
-      text = "Grade 2";
+      text = "Loại 2";
       break;
     case "Grade 3":
       color = "red";
-      text = "Grade 3";
+      text = "Loại 3";
       break;
     default:
       color = "gray";
-      text = "Unknown";
+      text = "Không xác định";
   }
 
   return <Tag color={color}>{text}</Tag>;

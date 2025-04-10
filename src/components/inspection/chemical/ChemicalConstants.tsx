@@ -3,22 +3,22 @@ import { IInspectingResult } from "@/interfaces";
 import { Typography, Tag } from "antd";
 
 export const LIMITS: Record<string, number> = {
-  arsen: 0.5,
+  arsen: 1,
   plumbum: 0.3,
   cadmi: 0.05,
   hydragyrum: 0.01,
-  glyphosate_glufosinate: 0.1,
-  sulfur_dioxide: 30,
+  glyphosate_glufosinate: 0.01,
+  sulfur_dioxide: 10,
   methyl_bromide: 0.01,
   hydrogen_phosphide: 0.05,
   dithiocarbamate: 1.0,
-  nitrat: 2000,
-  nano3_kno3: 500,
+  nitrat: 9,
+  nano3_kno3: 15,
   chlorate: 0.01,
   perchlorate: 0.01,
   salmonella: 0,
-  ecoli: 10,
-  coliforms: 100,
+  ecoli: 100,
+  coliforms: 10,
 };
 
 export const UNITS: Record<string, string> = {

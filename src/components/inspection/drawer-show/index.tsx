@@ -57,7 +57,11 @@ export const InspectionsShow: React.FC = () => {
     queryOptions: { enabled: !!id },
   });
 
-  const isLoading = formQueryResult.isLoading || resultQueryResult.isLoading;
+  const isLoading =
+    formQueryResult?.isLoading ||
+    resultQueryResult?.isLoading ||
+    formQueryResult?.isFetching ||
+    resultQueryResult?.isFetching;
 
   const inspection = useMemo(
     () =>
@@ -74,8 +78,7 @@ export const InspectionsShow: React.FC = () => {
   );
 
   const chemicalData = getChemicalData(inspectionResult);
-
-  const handleBack = () => navigate(-1);
+  const handleBack = () => navigate("/inspection-forms");
   const handleCreate = () => {
     if (inspection) {
       const { id, ...rest } = inspection;
@@ -113,9 +116,10 @@ export const InspectionsShow: React.FC = () => {
       open={true}
       width={800}
       onClose={handleBack}
-      bodyStyle={{ padding: "24px 32px" }}
+      bodyStyle={{ padding: "24px 32px", background: token.colorBgLayout }}
+      headerStyle={{ background: token.colorBgContainer }}
       title={
-        <Typography.Title level={3} style={{ margin: 0 }}>
+        <Typography.Title level={4} style={{ margin: 0 }}>
           #{inspection.id} - {inspection.task_name}
         </Typography.Title>
       }
@@ -177,14 +181,6 @@ export const InspectionsShow: React.FC = () => {
                 {
                   label: "Nội dung",
                   value: inspectionResult.result_content || "N/A",
-                },
-                {
-                  label: "Ảnh kết quả",
-                  value:
-                    Array.isArray(inspectionResult.inspect_images) &&
-                    inspectionResult.inspect_images.length > 0
-                      ? "Có"
-                      : "Không có",
                 },
               ]}
               renderItem={(data) => (
@@ -418,7 +414,11 @@ export const InspectionsShow: React.FC = () => {
           open={isEditing}
           initialValues={selectedResult}
           onClose={handleCloseDrawer}
-          onMutationSuccess={handleCloseDrawer}
+          onMutationSuccess={() => {
+            formQueryResult.refetch();
+            resultQueryResult.refetch();
+            handleCloseDrawer();
+          }}
         />
       )}
     </Drawer>

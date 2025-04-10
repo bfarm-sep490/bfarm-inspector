@@ -31,6 +31,7 @@ type Props = {
   onClose?: () => void;
   onMutationSuccess?: () => void;
   initialValues?: any;
+  refetch?: () => void;
 };
 
 export const InspectionModalForm: React.FC<Props> = (props) => {
@@ -197,16 +198,10 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
               <Button icon={<UploadOutlined />}>Tải ảnh lên</Button>
             </Upload>
           </Form.Item>
-          <Form.Item label="Hoặc nhập URL ảnh">
-            <Input
-              placeholder="Nhập URL ảnh"
-              onChange={handleImageInputChange}
-            />
-          </Form.Item>
           <Flex justify="space-between" style={{ paddingTop: 16 }}>
             <Button onClick={onModalClose}>Cancel</Button>
             <SaveButton htmlType="submit" type="primary" loading={formLoading}>
-              Tạo mới
+              Xác nhận
             </SaveButton>
           </Flex>
         </Form>
