@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useMemo } from "react";
-import { type HttpError, useShow, useTranslate } from "@refinedev/core";
+import { type HttpError, useOne, useShow, useTranslate } from "@refinedev/core";
 import {
   Button,
   List,
@@ -13,6 +13,9 @@ import {
   theme,
   Divider,
   Tooltip,
+  Grid,
+  Flex,
+  Card,
 } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { IInspectingForm, IInspectingResult } from "@/interfaces";
@@ -26,6 +29,11 @@ import {
   getChemicalData,
 } from "../chemical/ChemicalConstants";
 import { InspectionResultTag } from "../result";
+import { r } from "node_modules/react-router/dist/development/fog-of-war-BALYJxf_.mjs";
+// eslint-disable-next-line no-duplicate-imports
+import { Image } from "antd";
+import { TextField } from "@refinedev/antd";
+import ContaminantCheckCard from "@/utils/inspectingKind";
 
 export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -34,11 +42,10 @@ export const InspectionsShow: React.FC = () => {
   const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(
     null
   );
-
+  const breakpoints = Grid.useBreakpoint();
   const { id } = useParams();
   const navigate = useNavigate();
   const t = useTranslate();
-
   const { queryResult: formQueryResult } = useShow<
     { data: IInspectingForm[] },
     HttpError
@@ -57,25 +64,49 @@ export const InspectionsShow: React.FC = () => {
     queryOptions: { enabled: !!id },
   });
 
-  const isLoading =
-    formQueryResult?.isLoading ||
-    resultQueryResult?.isLoading ||
-    formQueryResult?.isFetching ||
-    resultQueryResult?.isFetching;
-
   const inspection = useMemo(
     () =>
       (formQueryResult.data as { data: IInspectingForm[] } | undefined)
         ?.data?.[0],
     [formQueryResult.data]
   );
+  const {
+    data: planData,
+    isLoading: isPlanLoading,
+    isFetching: isPlanFetching,
+    refetch: planRefetch,
+  } = useOne({
+    resource: "plans",
+    id: inspection?.plan_id,
+  });
+  const plan = planData?.data;
 
+  const {
+    data: plantData,
+    isLoading: isPlantLoading,
+    isFetching: isPlantFetching,
+    refetch: plantRefetch,
+  } = useOne({
+    resource: "plants",
+    id: plan?.plant_information?.plant_id,
+  });
+  const plant = plantData?.data;
   const inspectionResult = useMemo(
     () =>
       (resultQueryResult.data as { data: IInspectingResult[] } | undefined)
         ?.data?.[0],
     [resultQueryResult.data]
   );
+
+  const isLoading =
+    formQueryResult?.isLoading ||
+    resultQueryResult?.isLoading ||
+    formQueryResult?.isFetching ||
+    resultQueryResult?.isFetching ||
+    isPlanFetching ||
+    isPlanLoading ||
+    isPlantLoading ||
+    isPlantFetching;
 
   const chemicalData = getChemicalData(inspectionResult);
   const handleBack = () => navigate("/inspection-forms");
@@ -114,7 +145,7 @@ export const InspectionsShow: React.FC = () => {
   return (
     <Drawer
       open={true}
-      width={800}
+      width={breakpoints.sm ? "60%" : "100%"}
       onClose={handleBack}
       bodyStyle={{ padding: "24px 32px", background: token.colorBgLayout }}
       headerStyle={{ background: token.colorBgContainer }}
@@ -124,7 +155,57 @@ export const InspectionsShow: React.FC = () => {
         </Typography.Title>
       }
     >
-      <div style={{ marginBottom: 40 }}>
+      <Typography.Title level={5} style={{ margin: 0 }}>
+        Thông tin giống cây kiểm nghiệm
+      </Typography.Title>
+      <Divider />
+      <Flex vertical={false} justify="start" gap={10}>
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <Image
+            width={"100%"}
+            src={plant?.image_url}
+            style={{ marginBottom: 10 }}
+          />
+          <List
+            bordered
+            style={{
+              width: "100%",
+              background: token?.colorBgContainer,
+              marginBottom: 10,
+            }}
+            dataSource={[
+              {
+                label: "Tên cây trồng",
+                value: plant?.plant_name,
+              },
+              {
+                label: "Loại cây trồng",
+                value: plant?.type || "N/A",
+              },
+            ]}
+            renderItem={(data) => (
+              <List.Item>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <Typography.Text strong>{data.label}</Typography.Text>
+                  <Typography.Text>{data.value}</Typography.Text>
+                </div>
+              </List.Item>
+            )}
+          />
+        </div>
+        <ContaminantCheckCard type={plant?.type} style={{ width: "50%" }} />
+      </Flex>
+      <div style={{ marginBottom: 40, marginTop: 40 }}>
         <div
           style={{
             display: "flex",
