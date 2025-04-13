@@ -19,6 +19,23 @@ type VegetableContaminantLimits = {
   [vegetableType: string]: ContaminantLimit;
 };
 
+const contaminantBasedVegetableType = {
+  "Rau họ thập tự": ["cadmi"],
+  Hành: ["cadmi"],
+  "Rau ăn lá": ["cadmi", "plumbum"],
+  "Rau ăn quả": ["cadmi", "plumbum"],
+  "Rau ăn củ": ["cadmi", "plumbum"],
+  Nấm: ["cadmi"],
+  "Rau củ quả": ["hydrargyrum"],
+  "Rau khô": ["arsen"],
+};
+
+export const getContaminantLimitsByVegetableType = (
+  type: keyof typeof contaminantBasedVegetableType,
+) => {
+  return contaminantBasedVegetableType[type] || [];
+};
+
 const contaminantLimits: VegetableContaminantLimits = {
   "Rau họ thập tự": { Cadmi: 0.05 },
   Hành: { Cadmi: 0.05 },
@@ -263,7 +280,7 @@ const ContaminantCheckCard = ({
 
       <ContaminantGroup
         title="Kiểm định hóa chất"
-        contaminants={getContaminantsByGroup("Hóa chất").slice(0, 4)}
+        contaminants={getContaminantsByGroup("Hóa chất")}
         unit={units["Hóa chất"]}
         color={groupColors["Hóa chất"]}
         icon={groupIcons["Hóa chất"]}

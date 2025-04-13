@@ -159,10 +159,10 @@ export const InspectionsShow: React.FC = () => {
         Thông tin giống cây kiểm nghiệm
       </Typography.Title>
       <Divider />
-      <Flex vertical={false} justify="start" gap={10}>
+      <Flex vertical={breakpoints?.sm ? false : true} justify="start" gap={10}>
         <div
           style={{
-            width: "50%",
+            width: breakpoints?.sm ? "50%" : "100%",
           }}
         >
           <Image
@@ -203,7 +203,10 @@ export const InspectionsShow: React.FC = () => {
             )}
           />
         </div>
-        <ContaminantCheckCard type={plant?.type} style={{ width: "50%" }} />
+        <ContaminantCheckCard
+          type={plant?.type}
+          style={{ width: breakpoints?.sm ? "50%" : "100%" }}
+        />
       </Flex>
       <div style={{ marginBottom: 40, marginTop: 40 }}>
         <div
@@ -490,6 +493,7 @@ export const InspectionsShow: React.FC = () => {
 
       {isEditing && selectedResult && (
         <InspectionModalForm
+          type={plant?.type}
           id={selectedResult.id}
           action="create"
           open={isEditing}
