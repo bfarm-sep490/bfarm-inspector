@@ -100,11 +100,9 @@ function getContaminantLimits(vegetableType: string): ContaminantLimit {
   const result: ContaminantLimit = { ...globalLimits };
 
   if (contaminantLimits[vegetableType]) {
-    Object.entries(contaminantLimits[vegetableType]).forEach(
-      ([contaminant, limit]) => {
-        result[contaminant] = limit;
-      }
-    );
+    Object.entries(contaminantLimits[vegetableType]).forEach(([contaminant, limit]) => {
+      result[contaminant] = limit;
+    });
   }
 
   return result;
@@ -161,13 +159,7 @@ interface ContaminantGroupProps {
   icon: React.ReactNode;
 }
 
-const ContaminantGroup = ({
-  title,
-  contaminants,
-  unit,
-  color,
-  icon,
-}: ContaminantGroupProps) => {
+const ContaminantGroup = ({ title, contaminants, unit, color, icon }: ContaminantGroupProps) => {
   if (contaminants.length === 0) {
     return null;
   }
@@ -185,16 +177,10 @@ const ContaminantGroup = ({
           color: "white",
         }}
       >
-        {icon}{" "}
-        <span style={{ marginLeft: "8px", fontWeight: "bold" }}>{title}</span>
+        {icon} <span style={{ marginLeft: "8px", fontWeight: "bold" }}>{title}</span>
       </div>
       {contaminants.map((item, index) => (
-        <ContaminantItem
-          key={index}
-          name={item.name}
-          value={item.value}
-          unit={unit}
-        />
+        <ContaminantItem key={index} name={item.name} value={item.value} unit={unit} />
       ))}
       <Divider style={{ margin: "12px 0" }} />
     </div>
@@ -226,9 +212,7 @@ const ContaminantCheckCard = ({
     setVegetableType(type);
   }, [type]);
 
-  const getContaminantsByGroup = (
-    groupName: keyof typeof contaminantGroups
-  ) => {
+  const getContaminantsByGroup = (groupName: keyof typeof contaminantGroups) => {
     return contaminantGroups[groupName]
       .filter((name) => limits[name] !== undefined)
       .map((name) => ({ name, value: limits[name] }));
@@ -256,12 +240,7 @@ const ContaminantCheckCard = ({
   );
 
   return (
-    <Card
-      style={style}
-      title={cardTitle}
-      bordered={true}
-      className="contaminant-check-card"
-    >
+    <Card style={style} title={cardTitle} bordered={true} className="contaminant-check-card">
       <ContaminantGroup
         title="Kiểm định kim loại nặng"
         contaminants={getSpecificMetals()}

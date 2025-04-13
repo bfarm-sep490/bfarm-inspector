@@ -136,7 +136,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       <Spin spinning={formLoading || isLoading}>
         <Form form={form} layout="vertical" onFinish={onFinish}>
           {chemicalGroups
-            .map((x:any) => {
+            .map((x: any) => {
               if (x?.title === "Kim loại nặng") {
                 const types = props?.type
                   ? getContaminantLimitsByVegetableType(
@@ -196,9 +196,9 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                       dataIndex: "value",
                       key: "value",
                       width: 120,
-                      render: (_, record) => (
+                      render: (_, record: any) => (
                         <Form.Item
-                          name={record.key}
+                          name={record?.key}
                           style={{ marginBottom: 0 }}
                         >
                           <InputNumber style={{ width: "100%" }} />
@@ -206,7 +206,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                       ),
                     },
                   ]}
-                  dataSource={group.keys.map((key) => ({
+                  dataSource={group.keys.map((key: any) => ({
                     key,
                     label: `${key} (${UNITS[key] || "N/A"})`,
                   }))}

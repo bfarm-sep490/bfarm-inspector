@@ -6,8 +6,7 @@ import axios from "axios";
 export const TOKEN_KEY = "bfarmx-auth";
 export const USER_KEY = "bfarmx-user";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
 const authApiClient = axios.create({
   baseURL: `${API_URL}`,
   headers: {
@@ -27,7 +26,7 @@ function safelyDecodeJwt(token: string) {
         .atob(base64)
         .split("")
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
+        .join(""),
     );
 
     return JSON.parse(jsonPayload);
@@ -63,23 +62,11 @@ export const authProvider: AuthProvider = {
         }
 
         const userInfo = {
-          id: tokenPayload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-          ],
-          name: tokenPayload[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
-          ],
-          email:
-            tokenPayload[
-              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
-            ],
-          role: tokenPayload[
-            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-          ],
-          avatar:
-            tokenPayload[
-              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/uri"
-            ],
+          id: tokenPayload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"],
+          name: tokenPayload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
+          email: tokenPayload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+          role: tokenPayload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"],
+          avatar: tokenPayload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/uri"],
         };
 
         localStorage.setItem(USER_KEY, JSON.stringify(userInfo));
@@ -247,9 +234,7 @@ export const authProvider: AuthProvider = {
 
       const tokenPayload = safelyDecodeJwt(token);
       return tokenPayload
-        ? tokenPayload[
-            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-          ]
+        ? tokenPayload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]
         : null;
     } catch (error) {
       console.error("Error getting permissions:", error);
