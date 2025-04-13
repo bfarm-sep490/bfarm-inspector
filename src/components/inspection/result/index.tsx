@@ -5,9 +5,7 @@ interface InspectionResultTagProps {
   value?: "Pass" | "Fail" | string;
 }
 
-export const InspectionResultTag: React.FC<InspectionResultTagProps> = ({
-  value,
-}) => {
+export const InspectionResultTag: React.FC<InspectionResultTagProps> = ({ value }) => {
   let color = "default";
   let text = value || "Unknown";
 

@@ -23,8 +23,10 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import dayjs from "dayjs";
 import { chemicalGroups, UNITS } from "../chemical/ChemicalConstants";
+import { getContaminantLimitsByVegetableType } from "@/utils/inspectingKind";
 
 type Props = {
+  type?: string;
   id?: BaseKey;
   action: "edit" | "create";
   open?: boolean;
@@ -133,58 +135,87 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     >
       <Spin spinning={formLoading || isLoading}>
         <Form form={form} layout="vertical" onFinish={onFinish}>
-          {chemicalGroups.map((group) => (
-            <div key={group.title} style={{ marginBottom: "32px" }}>
-              <h3
-                style={{
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                  marginBottom: "16px",
-                }}
-              >
-                {group.title}
-              </h3>
-              <Table
-                columns={[
-                  {
-                    title: "Chất hóa học",
-                    dataIndex: "label",
-                    key: "label",
-                    width: 230,
-                    ellipsis: true,
-                    render: (text: string) => (
-                      <span
-                        style={{
-                          fontWeight: "bolder",
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        {text}
-                      </span>
-                    ),
-                  },
-                  {
-                    title: "Giá trị",
-                    dataIndex: "value",
-                    key: "value",
-                    width: 120,
-                    render: (_, record) => (
-                      <Form.Item name={record.key} style={{ marginBottom: 0 }}>
-                        <InputNumber style={{ width: "100%" }} />
-                      </Form.Item>
-                    ),
-                  },
-                ]}
-                dataSource={group.keys.map((key) => ({
-                  key,
-                  label: `${key} (${UNITS[key] || "N/A"})`,
-                }))}
-                pagination={false}
-                bordered
-                style={{ tableLayout: "fixed" }}
-              />
-            </div>
-          ))}
+          {chemicalGroups
+            .map((x: any) => {
+              if (x?.title === "Kim loại nặng") {
+                const types = props?.type
+                  ? getContaminantLimitsByVegetableType(
+                      props.type as
+                        | "Rau họ thập tự"
+                        | "Hành"
+                        | "Rau ăn lá"
+                        | "Rau ăn quả"
+                        | "Rau ăn củ"
+                        | "Nấm"
+                        | "Rau củ quả"
+                        | "Rau khô"
+                    )
+                  : [];
+                return {
+                  title: x?.title,
+                  keys: types,
+                };
+              }
+              return {
+                title: x?.title,
+                keys: x?.keys,
+              };
+            })
+            .map((group) => (
+              <div key={group.title} style={{ marginBottom: "32px" }}>
+                <h3
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    marginBottom: "16px",
+                  }}
+                >
+                  {group.title}
+                </h3>
+                <Table
+                  columns={[
+                    {
+                      title: "Chất hóa học",
+                      dataIndex: "label",
+                      key: "label",
+                      width: 230,
+                      ellipsis: true,
+                      render: (text: string) => (
+                        <span
+                          style={{
+                            fontWeight: "bolder",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {text}
+                        </span>
+                      ),
+                    },
+                    {
+                      title: "Giá trị",
+                      dataIndex: "value",
+                      key: "value",
+                      width: 120,
+                      render: (_, record: any) => (
+                        <Form.Item
+                          name={record?.key}
+                          style={{ marginBottom: 0 }}
+                        >
+                          <InputNumber style={{ width: "100%" }} />
+                        </Form.Item>
+                      ),
+                    },
+                  ]}
+                  dataSource={group.keys.map((key: any) => ({
+                    key,
+                    label: `${key} (${UNITS[key] || "N/A"})`,
+                  }))}
+                  pagination={false}
+                  bordered
+                  style={{ tableLayout: "fixed" }}
+                />
+              </div>
+            ))}
           <Form.Item label="Nội dung kết quả" name="result_content">
             <Input.TextArea rows={3} />
           </Form.Item>
