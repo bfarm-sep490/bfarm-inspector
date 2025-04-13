@@ -20,7 +20,7 @@ import routerProvider, {
   UnsavedChangesNotifier,
   DocumentTitleHandler,
 } from "@refinedev/react-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router";
 
@@ -33,10 +33,15 @@ import { App as AntdApp } from "antd";
 import { AuthPage } from "./pages/auth";
 import { DashboardPage } from "./pages/dashboard";
 import { dataProvider } from "./rest-data-provider";
-import { InspectionEdit, InspectionShow, InspectionsList } from "./pages/inspections";
+import {
+  InspectionEdit,
+  InspectionShow,
+  InspectionsList,
+} from "./pages/inspections";
 import { liveProvider } from "@refinedev/ably";
 import { ablyClient } from "./utils/ablyClient";
 import { InspectionsShow } from "./components/inspection";
+import { fetchToken, onMessageListener } from "./utils/firebase";
 
 interface TitleHandlerOptions {
   resource?: IResourceItem;
@@ -54,7 +59,34 @@ const App: React.FC = () => {
   // This hook is used to automatically login the user.
   // const { loading } = useAutoLoginForDemo();
 
-  const API_URL = import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
+  const [show, setShow] = useState(false);
+  const [notification, setNotification] = useState({ title: "", body: "" });
+  const [isTokenFound, setTokenFound] = useState(false);
+
+  useEffect(() => {
+    fetchToken(setTokenFound);
+  }, []);
+
+  onMessageListener()
+    .then((payload: any) => {
+      setNotification({
+        title: payload?.notification?.title,
+        body: payload?.notification?.body,
+      });
+      setShow(true);
+      console.log(payload);
+    })
+    .catch((err) => console.log("failed: ", err));
+
+  const onShowNotificationClicked = () => {
+    setNotification({
+      title: "Notification",
+      body: "This is a test notification",
+    });
+    setShow(true);
+  };
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
 
   const appDataProvider = dataProvider(API_URL);
 
@@ -105,7 +137,7 @@ const App: React.FC = () => {
                   meta: {
                     label: "Inspecting Forms",
                     icon: <ScheduleOutlined />,
-                  }
+                  },
                 },
               ]}
             >
@@ -170,8 +202,14 @@ const App: React.FC = () => {
                       />
                     }
                   />
-                  <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
-                  <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
+                  <Route
+                    path="/forgot-password"
+                    element={<AuthPage type="forgotPassword" />}
+                  />
+                  <Route
+                    path="/update-password"
+                    element={<AuthPage type="updatePassword" />}
+                  />
                 </Route>
 
                 <Route
@@ -196,10 +234,14 @@ const App: React.FC = () => {
                   >
                     <Route path=":id" element={<InspectionShow />} />
                   </Route>
-                  <Route path="/inspection-forms/:id" element={<InspectionShow />} />
-                  <Route path="/inspection-forms/edit/:id" element={<InspectionEdit />} />
-
-
+                  <Route
+                    path="/inspection-forms/:id"
+                    element={<InspectionShow />}
+                  />
+                  <Route
+                    path="/inspection-forms/edit/:id"
+                    element={<InspectionEdit />}
+                  />
                 </Route>
               </Routes>
               <UnsavedChangesNotifier />
@@ -209,7 +251,7 @@ const App: React.FC = () => {
           </RefineKbarProvider>
         </AntdApp>
       </ConfigProvider>
-    </BrowserRouter >
+    </BrowserRouter>
   );
 };
 
