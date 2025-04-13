@@ -28,7 +28,9 @@
   },
   "include": [
     "commitlint.config.ts",
-    "src"
+    "src",
+    "public/firebase-messaging-sw.js"
+
   ],
   "references": [
     {

@@ -1,5 +1,5 @@
 // import { Link } from "react-router";
-import { SearchOutlined, DownOutlined } from "@ant-design/icons";
+import { SearchOutlined, DownOutlined, NotificationOutlined } from "@ant-design/icons";
 import { RefineThemedLayoutV2HeaderProps } from "@refinedev/antd";
 import {
   useGetLocale,
@@ -7,6 +7,7 @@ import {
   useGetIdentity,
   useTranslate,
   pickNotDeprecated,
+  useList,
 } from "@refinedev/core";
 import {
   Dropdown,
@@ -22,6 +23,8 @@ import {
   Button,
   theme,
   type MenuProps,
+  Badge,
+  notification,
 } from "antd";
 import debounce from "lodash/debounce";
 import React, { useState, useEffect } from "react";
@@ -33,6 +36,8 @@ import { useConfigProvider } from "../../context";
 import { useStyles } from "./styled";
 
 import type { IIdentity } from "../../interfaces";
+import { NotificationPopup } from "./notification";
+import { onMessageListener } from "@/utils/firebase";
 
 const { Header: AntdHeader } = AntdLayout;
 const { useToken } = theme;
@@ -50,6 +55,7 @@ interface IOptions {
 }
 
 export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ isSticky, sticky }) => {
+  const [viewNotification, setViewNotification] = useState(false);
   const { token } = useToken();
   const { styles } = useStyles();
   const { mode, setMode } = useConfigProvider();
@@ -85,6 +91,77 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ isSticky, st
   //   ),
   // });
 
+  interface Notification {
+    id: string;
+    title: string;
+    message: string;
+    time: string;
+    read: boolean;
+    type: "message" | "alert" | "system";
+  }
+  const {
+    data: notificationData,
+    isLoading: notificationLoading,
+    refetch: notificationRefetch,
+  } = useList({
+    resource: `inspectors/${user?.id}/notifications`,
+  });
+  useEffect(() => {
+    if (!notificationLoading && notificationData) {
+      setNotifications((prev) =>
+        [
+          ...notificationData?.data?.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            message: item.body,
+            time: new Date(item.createdAt).toLocaleTimeString(),
+            read: item.read,
+            type: "message" as const,
+          })),
+        ]?.sort((a, b) => {
+          return new Date(b.time).getTime() - new Date(a.time).getTime();
+        }),
+      );
+    }
+  }, [notificationData]);
+  const [api, contextHolder] = notification.useNotification();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const handleMarkAsRead = (id: string) => {
+    setNotifications((prev) =>
+      prev.map((notification) =>
+        notification.id === id ? { ...notification, read: true } : notification,
+      ),
+    );
+  };
+
+  const handleMarkAllAsRead = () => {
+    setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })));
+  };
+  onMessageListener()
+    .then((payload: any) => {
+      setNotifications((prev) =>
+        [
+          ...prev,
+          {
+            id: payload?.data?.id,
+            title: payload?.notification?.title,
+            message: payload?.notification?.body,
+            time: new Date().toLocaleTimeString(),
+            read: false,
+            type: "message" as const,
+          },
+        ]?.sort((a, b) => {
+          return new Date(b.time).getTime() - new Date(a.time).getTime();
+        }),
+      );
+      api.info({
+        message: payload?.notification?.title,
+        description: payload?.notification?.body,
+        placement: "top",
+        duration: 3,
+      });
+    })
+    .catch((err) => console.log("failed: ", err));
   const [value, setValue] = useState<string>("");
   const [options, setOptions] = useState<IOptions[]>([]);
 
@@ -120,6 +197,7 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ isSticky, st
           justifyContent: screens.sm ? "space-between" : "end",
         }}
       >
+        {contextHolder}
         <Col xs={0} sm={8} md={12}>
           <AutoComplete
             style={{
@@ -165,6 +243,13 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({ isSticky, st
               }}
             />
 
+            <NotificationPopup
+              refetch={notificationRefetch}
+              isLoading={notificationLoading}
+              notifications={notifications}
+              onMarkAsRead={handleMarkAsRead}
+              onMarkAllAsRead={handleMarkAllAsRead}
+            />
             <Space size={screens.md ? 16 : 8} align="center">
               <Text ellipsis className={styles.userName}>
                 {user?.name}
