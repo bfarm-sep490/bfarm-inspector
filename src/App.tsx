@@ -48,7 +48,7 @@ interface TitleHandlerOptions {
 }
 
 const customTitleHandler = ({ resource }: TitleHandlerOptions): string => {
-  const baseTitle = "BFarmx Expert";
+  const baseTitle = "BFarmx Inspecting";
   const titleSegment = resource?.meta?.label;
 
   const title = titleSegment ? `${titleSegment} | ${baseTitle}` : baseTitle;
@@ -166,7 +166,11 @@ const App: React.FC = () => {
                   }
                 >
                   <Route index element={<DashboardPage />} />
+                  <Route path="/inspection-forms" element={<InspectionsList />} />
+                  <Route path="/inspection-forms/:id" element={<InspectionShow />} />
+                  <Route path="/inspection-forms/edit/:id" element={<InspectionEdit />} />
                 </Route>
+
                 <Route
                   element={
                     <Authenticated key="auth-pages" fallback={<Outlet />}>
@@ -211,39 +215,8 @@ const App: React.FC = () => {
                     element={<AuthPage type="updatePassword" />}
                   />
                 </Route>
-
-                <Route
-                  element={
-                    <Authenticated key="catch-all">
-                      <ThemedLayoutV2
-                        Sider={() => <ThemedSiderV2 Title={Title} fixed />}
-                        Header={() => <Header sticky />}
-                      >
-                        <Outlet />
-                      </ThemedLayoutV2>
-                    </Authenticated>
-                  }
-                >
-                  <Route
-                    path="/inspection-forms"
-                    element={
-                      <InspectionsList>
-                        <Outlet></Outlet>
-                      </InspectionsList>
-                    }
-                  >
-                    <Route path=":id" element={<InspectionShow />} />
-                  </Route>
-                  <Route
-                    path="/inspection-forms/:id"
-                    element={<InspectionShow />}
-                  />
-                  <Route
-                    path="/inspection-forms/edit/:id"
-                    element={<InspectionEdit />}
-                  />
-                </Route>
               </Routes>
+
               <UnsavedChangesNotifier />
               <DocumentTitleHandler handler={customTitleHandler} />
               <RefineKbar />
