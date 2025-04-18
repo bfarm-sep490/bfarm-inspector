@@ -216,7 +216,7 @@ export const InspectionsShow: React.FC = () => {
 
   const handleBack = () => navigate("/inspection-forms");
   const handleCreate = () => {
-    if (inspection) {
+    if (inspection && inspection.status !== "Completed" && inspection.status !== "Cancel") {
       const { id, ...rest } = inspection;
       const newInspection = {
         ...rest,
@@ -274,26 +274,14 @@ export const InspectionsShow: React.FC = () => {
             #{inspection.id} - {inspection.task_name}
           </Typography.Title>
         }
-        extra={
-          <Button
-            type="primary"
-            onClick={handleCreate}
-            disabled={inspection.status === "Cancel"}
-          >
-            Hoàn Thành
-          </Button>
-        }
-        style={{
-          padding: "0 0 16px 0",
-          borderBottom: `1px solid ${token.colorBorderSecondary}`,
-        }}
+
       />
 
       <Row gutter={[24, 24]} style={{ marginTop: 16 }}>
 
         <Col xs={24} md={16}>
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
-     
+
             <Card
               title={
                 <Flex align="center" gap={8}>
@@ -360,7 +348,7 @@ export const InspectionsShow: React.FC = () => {
               }}
               bodyStyle={{ padding: "16px" }}
             >
-              
+
               <Row gutter={[16, 16]}>
                 <Col span={24}>
                   <Space direction="vertical" size={12} style={{ width: "100%" }}>
@@ -420,7 +408,7 @@ export const InspectionsShow: React.FC = () => {
                       </Col>
                     </Row>
 
-               
+
                   </Space>
                 </Col>
               </Row>
@@ -446,8 +434,7 @@ export const InspectionsShow: React.FC = () => {
                     Xem chi tiết
                   </Button>
                 ) : (
-                  !inspectionResult &&
-                  (inspection.status === "Pending" || inspection.status === "Ongoing") && (
+                  !inspectionResult && inspection.status !== "Completed" && inspection.status !== "Cancel" && (
                     <Button
                       type="primary"
                       icon={<EditOutlined />}
@@ -567,7 +554,7 @@ export const InspectionsShow: React.FC = () => {
         <ChemicalDataDisplay inspectionResult={inspectionResult} />
       </Modal>
 
-      {isEditing && selectedResult && (
+      {isEditing && selectedResult && inspection.status !== "Completed" && inspection.status !== "Cancel" && (
         <InspectionModalForm
           type={plant?.type}
           id={selectedResult.id}
