@@ -50,7 +50,7 @@ export const chemicalGroups: ChemicalCategory[] = [
   {
     title: "Kim loại nặng",
     keys: ["arsen", "plumbum", "cadmi", "hydragyrum"],
-    color: "#ff4d4f"
+    color: "#722ed1 "
   },
   {
     title: "Vi sinh vật gây bệnh",
