@@ -118,11 +118,17 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                   <Typography.Text>{contaminant.name}</Typography.Text>
                   <Flex gap={8} align="center">
                     {contaminant.standard && (
-                      <Tag color="default" style={{ margin: 0 }}>
+                      <Typography.Text
+                        strong
+                        style={{
+                          color: token.colorError,
+                          marginRight: 8
+                        }}
+                      >
                         {contaminant.standard}
-                      </Tag>
+                      </Typography.Text>
                     )}
-                    <Typography.Text strong>
+                    <Typography.Text>
                       {contaminant.value}
                     </Typography.Text>
                   </Flex>
