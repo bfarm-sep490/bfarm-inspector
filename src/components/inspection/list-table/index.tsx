@@ -1,13 +1,6 @@
-/* eslint-disable prettier/prettier */
 import React from "react";
 import { useTable } from "@refinedev/antd";
-import {
-  getDefaultFilter,
-  type HttpError,
-  useGetIdentity,
-  useGo,
-  useList,
-} from "@refinedev/core";
+import { getDefaultFilter, type HttpError, useGetIdentity, useGo, useList } from "@refinedev/core";
 import { Table, Button, InputNumber, Typography, Space } from "antd";
 import {
   EyeOutlined,
@@ -25,7 +18,7 @@ import { IIdentity, IInspectingForm } from "@/interfaces";
 import { InspectionStatusTag } from "../status";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export const InspectionListTable: React.FC = () => {
   const navigate = useNavigate();
@@ -59,18 +52,12 @@ export const InspectionListTable: React.FC = () => {
         )}
       />
 
-      <Table.Column
-        title="📋 Tên kế hoạch"
-        dataIndex="plan_name"
-        key="plan_name"
-      />
+      <Table.Column title="📋 Tên kế hoạch" dataIndex="plan_name" key="plan_name" />
       <Table.Column
         title="✏️ Nhiệm vụ"
         dataIndex="task_name"
         key="task_name"
-        render={(value) => (
-          <span>{value.charAt(0).toUpperCase() + value.slice(1)}</span>
-        )}
+        render={(value) => <span>{value.charAt(0).toUpperCase() + value.slice(1)}</span>}
       />
 
       <Table.Column
@@ -86,9 +73,7 @@ export const InspectionListTable: React.FC = () => {
             <span>
               <CalendarOutlined style={{ color: "#52c41a", marginRight: 5 }} />
               <span>{date}</span>
-              <span style={{ color: "#ff4d4f", marginLeft: 5 }}>
-                {time}
-              </span>{" "}
+              <span style={{ color: "#ff4d4f", marginLeft: 5 }}>{time}</span>{" "}
             </span>
           );
         }}
@@ -110,14 +95,10 @@ export const InspectionListTable: React.FC = () => {
                 transition={{ duration: 0.8, repeat: Infinity }}
                 style={{ display: "inline-block" }}
               >
-                <HourglassOutlined
-                  style={{ color: "#faad14", marginRight: 5 }}
-                />
+                <HourglassOutlined style={{ color: "#faad14", marginRight: 5 }} />
               </motion.span>
               <span>{date}</span>
-              <span style={{ color: "#ff4d4f", marginLeft: 5 }}>
-                {time}
-              </span>{" "}
+              <span style={{ color: "#ff4d4f", marginLeft: 5 }}>{time}</span>{" "}
             </span>
           );
         }}
@@ -131,28 +112,16 @@ export const InspectionListTable: React.FC = () => {
           let icon;
           let color;
           if (status === "Complete") {
-            icon = (
-              <CheckCircleOutlined
-                style={{ color: "#52c41a", marginRight: 5 }}
-              />
-            );
+            icon = <CheckCircleOutlined style={{ color: "#52c41a", marginRight: 5 }} />;
             color = "green";
           } else if (status === "Pending") {
-            icon = (
-              <HourglassOutlined style={{ color: "#faad14", marginRight: 5 }} />
-            );
+            icon = <HourglassOutlined style={{ color: "#faad14", marginRight: 5 }} />;
             color = "orange";
           } else if (status === "Ongoing") {
-            icon = (
-              <SettingOutlined style={{ color: "blue", marginRight: 5 }} />
-            );
+            icon = <SettingOutlined style={{ color: "blue", marginRight: 5 }} />;
             color = "blue";
           } else {
-            icon = (
-              <CloseCircleOutlined
-                style={{ color: "#f5222d", marginRight: 5 }}
-              />
-            );
+            icon = <CloseCircleOutlined style={{ color: "#f5222d", marginRight: 5 }} />;
             color = "red";
           }
           return (
@@ -172,10 +141,7 @@ export const InspectionListTable: React.FC = () => {
         render={(_, record: IInspectingForm) => (
           <Space>
             {record.id ? (
-              <Button
-                icon={<EyeOutlined />}
-                onClick={() => handleView(record.id)}
-              />
+              <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)} />
             ) : (
               <Typography.Text type="secondary">Không có</Typography.Text>
             )}

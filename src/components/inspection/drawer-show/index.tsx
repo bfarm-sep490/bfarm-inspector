@@ -30,7 +30,7 @@ import {
 import { IInspectingForm, IInspectingResult } from "@/interfaces";
 import { InspectionModalForm } from "../drawer-form";
 import { InspectionStatusTag } from "../status";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import dayjs from "dayjs";
 import {
   chemicalGroups,
@@ -88,13 +88,18 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
           return (
             <div key={group.title}>
               <Flex align="center" gap={8} style={{ marginBottom: 12 }}>
-                <div style={{
-                  width: 4,
-                  height: 16,
-                  backgroundColor: group.color,
-                  borderRadius: 2,
-                }} />
-                <Typography.Text strong style={{ color: group.color, fontSize: 15 }}>
+                <div
+                  style={{
+                    width: 4,
+                    height: 16,
+                    backgroundColor: group.color,
+                    borderRadius: 2,
+                  }}
+                />
+                <Typography.Text
+                  strong
+                  style={{ color: group.color, fontSize: 15 }}
+                >
                   {group.title}
                 </Typography.Text>
               </Flex>
@@ -117,7 +122,9 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                         {contaminant.standard}
                       </Tag>
                     )}
-                    <Typography.Text strong>{contaminant.value}</Typography.Text>
+                    <Typography.Text strong>
+                      {contaminant.value}
+                    </Typography.Text>
                   </Flex>
                 </Flex>
               ))}
@@ -133,7 +140,9 @@ export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const { token } = theme.useToken();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(null);
+  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(
+    null
+  );
   const breakpoints = Grid.useBreakpoint();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -158,7 +167,8 @@ export const InspectionsShow: React.FC = () => {
 
   const inspection = useMemo(
     () =>
-      (formQueryResult.data as { data: IInspectingForm[] } | undefined)?.data?.[0],
+      (formQueryResult.data as { data: IInspectingForm[] } | undefined)
+        ?.data?.[0],
     [formQueryResult.data]
   );
 
@@ -184,7 +194,8 @@ export const InspectionsShow: React.FC = () => {
 
   const inspectionResult = useMemo(
     () =>
-      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)?.data?.[0],
+      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)
+        ?.data?.[0],
     [resultQueryResult.data]
   );
 
@@ -203,20 +214,69 @@ export const InspectionsShow: React.FC = () => {
   const initialContaminants: Contaminant[] = [
     { key: "cadmi", name: "Cadmium", value: "< 0.05 mg/kg", standard: "Max" },
     { key: "plumbum", name: "Plumbum", value: "< 0.3 mg/kg", standard: "Max" },
-    { key: "salmonella", name: "Salmonella", value: "< 0 CFU/25g", standard: "Max" },
-    { key: "coliforms", name: "Coliforms", value: "< 10 CFU/g", standard: "Max" },
-    { key: "ecoli", name: "E.coli", value: "100 - 1000 CFU/g", standard: "Range" },
-    { key: "sulfur_dioxide", name: "Sulfur Dioxide", value: "< 10 mg/kg", standard: "Max" },
-    { key: "glyphosate_glufosinate", name: "Glyphosate, Glufosinate", value: "< 0.01 mg/kg", standard: "Max" },
-    { key: "methyl_bromide", name: "Methyl Bromide", value: "< 0.01 mg/kg", standard: "Max" },
-    { key: "dithiocarbamate", name: "Dithiocarbamate", value: "< 1.0 mg/kg", standard: "Max" },
-    { key: "chlorate", name: "Chlorate", value: "< 0.01 mg/kg", standard: "Max" },
-    { key: "perchlorate", name: "Perchlorate", value: "< 0.01 mg/kg", standard: "Max" },
+    {
+      key: "salmonella",
+      name: "Salmonella",
+      value: "< 0 CFU/25g",
+      standard: "Max",
+    },
+    {
+      key: "coliforms",
+      name: "Coliforms",
+      value: "< 10 CFU/g",
+      standard: "Max",
+    },
+    {
+      key: "ecoli",
+      name: "E.coli",
+      value: "100 - 1000 CFU/g",
+      standard: "Range",
+    },
+    {
+      key: "sulfur_dioxide",
+      name: "Sulfur Dioxide",
+      value: "< 10 mg/kg",
+      standard: "Max",
+    },
+    {
+      key: "glyphosate_glufosinate",
+      name: "Glyphosate, Glufosinate",
+      value: "< 0.01 mg/kg",
+      standard: "Max",
+    },
+    {
+      key: "methyl_bromide",
+      name: "Methyl Bromide",
+      value: "< 0.01 mg/kg",
+      standard: "Max",
+    },
+    {
+      key: "dithiocarbamate",
+      name: "Dithiocarbamate",
+      value: "< 1.0 mg/kg",
+      standard: "Max",
+    },
+    {
+      key: "chlorate",
+      name: "Chlorate",
+      value: "< 0.01 mg/kg",
+      standard: "Max",
+    },
+    {
+      key: "perchlorate",
+      name: "Perchlorate",
+      value: "< 0.01 mg/kg",
+      standard: "Max",
+    },
   ];
 
   const handleBack = () => navigate("/inspection-forms");
   const handleCreate = () => {
-    if (inspection && inspection.status !== "Completed" && inspection.status !== "Cancel") {
+    if (
+      inspection &&
+      inspection.status !== "Completed" &&
+      inspection.status !== "Cancel"
+    ) {
       const { id, ...rest } = inspection;
       const newInspection = {
         ...rest,
@@ -260,12 +320,14 @@ export const InspectionsShow: React.FC = () => {
     }
   };
   return (
-    <div style={{
-      padding: "16px",
-      background: token.colorBgContainer,
-      maxWidth: 1200,
-      margin: "0 auto",
-    }}>
+    <div
+      style={{
+        padding: "16px",
+        background: token.colorBgContainer,
+        maxWidth: 1200,
+        margin: "0 auto",
+      }}
+    >
       {/* Header */}
       <PageHeader
         onBack={handleBack}
@@ -274,14 +336,11 @@ export const InspectionsShow: React.FC = () => {
             #{inspection.id} - {inspection.task_name}
           </Typography.Title>
         }
-
       />
 
       <Row gutter={[24, 24]} style={{ marginTop: 16 }}>
-
         <Col xs={24} md={16}>
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
-
             <Card
               title={
                 <Flex align="center" gap={8}>
@@ -310,10 +369,16 @@ export const InspectionsShow: React.FC = () => {
                   />
                 </Col>
                 <Col xs={24} md={16}>
-                  <Space direction="vertical" size={16} style={{ width: "100%" }}>
+                  <Space
+                    direction="vertical"
+                    size={16}
+                    style={{ width: "100%" }}
+                  >
                     <Flex justify="space-between" align="center">
                       <Typography.Text strong>Tên cây trồng</Typography.Text>
-                      <Typography.Text>{plant?.plant_name || "N/A"}</Typography.Text>
+                      <Typography.Text>
+                        {plant?.plant_name || "N/A"}
+                      </Typography.Text>
                     </Flex>
                     <Flex justify="space-between" align="center">
                       <Typography.Text strong>Loại cây trồng</Typography.Text>
@@ -348,21 +413,30 @@ export const InspectionsShow: React.FC = () => {
               }}
               bodyStyle={{ padding: "16px" }}
             >
-
               <Row gutter={[16, 16]}>
                 <Col span={24}>
-                  <Space direction="vertical" size={12} style={{ width: "100%" }}>
+                  <Space
+                    direction="vertical"
+                    size={12}
+                    style={{ width: "100%" }}
+                  >
                     <Row gutter={[16, 16]}>
                       <Col xs={24} md={12}>
                         <Flex justify="space-between" align="center">
                           <Typography.Text strong>Tên kế hoạch</Typography.Text>
-                          <Typography.Text>{inspection.plan_name || "N/A"}</Typography.Text>
+                          <Typography.Text>
+                            {inspection.plan_name || "N/A"}
+                          </Typography.Text>
                         </Flex>
                       </Col>
                       <Col xs={24} md={12}>
                         <Flex justify="space-between" align="center">
-                          <Typography.Text strong>Trung tâm kiểm định</Typography.Text>
-                          <Typography.Text>{inspection.inspector_name || "N/A"}</Typography.Text>
+                          <Typography.Text strong>
+                            Trung tâm kiểm định
+                          </Typography.Text>
+                          <Typography.Text>
+                            {inspection.inspector_name || "N/A"}
+                          </Typography.Text>
                         </Flex>
                       </Col>
                     </Row>
@@ -374,7 +448,8 @@ export const InspectionsShow: React.FC = () => {
                         <Flex justify="space-between" align="center">
                           <Typography.Text strong>Ngày bắt đầu</Typography.Text>
                           <Typography.Text>
-                            {dayjs(inspection.start_date).format("DD/MM/YYYY")} lúc{" "}
+                            {dayjs(inspection.start_date).format("DD/MM/YYYY")}{" "}
+                            lúc{" "}
                             <Tag color="red" style={{ marginLeft: 4 }}>
                               {dayjs(inspection.start_date).format("HH:mm:ss")}
                             </Tag>
@@ -383,9 +458,12 @@ export const InspectionsShow: React.FC = () => {
                       </Col>
                       <Col xs={24} md={12}>
                         <Flex justify="space-between" align="center">
-                          <Typography.Text strong>Ngày kết thúc</Typography.Text>
+                          <Typography.Text strong>
+                            Ngày kết thúc
+                          </Typography.Text>
                           <Typography.Text>
-                            {dayjs(inspection.end_date).format("DD/MM/YYYY")} lúc{" "}
+                            {dayjs(inspection.end_date).format("DD/MM/YYYY")}{" "}
+                            lúc{" "}
                             <Tag color="red" style={{ marginLeft: 4 }}>
                               {dayjs(inspection.end_date).format("HH:mm:ss")}
                             </Tag>
@@ -407,8 +485,6 @@ export const InspectionsShow: React.FC = () => {
                         </Flex>
                       </Col>
                     </Row>
-
-
                   </Space>
                 </Col>
               </Row>
@@ -434,7 +510,9 @@ export const InspectionsShow: React.FC = () => {
                     Xem chi tiết
                   </Button>
                 ) : (
-                  !inspectionResult && inspection.status !== "Completed" && inspection.status !== "Cancel" && (
+                  !inspectionResult &&
+                  inspection.status !== "Completed" &&
+                  inspection.status !== "Cancel" && (
                     <Button
                       type="primary"
                       icon={<EditOutlined />}
@@ -447,14 +525,22 @@ export const InspectionsShow: React.FC = () => {
               }
             >
               {inspectionResult ? (
-                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+                <Space
+                  direction="vertical"
+                  size="middle"
+                  style={{ width: "100%" }}
+                >
                   <Flex justify="space-between">
                     <Typography.Text strong>Đánh giá</Typography.Text>
-                    <InspectionResultTag value={inspectionResult.evaluated_result} />
+                    <InspectionResultTag
+                      value={inspectionResult.evaluated_result}
+                    />
                   </Flex>
                   <Flex justify="space-between">
                     <Typography.Text strong>Nội dung</Typography.Text>
-                    <Typography.Text>{inspectionResult.result_content || "N/A"}</Typography.Text>
+                    <Typography.Text>
+                      {inspectionResult.result_content || "N/A"}
+                    </Typography.Text>
                   </Flex>
                 </Space>
               ) : inspection.status === "Cancel" ? (
@@ -493,13 +579,18 @@ export const InspectionsShow: React.FC = () => {
                 borderBottom: `1px solid ${token.colorBorderSecondary}`,
               }}
             >
-              <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: "100%" }}
+              >
                 <Flex justify="space-between">
                   <Typography.Text strong>Hoàn thành</Typography.Text>
                   <Typography.Text>
                     {inspection.complete_date ? (
                       <>
-                        {dayjs(inspection.complete_date).format("DD/MM/YYYY")} lúc{" "}
+                        {dayjs(inspection.complete_date).format("DD/MM/YYYY")}{" "}
+                        lúc{" "}
                         <Tag color="red">
                           {dayjs(inspection.complete_date).format("HH:mm:ss")}
                         </Tag>
@@ -520,7 +611,9 @@ export const InspectionsShow: React.FC = () => {
                 </Flex>
                 <Flex justify="space-between">
                   <Typography.Text strong>Tạo bởi</Typography.Text>
-                  <Typography.Text>{inspection.created_by || "N/A"}</Typography.Text>
+                  <Typography.Text>
+                    {inspection.created_by || "N/A"}
+                  </Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
                   <Typography.Text strong>Cập nhật</Typography.Text>
@@ -532,7 +625,9 @@ export const InspectionsShow: React.FC = () => {
                 </Flex>
                 <Flex justify="space-between">
                   <Typography.Text strong>Cập nhật bởi</Typography.Text>
-                  <Typography.Text>{inspection.updated_by || "N/A"}</Typography.Text>
+                  <Typography.Text>
+                    {inspection.updated_by || "N/A"}
+                  </Typography.Text>
                 </Flex>
               </Space>
             </Card>
@@ -554,21 +649,24 @@ export const InspectionsShow: React.FC = () => {
         <ChemicalDataDisplay inspectionResult={inspectionResult} />
       </Modal>
 
-      {isEditing && selectedResult && inspection.status !== "Completed" && inspection.status !== "Cancel" && (
-        <InspectionModalForm
-          type={plant?.type}
-          id={selectedResult.id}
-          action="create"
-          open={isEditing}
-          initialValues={selectedResult}
-          onClose={handleCloseDrawer}
-          onMutationSuccess={() => {
-            formQueryResult.refetch();
-            resultQueryResult.refetch();
-            handleCloseDrawer();
-          }}
-        />
-      )}
+      {isEditing &&
+        selectedResult &&
+        inspection.status !== "Completed" &&
+        inspection.status !== "Cancel" && (
+          <InspectionModalForm
+            type={plant?.type}
+            id={selectedResult.id}
+            action="create"
+            open={isEditing}
+            initialValues={selectedResult}
+            onClose={handleCloseDrawer}
+            onMutationSuccess={() => {
+              formQueryResult.refetch();
+              resultQueryResult.refetch();
+              handleCloseDrawer();
+            }}
+          />
+        )}
     </div>
   );
 };
