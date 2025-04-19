@@ -3,45 +3,137 @@ import React, { useState, useMemo } from "react";
 import { type HttpError, useOne, useShow, useTranslate } from "@refinedev/core";
 import {
   Button,
-  List,
   Typography,
   Spin,
   Alert,
-  Drawer,
   Modal,
-  Table,
   theme,
   Divider,
-  Tooltip,
   Grid,
   Flex,
   Card,
+  Image,
+  Space,
+  Tag,
+  Row,
+  Col,
 } from "antd";
-import { EditOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  EyeOutlined,
+  InfoCircleOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  ExperimentOutlined,
+} from "@ant-design/icons";
 import { IInspectingForm, IInspectingResult } from "@/interfaces";
 import { InspectionModalForm } from "../drawer-form";
 import { InspectionStatusTag } from "../status";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import {
   chemicalGroups,
-  columns,
   getChemicalData,
+  ChemicalDataDisplay,
 } from "../chemical/ChemicalConstants";
 import { InspectionResultTag } from "../result";
-import { r } from "node_modules/react-router/dist/development/fog-of-war-BALYJxf_.mjs";
-// eslint-disable-next-line no-duplicate-imports
-import { Image } from "antd";
-import { TextField } from "@refinedev/antd";
-import ContaminantCheckCard from "@/utils/inspectingKind";
+import { PageHeader } from "@refinedev/antd";
+
+interface Contaminant {
+  key: string;
+  name: string;
+  value: string;
+  standard?: string;
+}
+
+interface ContaminantCheckCardProps {
+  type: string;
+  style?: React.CSSProperties;
+  contaminants: Contaminant[];
+}
+
+const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
+  type,
+  style,
+  contaminants,
+}) => {
+  const { token } = theme.useToken();
+
+  return (
+    <Card
+      title={
+        <Flex align="center" gap={8}>
+          <ExperimentOutlined style={{ color: token.colorError }} />
+          <span>Tiêu chí kiểm định</span>
+        </Flex>
+      }
+      headStyle={{
+        borderBottom: `2px solid ${token.colorError}`,
+        backgroundColor: token.colorErrorBg,
+      }}
+      style={{
+        ...style,
+        border: `1px solid ${token.colorBorderSecondary}`,
+        borderRadius: token.borderRadiusLG,
+      }}
+    >
+      <Space direction="vertical" style={{ width: "100%" }}>
+        {chemicalGroups.map((group) => {
+          const groupContaminants = contaminants.filter((item) =>
+            group.keys.includes(item.key)
+          );
+          if (groupContaminants.length === 0) return null;
+
+          return (
+            <div key={group.title}>
+              <Flex align="center" gap={8} style={{ marginBottom: 12 }}>
+                <div style={{
+                  width: 4,
+                  height: 16,
+                  backgroundColor: group.color,
+                  borderRadius: 2,
+                }} />
+                <Typography.Text strong style={{ color: group.color, fontSize: 15 }}>
+                  {group.title}
+                </Typography.Text>
+              </Flex>
+
+              {groupContaminants.map((contaminant) => (
+                <Flex
+                  key={contaminant.key}
+                  justify="space-between"
+                  style={{
+                    marginBottom: 8,
+                    padding: "6px 8px",
+                    backgroundColor: token.colorFillAlter,
+                    borderRadius: token.borderRadiusSM,
+                  }}
+                >
+                  <Typography.Text>{contaminant.name}</Typography.Text>
+                  <Flex gap={8} align="center">
+                    {contaminant.standard && (
+                      <Tag color="default" style={{ margin: 0 }}>
+                        {contaminant.standard}
+                      </Tag>
+                    )}
+                    <Typography.Text strong>{contaminant.value}</Typography.Text>
+                  </Flex>
+                </Flex>
+              ))}
+            </div>
+          );
+        })}
+      </Space>
+    </Card>
+  );
+};
 
 export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const { token } = theme.useToken();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(
-    null
-  );
+  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(null);
   const breakpoints = Grid.useBreakpoint();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -66,15 +158,14 @@ export const InspectionsShow: React.FC = () => {
 
   const inspection = useMemo(
     () =>
-      (formQueryResult.data as { data: IInspectingForm[] } | undefined)
-        ?.data?.[0],
+      (formQueryResult.data as { data: IInspectingForm[] } | undefined)?.data?.[0],
     [formQueryResult.data]
   );
+
   const {
     data: planData,
     isLoading: isPlanLoading,
     isFetching: isPlanFetching,
-    refetch: planRefetch,
   } = useOne({
     resource: "plans",
     id: inspection?.plan_id,
@@ -85,16 +176,15 @@ export const InspectionsShow: React.FC = () => {
     data: plantData,
     isLoading: isPlantLoading,
     isFetching: isPlantFetching,
-    refetch: plantRefetch,
   } = useOne({
     resource: "plants",
     id: plan?.plant_information?.plant_id,
   });
   const plant = plantData?.data;
+
   const inspectionResult = useMemo(
     () =>
-      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)
-        ?.data?.[0],
+      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)?.data?.[0],
     [resultQueryResult.data]
   );
 
@@ -109,9 +199,24 @@ export const InspectionsShow: React.FC = () => {
     isPlantFetching;
 
   const chemicalData = getChemicalData(inspectionResult);
+
+  const initialContaminants: Contaminant[] = [
+    { key: "cadmi", name: "Cadmium", value: "< 0.05 mg/kg", standard: "Max" },
+    { key: "plumbum", name: "Plumbum", value: "< 0.3 mg/kg", standard: "Max" },
+    { key: "salmonella", name: "Salmonella", value: "< 0 CFU/25g", standard: "Max" },
+    { key: "coliforms", name: "Coliforms", value: "< 10 CFU/g", standard: "Max" },
+    { key: "ecoli", name: "E.coli", value: "100 - 1000 CFU/g", standard: "Range" },
+    { key: "sulfur_dioxide", name: "Sulfur Dioxide", value: "< 10 mg/kg", standard: "Max" },
+    { key: "glyphosate_glufosinate", name: "Glyphosate, Glufosinate", value: "< 0.01 mg/kg", standard: "Max" },
+    { key: "methyl_bromide", name: "Methyl Bromide", value: "< 0.01 mg/kg", standard: "Max" },
+    { key: "dithiocarbamate", name: "Dithiocarbamate", value: "< 1.0 mg/kg", standard: "Max" },
+    { key: "chlorate", name: "Chlorate", value: "< 0.01 mg/kg", standard: "Max" },
+    { key: "perchlorate", name: "Perchlorate", value: "< 0.01 mg/kg", standard: "Max" },
+  ];
+
   const handleBack = () => navigate("/inspection-forms");
   const handleCreate = () => {
-    if (inspection) {
+    if (inspection && inspection.status !== "Completed" && inspection.status !== "Cancel") {
       const { id, ...rest } = inspection;
       const newInspection = {
         ...rest,
@@ -142,356 +247,314 @@ export const InspectionsShow: React.FC = () => {
     return <Alert type="error" message="Failed to load inspection data" />;
   if (!inspection) return <Typography.Text>Không có dữ liệu.</Typography.Text>;
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "Completed":
+        return <CheckCircleOutlined style={{ color: token.colorSuccess }} />;
+      case "Ongoing":
+        return <ClockCircleOutlined style={{ color: token.colorWarning }} />;
+      case "Cancel":
+        return <CloseCircleOutlined style={{ color: token.colorError }} />;
+      default:
+        return <InfoCircleOutlined style={{ color: token.colorInfo }} />;
+    }
+  };
   return (
-    <Drawer
-      open={true}
-      width={breakpoints.sm ? "60%" : "100%"}
-      onClose={handleBack}
-      bodyStyle={{ padding: "24px 32px", background: token.colorBgLayout }}
-      headerStyle={{ background: token.colorBgContainer }}
-      title={
-        <Typography.Title level={4} style={{ margin: 0 }}>
-          #{inspection.id} - {inspection.task_name}
-        </Typography.Title>
-      }
-    >
-      <Typography.Title level={5} style={{ margin: 0 }}>
-        Thông tin giống cây kiểm nghiệm
-      </Typography.Title>
-      <Divider />
-      <Flex vertical={breakpoints?.sm ? false : true} justify="start" gap={10}>
-        <div
-          style={{
-            width: breakpoints?.sm ? "50%" : "100%",
-          }}
-        >
-          <Image
-            width={"100%"}
-            src={plant?.image_url}
-            style={{ marginBottom: 10 }}
-          />
-          <List
-            bordered
-            style={{
-              width: "100%",
-              background: token?.colorBgContainer,
-              marginBottom: 10,
-            }}
-            dataSource={[
-              {
-                label: "Tên cây trồng",
-                value: plant?.plant_name,
-              },
-              {
-                label: "Loại cây trồng",
-                value: plant?.type || "N/A",
-              },
-            ]}
-            renderItem={(data) => (
-              <List.Item>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <Typography.Text strong>{data.label}</Typography.Text>
-                  <Typography.Text>{data.value}</Typography.Text>
-                </div>
-              </List.Item>
-            )}
-          />
-        </div>
-        <ContaminantCheckCard
-          type={plant?.type}
-          style={{ width: breakpoints?.sm ? "50%" : "100%" }}
-        />
-      </Flex>
-      <div style={{ marginBottom: 40, marginTop: 40 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 8,
-          }}
-        >
-          <Typography.Title level={5} style={{ margin: 0 }}>
-            Kết quả
+    <div style={{
+      padding: "16px",
+      background: token.colorBgContainer,
+      maxWidth: 1200,
+      margin: "0 auto",
+    }}>
+      {/* Header */}
+      <PageHeader
+        onBack={handleBack}
+        title={
+          <Typography.Title level={4} style={{ margin: 0 }}>
+            #{inspection.id} - {inspection.task_name}
           </Typography.Title>
+        }
 
-          {inspectionResult && (
-            <Button
-              type="primary"
-              icon={<EyeOutlined />}
-              onClick={handleOpenModal}
+      />
+
+      <Row gutter={[24, 24]} style={{ marginTop: 16 }}>
+
+        <Col xs={24} md={16}>
+          <Space direction="vertical" size={24} style={{ width: "100%" }}>
+
+            <Card
+              title={
+                <Flex align="center" gap={8}>
+                  <InfoCircleOutlined style={{ color: token.colorPrimary }} />
+                  <span>Thông tin giống cây kiểm nghiệm</span>
+                </Flex>
+              }
+              headStyle={{
+                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                padding: "12px 16px",
+              }}
+              bodyStyle={{ padding: "16px" }}
             >
-              Xem chi tiết
-            </Button>
-          )}
-          {!inspectionResult &&
-            (inspection.status === "Pending" ||
-              inspection.status === "Ongoing") && (
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={handleCreate}
-              >
-                Hoàn Thành
-              </Button>
-            )}
-        </div>
-        <Divider style={{ marginTop: 0 }} />
-        <div
-          style={{
-            border: `1px solid ${token.colorBorder}`,
-            borderRadius: 8,
-            padding: 16,
-            background: token.colorBgContainer,
-          }}
-        >
-          {inspectionResult ? (
-            <List
-              dataSource={[
-                {
-                  label: "Đánh giá",
-                  value: (
-                    <InspectionResultTag
-                      value={inspectionResult.evaluated_result}
-                    />
-                  ),
-                },
-                {
-                  label: "Nội dung",
-                  value: inspectionResult.result_content || "N/A",
-                },
-              ]}
-              renderItem={(data) => (
-                <List.Item>
-                  <div
+              <Row gutter={[16, 16]}>
+                <Col xs={24} md={8}>
+                  <Image
+                    width="100%"
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      width: "100%",
+                      borderRadius: token.borderRadiusLG,
+                      border: `1px solid ${token.colorBorder}`,
+                      aspectRatio: "1/1",
+                      objectFit: "cover",
                     }}
+                    src={plant?.image_url}
+                    fallback="https://via.placeholder.com/300x300?text=No+Image"
+                  />
+                </Col>
+                <Col xs={24} md={16}>
+                  <Space direction="vertical" size={16} style={{ width: "100%" }}>
+                    <Flex justify="space-between" align="center">
+                      <Typography.Text strong>Tên cây trồng</Typography.Text>
+                      <Typography.Text>{plant?.plant_name || "N/A"}</Typography.Text>
+                    </Flex>
+                    <Flex justify="space-between" align="center">
+                      <Typography.Text strong>Loại cây trồng</Typography.Text>
+                      <Typography.Text>{plant?.type || "N/A"}</Typography.Text>
+                    </Flex>
+                    {plant?.description && (
+                      <div>
+                        <Typography.Text strong>Mô tả</Typography.Text>
+                        <Typography.Paragraph
+                          ellipsis={{ rows: 3, expandable: true }}
+                          style={{ marginBottom: 0 }}
+                        >
+                          {plant.description}
+                        </Typography.Paragraph>
+                      </div>
+                    )}
+                  </Space>
+                </Col>
+              </Row>
+            </Card>
+
+            <Card
+              title={
+                <Flex align="center" gap={8}>
+                  <InfoCircleOutlined style={{ color: token.colorPrimary }} />
+                  <span>Thông tin công việc</span>
+                </Flex>
+              }
+              headStyle={{
+                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                padding: "12px 16px",
+              }}
+              bodyStyle={{ padding: "16px" }}
+            >
+
+              <Row gutter={[16, 16]}>
+                <Col span={24}>
+                  <Space direction="vertical" size={12} style={{ width: "100%" }}>
+                    <Row gutter={[16, 16]}>
+                      <Col xs={24} md={12}>
+                        <Flex justify="space-between" align="center">
+                          <Typography.Text strong>Tên kế hoạch</Typography.Text>
+                          <Typography.Text>{inspection.plan_name || "N/A"}</Typography.Text>
+                        </Flex>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Flex justify="space-between" align="center">
+                          <Typography.Text strong>Trung tâm kiểm định</Typography.Text>
+                          <Typography.Text>{inspection.inspector_name || "N/A"}</Typography.Text>
+                        </Flex>
+                      </Col>
+                    </Row>
+
+                    <Divider style={{ margin: "8px 0" }} />
+
+                    <Row gutter={[16, 16]}>
+                      <Col xs={24} md={12}>
+                        <Flex justify="space-between" align="center">
+                          <Typography.Text strong>Ngày bắt đầu</Typography.Text>
+                          <Typography.Text>
+                            {dayjs(inspection.start_date).format("DD/MM/YYYY")} lúc{" "}
+                            <Tag color="red" style={{ marginLeft: 4 }}>
+                              {dayjs(inspection.start_date).format("HH:mm:ss")}
+                            </Tag>
+                          </Typography.Text>
+                        </Flex>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Flex justify="space-between" align="center">
+                          <Typography.Text strong>Ngày kết thúc</Typography.Text>
+                          <Typography.Text>
+                            {dayjs(inspection.end_date).format("DD/MM/YYYY")} lúc{" "}
+                            <Tag color="red" style={{ marginLeft: 4 }}>
+                              {dayjs(inspection.end_date).format("HH:mm:ss")}
+                            </Tag>
+                          </Typography.Text>
+                        </Flex>
+                      </Col>
+                    </Row>
+
+                    <Divider style={{ margin: "8px 0" }} />
+
+                    <Row gutter={[16, 16]}>
+                      <Col xs={24} md={12}>
+                        <Flex justify="space-between" align="center">
+                          <Typography.Text strong>Trạng thái</Typography.Text>
+                          <Flex align="center" gap={8}>
+                            {getStatusIcon(inspection.status)}
+                            <InspectionStatusTag value={inspection.status} />
+                          </Flex>
+                        </Flex>
+                      </Col>
+                    </Row>
+
+
+                  </Space>
+                </Col>
+              </Row>
+            </Card>
+
+            <Card
+              title={
+                <Flex align="center" gap={8}>
+                  <InfoCircleOutlined style={{ color: token.colorPrimary }} />
+                  <span>Kết quả</span>
+                </Flex>
+              }
+              headStyle={{
+                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+              }}
+              extra={
+                inspectionResult ? (
+                  <Button
+                    type="primary"
+                    icon={<EyeOutlined />}
+                    onClick={handleOpenModal}
                   >
-                    <Typography.Text strong>{data.label}</Typography.Text>
-                    <Typography.Text>{data.value}</Typography.Text>
-                  </div>
-                </List.Item>
-              )}
-            />
-          ) : inspection.status === "Cancel" ? (
-            <Typography.Text type="danger">
-              Đợt kiểm nghiệm đã bị hủy. Không thể tạo kết quả.
-            </Typography.Text>
-          ) : (
-            <Typography.Text type="secondary">Chưa có kết quả.</Typography.Text>
-          )}
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 8,
-        }}
-      >
-        <Typography.Title level={5} style={{ margin: 0 }}>
-          Thông tin công việc
-        </Typography.Title>
-      </div>
-      <Divider style={{ marginTop: 0 }} />
-
-      <div
-        style={{
-          border: `1px solid ${token.colorBorder}`,
-          borderRadius: 8,
-          padding: 16,
-          marginBottom: 32,
-          background: token.colorBgContainer,
-        }}
-      >
-        {inspection && (
-          <List
-            dataSource={[
-              { label: "Tên kế hoạch", value: inspection.plan_name || "N/A" },
-              {
-                label: "Trung tâm kiểm định",
-                value: inspection.inspector_name || "N/A",
-              },
-              {
-                label: "Nhiệm vụ",
-                value: inspection.task_name
-                  ? inspection.task_name.charAt(0).toUpperCase() +
-                    inspection.task_name.slice(1)
-                  : "N/A",
-              },
-              { label: "Mô tả", value: inspection.description || "N/A" },
-              {
-                label: "Ngày bắt đầu",
-                value: (
-                  <>
-                    {new Date(inspection.start_date).toLocaleDateString()} lúc{" "}
-                    <span style={{ color: "red" }}>
-                      {new Date(inspection.start_date).toLocaleTimeString([], {
-                        hour12: false,
-                      })}
-                    </span>
-                  </>
-                ),
-              },
-              {
-                label: "Ngày kết thúc",
-                value: (
-                  <>
-                    {new Date(inspection.end_date).toLocaleDateString()} lúc{" "}
-                    <span style={{ color: "red" }}>
-                      {new Date(inspection.end_date).toLocaleTimeString([], {
-                        hour12: false,
-                      })}
-                    </span>
-                  </>
-                ),
-              },
-
-              {
-                label: "Trạng thái",
-                value: <InspectionStatusTag value={inspection.status} />,
-              },
-              {
-                label: "Cho thu hoạch",
-                value: inspection.can_harvest ? (
-                  "Có"
+                    Xem chi tiết
+                  </Button>
                 ) : (
-                  <span style={{ color: "red" }}>Không</span>
-                ),
-              },
-            ]}
-            renderItem={(item) => (
-              <List.Item>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <Typography.Text strong>{item.label}</Typography.Text>
-                  <Typography.Text>{item.value}</Typography.Text>
-                </div>
-              </List.Item>
-            )}
-          />
-        )}
-      </div>
-
-      <Typography.Title level={5} style={{ marginBottom: 8 }}>
-        Thời gian
-      </Typography.Title>
-      <Divider style={{ marginTop: 0 }} />
-
-      <div
-        style={{
-          border: `1px solid ${token.colorBorder}`,
-          borderRadius: 8,
-          padding: 16,
-          marginBottom: 32,
-          background: token.colorBgContainer,
-        }}
-      >
-        <List
-          dataSource={[
-            {
-              label: "Hoàn thành",
-              value: inspection.complete_date ? (
-                <>
-                  {new Date(inspection.complete_date).toLocaleDateString()} lúc{" "}
-                  <span style={{ color: "red" }}>
-                    {new Date(inspection.complete_date).toLocaleTimeString([], {
-                      hour12: false,
-                    })}
-                  </span>
-                </>
+                  !inspectionResult && inspection.status !== "Completed" && inspection.status !== "Cancel" && (
+                    <Button
+                      type="primary"
+                      icon={<EditOutlined />}
+                      onClick={handleCreate}
+                    >
+                      Hoàn Thành
+                    </Button>
+                  )
+                )
+              }
+            >
+              {inspectionResult ? (
+                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+                  <Flex justify="space-between">
+                    <Typography.Text strong>Đánh giá</Typography.Text>
+                    <InspectionResultTag value={inspectionResult.evaluated_result} />
+                  </Flex>
+                  <Flex justify="space-between">
+                    <Typography.Text strong>Nội dung</Typography.Text>
+                    <Typography.Text>{inspectionResult.result_content || "N/A"}</Typography.Text>
+                  </Flex>
+                </Space>
+              ) : inspection.status === "Cancel" ? (
+                <Alert
+                  type="error"
+                  message="Đợt kiểm nghiệm đã bị hủy. Không thể tạo kết quả."
+                  showIcon
+                />
               ) : (
-                "N/A"
-              ),
-            },
-            {
-              label: "Tạo lúc",
-              value: (
-                <>
-                  {new Date(inspection.created_at).toLocaleDateString()} lúc{" "}
-                  <span style={{ color: "red" }}>
-                    {new Date(inspection.created_at).toLocaleTimeString([], {
-                      hour12: false,
-                    })}
-                  </span>
-                </>
-              ),
-            },
+                <Alert
+                  type="info"
+                  message="Chưa có kết quả kiểm nghiệm."
+                  showIcon
+                />
+              )}
+            </Card>
+          </Space>
+        </Col>
 
-            { label: "Tạo bởi", value: inspection.created_by || "N/A" },
-            {
-              label: "Cập nhật",
-              value: inspection.updated_at
-                ? new Date(inspection.updated_at).toLocaleDateString()
-                : "N/A",
-            },
-            { label: "Cập nhật bởi", value: inspection.updated_by || "N/A" },
-          ]}
-          renderItem={(data) => (
-            <List.Item>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
-                <Typography.Text strong>{data.label}</Typography.Text>
-                <Typography.Text>{data.value}</Typography.Text>
-              </div>
-            </List.Item>
-          )}
-        />
-      </div>
+        <Col xs={24} md={8}>
+          <Space direction="vertical" size={24} style={{ width: "100%" }}>
+            <ContaminantCheckCard
+              type={plant?.type}
+              contaminants={initialContaminants}
+              style={{ height: "100%" }}
+            />
+
+            <Card
+              title={
+                <Flex align="center" gap={8}>
+                  <InfoCircleOutlined style={{ color: token.colorPrimary }} />
+                  <span>Thời gian</span>
+                </Flex>
+              }
+              headStyle={{
+                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+              }}
+            >
+              <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+                <Flex justify="space-between">
+                  <Typography.Text strong>Hoàn thành</Typography.Text>
+                  <Typography.Text>
+                    {inspection.complete_date ? (
+                      <>
+                        {dayjs(inspection.complete_date).format("DD/MM/YYYY")} lúc{" "}
+                        <Tag color="red">
+                          {dayjs(inspection.complete_date).format("HH:mm:ss")}
+                        </Tag>
+                      </>
+                    ) : (
+                      "N/A"
+                    )}
+                  </Typography.Text>
+                </Flex>
+                <Flex justify="space-between">
+                  <Typography.Text strong>Tạo lúc</Typography.Text>
+                  <Typography.Text>
+                    {dayjs(inspection.created_at).format("DD/MM/YYYY")} lúc{" "}
+                    <Tag color="red">
+                      {dayjs(inspection.created_at).format("HH:mm:ss")}
+                    </Tag>
+                  </Typography.Text>
+                </Flex>
+                <Flex justify="space-between">
+                  <Typography.Text strong>Tạo bởi</Typography.Text>
+                  <Typography.Text>{inspection.created_by || "N/A"}</Typography.Text>
+                </Flex>
+                <Flex justify="space-between">
+                  <Typography.Text strong>Cập nhật</Typography.Text>
+                  <Typography.Text>
+                    {inspection.updated_at
+                      ? dayjs(inspection.updated_at).format("DD/MM/YYYY")
+                      : "N/A"}
+                  </Typography.Text>
+                </Flex>
+                <Flex justify="space-between">
+                  <Typography.Text strong>Cập nhật bởi</Typography.Text>
+                  <Typography.Text>{inspection.updated_by || "N/A"}</Typography.Text>
+                </Flex>
+              </Space>
+            </Card>
+          </Space>
+        </Col>
+      </Row>
 
       <Modal
         open={isModalVisible}
         onCancel={handleCloseModal}
         footer={null}
         width={750}
+        title={
+          <Typography.Title level={3} style={{ margin: 0 }}>
+            Chi tiết kết quả kiểm nghiệm
+          </Typography.Title>
+        }
       >
-        <Typography.Title level={3}>
-          Chi tiết kết quả kiểm nghiệm
-        </Typography.Title>
-        {chemicalGroups.map((group) => {
-          const groupData = chemicalData.filter((item) =>
-            group.keys.includes(item.key)
-          );
-          if (groupData.length === 0) return null;
-
-          return (
-            <div key={group.title} style={{ marginBottom: 24 }}>
-              <Typography.Text strong>{group.title}</Typography.Text>
-              <Table
-                rowKey="key"
-                dataSource={groupData}
-                columns={columns}
-                pagination={false}
-                bordered
-                style={{ marginTop: 8 }}
-              />
-            </div>
-          );
-        })}
+        <ChemicalDataDisplay inspectionResult={inspectionResult} />
       </Modal>
 
-      {isEditing && selectedResult && (
+      {isEditing && selectedResult && inspection.status !== "Completed" && inspection.status !== "Cancel" && (
         <InspectionModalForm
           type={plant?.type}
           id={selectedResult.id}
@@ -506,6 +569,6 @@ export const InspectionsShow: React.FC = () => {
           }}
         />
       )}
-    </Drawer>
+    </div>
   );
 };

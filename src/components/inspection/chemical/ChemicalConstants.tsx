@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { IInspectingResult } from "@/interfaces";
-import { Typography, Tag } from "antd";
+import { Typography, Tag, Space, Divider, Flex } from "antd";
 
 export const LIMITS: Record<string, number> = {
   arsen: 1,
@@ -40,137 +40,203 @@ export const UNITS: Record<string, string> = {
   coliforms: "CFU/g",
 };
 
-export const columns = [
-  {
-    title: "Chỉ tiêu",
-    dataIndex: "label",
-    width: 200,
-    key: "label",
-    render: (text: string) => <Typography.Text strong>{text}</Typography.Text>,
-  },
-  {
-    title: "Giá trị",
-    dataIndex: "value",
-    width: 100,
-    key: "value",
-    render: (value: number, record: any) => {
-      const limit = LIMITS[record.key];
-      const isExceed = limit !== undefined && value > limit;
-      return <Tag color={isExceed ? "red" : "green"}>{value}</Tag>;
-    },
-  },
-];
-
 export type ChemicalCategory = {
   title: string;
   keys: string[];
+  color: string; 
 };
 
 export const chemicalGroups: ChemicalCategory[] = [
-  { title: "Kim loại nặng", keys: ["arsen", "plumbum", "cadmi", "hydragyrum"] },
-  { title: "Vi sinh vật gây bệnh", keys: ["salmonella", "coliforms", "ecoli"] },
+  {
+    title: "Kim loại nặng",
+    keys: ["arsen", "plumbum", "cadmi", "hydragyrum"],
+    color: "#ff4d4f"
+  },
+  {
+    title: "Vi sinh vật gây bệnh",
+    keys: ["salmonella", "coliforms", "ecoli"],
+    color: "#1890ff" 
+  },
   {
     title: "Thuốc trừ sâu & tồn dư BVTV",
-    keys: [
-      "glyphosate_glufosinate",
-      "dithiocarbamate",
-      "chlorate",
-      "perchlorate",
-    ],
+    keys: ["glyphosate_glufosinate", "dithiocarbamate", "chlorate", "perchlorate"],
+    color: "#52c41a" 
   },
   {
     title: "Chất xông hơi & bảo quản",
     keys: ["sulfur_dioxide", "methyl_bromide", "hydrogen_phosphide"],
+    color: "#fa8c16" 
   },
   {
     title: "Hóa chất nông nghiệp",
     keys: ["nitrat", "nano3_kno3"],
+    color: "#722ed1" 
   },
 ];
 
-export const getChemicalData = (inspectionResult?: IInspectingResult) =>
-  !inspectionResult
-    ? []
-    : [
-        {
-          key: "arsen",
-          label: `Arsen (${UNITS["arsen"]})`,
-          value: inspectionResult.arsen,
-        },
+export const getChemicalData = (inspectionResult?: IInspectingResult) => {
+  if (!inspectionResult) return [];
 
-        {
-          key: "plumbum",
-          label: `Plumbum (${UNITS["plumbum"]})`,
-          value: inspectionResult.plumbum,
-        },
-        {
-          key: "cadmi",
-          label: `Cadmium (${UNITS["cadmi"]})`,
-          value: inspectionResult.cadmi,
-        },
-        {
-          key: "hydragyrum",
-          label: `Mercury (${UNITS["hydragyrum"]})`,
-          value: inspectionResult.hydrargyrum,
-        },
-        {
-          key: "salmonella",
-          label: `Salmonella (${UNITS["salmonella"]})`,
-          value: inspectionResult.salmonella,
-        },
-        {
-          key: "coliforms",
-          label: `Coliforms (${UNITS["coliforms"]})`,
-          value: inspectionResult.coliforms,
-        },
-        {
-          key: "ecoli",
-          label: `E. Coli (${UNITS["ecoli"]})`,
-          value: inspectionResult.ecoli,
-        },
-        {
-          key: "glyphosate_glufosinate",
-          label: `Glyphosate/Glufosinate (${UNITS["glyphosate_glufosinate"]})`,
-          value: inspectionResult.glyphosate_glufosinate,
-        },
-        {
-          key: "sulfur_dioxide",
-          label: `Sulfur Dioxide (${UNITS["sulfur_dioxide"]})`,
-          value: inspectionResult.sulfur_dioxide,
-        },
-        {
-          key: "methyl_bromide",
-          label: `Methyl Bromide (${UNITS["methyl_bromide"]})`,
-          value: inspectionResult.methyl_bromide,
-        },
-        {
-          key: "hydrogen_phosphide",
-          label: `Hydrogen Phosphide (${UNITS["hydrogen_phosphide"]})`,
-          value: inspectionResult.hydrogen_phosphide,
-        },
-        {
-          key: "dithiocarbamate",
-          label: `Dithiocarbamate (${UNITS["dithiocarbamate"]})`,
-          value: inspectionResult.dithiocarbamate,
-        },
-        {
-          key: "nitrat",
-          label: `Nitrat (${UNITS["nitrat"]})`,
-          value: inspectionResult.nitrat,
-        },
-        {
-          key: "nano3_kno3",
-          label: `Nano3/KNO3 (${UNITS["nano3_kno3"]})`,
-          value: inspectionResult.nano3_kno3,
-        },
-        {
-          key: "chlorate",
-          label: `Chlorate (${UNITS["chlorate"]})`,
-          value: inspectionResult.chlorate,
-        },
-        {
-          key: "perchlorate",
-          label: `Perchlorate (${UNITS["perchlorate"]})`,
-          value: inspectionResult.perchlorate,
-        },
-      ];
+  const chemicalData = [
+    {
+      key: "arsen",
+      label: `Arsen`,
+      unit: UNITS["arsen"],
+      value: inspectionResult.arsen,
+      limit: LIMITS["arsen"],
+    },
+    {
+      key: "plumbum",
+      label: `Plumbum`,
+      unit: UNITS["plumbum"],
+      value: inspectionResult.plumbum,
+      limit: LIMITS["plumbum"],
+    },
+    {
+      key: "cadmi",
+      label: `Cadmium`,
+      unit: UNITS["cadmi"],
+      value: inspectionResult.cadmi,
+      limit: LIMITS["cadmi"],
+    },
+    {
+      key: "hydragyrum",
+      label: `Thủy ngân`,
+      unit: UNITS["hydragyrum"],
+      value: inspectionResult.hydrargyrum,
+      limit: LIMITS["hydragyrum"],
+    },
+    {
+      key: "salmonella",
+      label: `Salmonella`,
+      unit: UNITS["salmonella"],
+      value: inspectionResult.salmonella,
+      limit: LIMITS["salmonella"],
+    },
+    {
+      key: "coliforms",
+      label: `Coliforms`,
+      unit: UNITS["coliforms"],
+      value: inspectionResult.coliforms,
+      limit: LIMITS["coliforms"],
+    },
+    {
+      key: "ecoli",
+      label: `E. Coli`,
+      unit: UNITS["ecoli"],
+      value: inspectionResult.ecoli,
+      limit: LIMITS["ecoli"],
+    },
+    {
+      key: "glyphosate_glufosinate",
+      label: `Glyphosate/Glufosinate`,
+      unit: UNITS["glyphosate_glufosinate"],
+      value: inspectionResult.glyphosate_glufosinate,
+      limit: LIMITS["glyphosate_glufosinate"],
+    },
+    {
+      key: "sulfur_dioxide",
+      label: `Sulfur Dioxide`,
+      unit: UNITS["sulfur_dioxide"],
+      value: inspectionResult.sulfur_dioxide,
+      limit: LIMITS["sulfur_dioxide"],
+    },
+    {
+      key: "methyl_bromide",
+      label: `Methyl Bromide`,
+      unit: UNITS["methyl_bromide"],
+      value: inspectionResult.methyl_bromide,
+      limit: LIMITS["methyl_bromide"],
+    },
+    {
+      key: "hydrogen_phosphide",
+      label: `Hydrogen Phosphide`,
+      unit: UNITS["hydrogen_phosphide"],
+      value: inspectionResult.hydrogen_phosphide,
+      limit: LIMITS["hydrogen_phosphide"],
+    },
+    {
+      key: "dithiocarbamate",
+      label: `Dithiocarbamate`,
+      unit: UNITS["dithiocarbamate"],
+      value: inspectionResult.dithiocarbamate,
+      limit: LIMITS["dithiocarbamate"],
+    },
+    {
+      key: "nitrat",
+      label: `Nitrat`,
+      unit: UNITS["nitrat"],
+      value: inspectionResult.nitrat,
+      limit: LIMITS["nitrat"],
+    },
+    {
+      key: "nano3_kno3",
+      label: `NaNO3/KNO3`,
+      unit: UNITS["nano3_kno3"],
+      value: inspectionResult.nano3_kno3,
+      limit: LIMITS["nano3_kno3"],
+    },
+    {
+      key: "chlorate",
+      label: `Chlorate`,
+      unit: UNITS["chlorate"],
+      value: inspectionResult.chlorate,
+      limit: LIMITS["chlorate"],
+    },
+    {
+      key: "perchlorate",
+      label: `Perchlorate`,
+      unit: UNITS["perchlorate"],
+      value: inspectionResult.perchlorate,
+      limit: LIMITS["perchlorate"],
+    },
+  ];
+
+  return chemicalData;
+};
+
+
+export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResult }> = ({ inspectionResult }) => {
+  const chemicalData = getChemicalData(inspectionResult);
+
+  return (
+    <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+      {chemicalGroups.map((group) => {
+        const groupData = chemicalData.filter((item) =>
+          group.keys.includes(item.key)
+        );
+        if (groupData.length === 0) return null;
+
+        return (
+          <div key={group.title}>
+            <Typography.Text strong style={{ color: group.color, fontSize: 16 }}>
+              {group.title}
+            </Typography.Text>
+            <Divider style={{ margin: "8px 0" }} />
+            {groupData.map((item) => {
+              const isExceed = item.limit !== undefined && item.value > item.limit;
+              return (
+                <Flex
+                  key={item.key}
+                  justify="space-between"
+                  align="center"
+                  style={{ padding: "8px 0" }}
+                >
+                  <Typography.Text>{item.label}</Typography.Text>
+                  <Space>
+                    <Typography.Text>
+                      {item.value} {item.unit}
+                    </Typography.Text>
+                    <Tag color={isExceed ? "red" : "green"}>
+                      {isExceed ? "Vượt mức" : "Đạt"}
+                    </Tag>
+                  </Space>
+                </Flex>
+              );
+            })}
+          </div>
+        );
+      })}
+    </Space>
+  );
+};

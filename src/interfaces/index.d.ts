@@ -26,6 +26,7 @@ export interface IFarmerPermission {
   is_active: boolean;
 }
 export interface IInspectingForm {
+  criteria: never[];
   id: number;
   plan_id: number;
   plan_name: string;

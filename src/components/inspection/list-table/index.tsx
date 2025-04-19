@@ -25,9 +25,10 @@ import { IIdentity, IInspectingForm } from "@/interfaces";
 import { InspectionStatusTag } from "../status";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export const InspectionListTable: React.FC = () => {
-  const go = useGo();
+  const navigate = useNavigate();
   const { data: user } = useGetIdentity<IIdentity>();
   const { data, isLoading } = useList<IInspectingForm, HttpError>({
     resource: "inspecting-forms",
@@ -36,14 +37,14 @@ export const InspectionListTable: React.FC = () => {
 
   const handleView = (id?: number) => {
     if (id) {
-      go({ to: `/inspection-forms/${id}`, type: "push" });
+      navigate(`/inspection-forms/${id}`);
     }
   };
 
   return (
     <Table
       loading={isLoading}
-      dataSource={data?.data?.filter((x=>x.status !== "Draft"))}
+      dataSource={data?.data?.filter((x) => x.status !== "Draft")}
       pagination={{ pageSize: 10 }}
       rowKey="id"
       scroll={{ x: true }}
@@ -56,16 +57,6 @@ export const InspectionListTable: React.FC = () => {
         filterIcon={(filtered) => (
           <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
         )}
-        // defaultFilteredValue={getDefaultFilter("id", filters, "eq")}
-        // filterDropdown={(props) => (
-        //   <InputNumber
-        //     style={{ width: "100%" }}
-        //     placeholder="Tìm ID"
-        //     onChange={(value) =>
-        //       setFilters([{ field: "id", operator: "eq", value }])
-        //     }
-        //   />
-        // )}
       />
 
       <Table.Column
