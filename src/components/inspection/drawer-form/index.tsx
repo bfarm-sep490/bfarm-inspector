@@ -1,23 +1,6 @@
-/* eslint-disable prettier/prettier */
 import { SaveButton } from "@refinedev/antd";
-import {
-  BaseKey,
-  useCustomMutation,
-  useGetToPath,
-  useGo,
-} from "@refinedev/core";
-import {
-  Form,
-  InputNumber,
-  Modal,
-  Spin,
-  Button,
-  Flex,
-  message,
-  Upload,
-  Input,
-  Table,
-} from "antd";
+import { BaseKey, useCustomMutation, useGetToPath, useGo } from "@refinedev/core";
+import { Form, InputNumber, Modal, Spin, Button, Flex, message, Upload, Input, Table } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
@@ -50,12 +33,8 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     if (props.open && props.initialValues) {
       const formattedData = {
         ...props.initialValues,
-        start_date: props.initialValues.start_date
-          ? dayjs(props.initialValues.start_date)
-          : null,
-        end_date: props.initialValues.end_date
-          ? dayjs(props.initialValues.end_date)
-          : null,
+        start_date: props.initialValues.start_date ? dayjs(props.initialValues.start_date) : null,
+        end_date: props.initialValues.end_date ? dayjs(props.initialValues.end_date) : null,
       };
       form.setFieldsValue(formattedData);
     }
@@ -98,7 +77,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
           message.error("Tạo thất bại, vui lòng thử lại");
           setFormLoading(false);
         },
-      }
+      },
     );
   };
 
@@ -117,9 +96,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       open={props.open}
       title={
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "24px", fontWeight: "bold" }}>
-            Tạo kết quả kiểm nghiệm
-          </div>
+          <div style={{ fontSize: "24px", fontWeight: "bold" }}>Tạo kết quả kiểm nghiệm</div>
           <hr
             style={{
               marginTop: "8px",
@@ -148,7 +125,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                         | "Rau ăn củ"
                         | "Nấm"
                         | "Rau củ quả"
-                        | "Rau khô"
+                        | "Rau khô",
                     )
                   : [];
                 return {
@@ -197,10 +174,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                       key: "value",
                       width: 120,
                       render: (_, record: any) => (
-                        <Form.Item
-                          name={record?.key}
-                          style={{ marginBottom: 0 }}
-                        >
+                        <Form.Item name={record?.key} style={{ marginBottom: 0 }}>
                           <InputNumber style={{ width: "100%" }} />
                         </Form.Item>
                       ),
@@ -220,12 +194,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
             <Input.TextArea rows={3} />
           </Form.Item>
           <Form.Item label="Chọn ảnh từ máy">
-            <Upload
-              name="file"
-              action="/upload"
-              listType="picture"
-              onChange={handleImageUpload}
-            >
+            <Upload name="file" action="/upload" listType="picture" onChange={handleImageUpload}>
               <Button icon={<UploadOutlined />}>Tải ảnh lên</Button>
             </Upload>
           </Form.Item>

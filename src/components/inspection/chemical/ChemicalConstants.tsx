@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IInspectingResult } from "@/interfaces";
 import { Typography, Tag, Space, Divider, Flex } from "antd";
 
@@ -43,34 +42,34 @@ export const UNITS: Record<string, string> = {
 export type ChemicalCategory = {
   title: string;
   keys: string[];
-  color: string; 
+  color: string;
 };
 
 export const chemicalGroups: ChemicalCategory[] = [
   {
     title: "Kim loại nặng",
     keys: ["arsen", "plumbum", "cadmi", "hydragyrum"],
-    color: "#722ed1 "
+    color: "#722ed1 ",
   },
   {
     title: "Vi sinh vật gây bệnh",
     keys: ["salmonella", "coliforms", "ecoli"],
-    color: "#1890ff" 
+    color: "#1890ff",
   },
   {
     title: "Thuốc trừ sâu & tồn dư BVTV",
     keys: ["glyphosate_glufosinate", "dithiocarbamate", "chlorate", "perchlorate"],
-    color: "#52c41a" 
+    color: "#52c41a",
   },
   {
     title: "Chất xông hơi & bảo quản",
     keys: ["sulfur_dioxide", "methyl_bromide", "hydrogen_phosphide"],
-    color: "#fa8c16" 
+    color: "#fa8c16",
   },
   {
     title: "Hóa chất nông nghiệp",
     keys: ["nitrat", "nano3_kno3"],
-    color: "#722ed1" 
+    color: "#722ed1",
   },
 ];
 
@@ -195,16 +194,15 @@ export const getChemicalData = (inspectionResult?: IInspectingResult) => {
   return chemicalData;
 };
 
-
-export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResult }> = ({ inspectionResult }) => {
+export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResult }> = ({
+  inspectionResult,
+}) => {
   const chemicalData = getChemicalData(inspectionResult);
 
   return (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
       {chemicalGroups.map((group) => {
-        const groupData = chemicalData.filter((item) =>
-          group.keys.includes(item.key)
-        );
+        const groupData = chemicalData.filter((item) => group.keys.includes(item.key));
         if (groupData.length === 0) return null;
 
         return (
@@ -227,9 +225,7 @@ export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResul
                     <Typography.Text>
                       {item.value} {item.unit}
                     </Typography.Text>
-                    <Tag color={isExceed ? "red" : "green"}>
-                      {isExceed ? "Vượt mức" : "Đạt"}
-                    </Tag>
+                    <Tag color={isExceed ? "red" : "green"}>{isExceed ? "Vượt mức" : "Đạt"}</Tag>
                   </Space>
                 </Flex>
               );

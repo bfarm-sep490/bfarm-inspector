@@ -1,13 +1,12 @@
-/* eslint-disable prettier/prettier */
 "use client";
 
 import { Card, Tag, Typography } from "antd";
 import {
-    getChemicalData,
-    chemicalGroups,
-    LIMITS,
-  } from "@/components/inspection/chemical/ChemicalConstants";
-  
+  getChemicalData,
+  chemicalGroups,
+  LIMITS,
+} from "@/components/inspection/chemical/ChemicalConstants";
+
 import { IInspectingResult } from "@/interfaces";
 
 type Props = {

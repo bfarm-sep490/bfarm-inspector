@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useState, useMemo } from "react";
 import { type HttpError, useOne, useShow, useTranslate } from "@refinedev/core";
 import {
@@ -80,9 +79,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
     >
       <Space direction="vertical" style={{ width: "100%" }}>
         {chemicalGroups.map((group) => {
-          const groupContaminants = contaminants.filter((item) =>
-            group.keys.includes(item.key)
-          );
+          const groupContaminants = contaminants.filter((item) => group.keys.includes(item.key));
           if (groupContaminants.length === 0) return null;
 
           return (
@@ -96,10 +93,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                     borderRadius: 2,
                   }}
                 />
-                <Typography.Text
-                  strong
-                  style={{ color: group.color, fontSize: 15 }}
-                >
+                <Typography.Text strong style={{ color: group.color, fontSize: 15 }}>
                   {group.title}
                 </Typography.Text>
               </Flex>
@@ -122,15 +116,13 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                         strong
                         style={{
                           color: token.colorError,
-                          marginRight: 8
+                          marginRight: 8,
                         }}
                       >
                         {contaminant.standard}
                       </Typography.Text>
                     )}
-                    <Typography.Text>
-                      {contaminant.value}
-                    </Typography.Text>
+                    <Typography.Text>{contaminant.value}</Typography.Text>
                   </Flex>
                 </Flex>
               ))}
@@ -146,36 +138,26 @@ export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const { token } = theme.useToken();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(
-    null
-  );
+  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(null);
   const breakpoints = Grid.useBreakpoint();
   const { id } = useParams();
   const navigate = useNavigate();
   const t = useTranslate();
-  const { queryResult: formQueryResult } = useShow<
-    { data: IInspectingForm[] },
-    HttpError
-  >({
+  const { queryResult: formQueryResult } = useShow<{ data: IInspectingForm[] }, HttpError>({
     resource: "inspecting-forms",
     id,
     queryOptions: { enabled: !!id },
   });
 
-  const { queryResult: resultQueryResult } = useShow<
-    { data: IInspectingResult[] },
-    HttpError
-  >({
+  const { queryResult: resultQueryResult } = useShow<{ data: IInspectingResult[] }, HttpError>({
     resource: "inspecting-results",
     id,
     queryOptions: { enabled: !!id },
   });
 
   const inspection = useMemo(
-    () =>
-      (formQueryResult.data as { data: IInspectingForm[] } | undefined)
-        ?.data?.[0],
-    [formQueryResult.data]
+    () => (formQueryResult.data as { data: IInspectingForm[] } | undefined)?.data?.[0],
+    [formQueryResult.data],
   );
 
   const {
@@ -199,10 +181,8 @@ export const InspectionsShow: React.FC = () => {
   const plant = plantData?.data;
 
   const inspectionResult = useMemo(
-    () =>
-      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)
-        ?.data?.[0],
-    [resultQueryResult.data]
+    () => (resultQueryResult.data as { data: IInspectingResult[] } | undefined)?.data?.[0],
+    [resultQueryResult.data],
   );
 
   const isLoading =
@@ -278,20 +258,12 @@ export const InspectionsShow: React.FC = () => {
 
   const handleBack = () => navigate("/inspection-forms");
   const handleCreate = () => {
-    if (
-      inspection &&
-      inspection.status !== "Completed" &&
-      inspection.status !== "Cancel"
-    ) {
+    if (inspection && inspection.status !== "Completed" && inspection.status !== "Cancel") {
       const { id, ...rest } = inspection;
       const newInspection = {
         ...rest,
-        start_date: inspection.start_date
-          ? dayjs(inspection.start_date).toISOString()
-          : "",
-        end_date: inspection.end_date
-          ? dayjs(inspection.end_date).toISOString()
-          : "",
+        start_date: inspection.start_date ? dayjs(inspection.start_date).toISOString() : "",
+        end_date: inspection.end_date ? dayjs(inspection.end_date).toISOString() : "",
       } as IInspectingForm;
 
       setSelectedResult({ ...newInspection, id });
@@ -375,16 +347,10 @@ export const InspectionsShow: React.FC = () => {
                   />
                 </Col>
                 <Col xs={24} md={16}>
-                  <Space
-                    direction="vertical"
-                    size={16}
-                    style={{ width: "100%" }}
-                  >
+                  <Space direction="vertical" size={16} style={{ width: "100%" }}>
                     <Flex justify="space-between" align="center">
                       <Typography.Text strong>Tên cây trồng</Typography.Text>
-                      <Typography.Text>
-                        {plant?.plant_name || "N/A"}
-                      </Typography.Text>
+                      <Typography.Text>{plant?.plant_name || "N/A"}</Typography.Text>
                     </Flex>
                     <Flex justify="space-between" align="center">
                       <Typography.Text strong>Loại cây trồng</Typography.Text>
@@ -421,28 +387,18 @@ export const InspectionsShow: React.FC = () => {
             >
               <Row gutter={[16, 16]}>
                 <Col span={24}>
-                  <Space
-                    direction="vertical"
-                    size={12}
-                    style={{ width: "100%" }}
-                  >
+                  <Space direction="vertical" size={12} style={{ width: "100%" }}>
                     <Row gutter={[16, 16]}>
                       <Col xs={24} md={12}>
                         <Flex justify="space-between" align="center">
                           <Typography.Text strong>Tên kế hoạch</Typography.Text>
-                          <Typography.Text>
-                            {inspection.plan_name || "N/A"}
-                          </Typography.Text>
+                          <Typography.Text>{inspection.plan_name || "N/A"}</Typography.Text>
                         </Flex>
                       </Col>
                       <Col xs={24} md={12}>
                         <Flex justify="space-between" align="center">
-                          <Typography.Text strong>
-                            Trung tâm kiểm định
-                          </Typography.Text>
-                          <Typography.Text>
-                            {inspection.inspector_name || "N/A"}
-                          </Typography.Text>
+                          <Typography.Text strong>Trung tâm kiểm định</Typography.Text>
+                          <Typography.Text>{inspection.inspector_name || "N/A"}</Typography.Text>
                         </Flex>
                       </Col>
                     </Row>
@@ -454,8 +410,7 @@ export const InspectionsShow: React.FC = () => {
                         <Flex justify="space-between" align="center">
                           <Typography.Text strong>Ngày bắt đầu</Typography.Text>
                           <Typography.Text>
-                            {dayjs(inspection.start_date).format("DD/MM/YYYY")}{" "}
-                            lúc{" "}
+                            {dayjs(inspection.start_date).format("DD/MM/YYYY")} lúc{" "}
                             <Tag color="red" style={{ marginLeft: 4 }}>
                               {dayjs(inspection.start_date).format("HH:mm:ss")}
                             </Tag>
@@ -464,12 +419,9 @@ export const InspectionsShow: React.FC = () => {
                       </Col>
                       <Col xs={24} md={12}>
                         <Flex justify="space-between" align="center">
-                          <Typography.Text strong>
-                            Ngày kết thúc
-                          </Typography.Text>
+                          <Typography.Text strong>Ngày kết thúc</Typography.Text>
                           <Typography.Text>
-                            {dayjs(inspection.end_date).format("DD/MM/YYYY")}{" "}
-                            lúc{" "}
+                            {dayjs(inspection.end_date).format("DD/MM/YYYY")} lúc{" "}
                             <Tag color="red" style={{ marginLeft: 4 }}>
                               {dayjs(inspection.end_date).format("HH:mm:ss")}
                             </Tag>
@@ -508,22 +460,14 @@ export const InspectionsShow: React.FC = () => {
               }}
               extra={
                 inspectionResult ? (
-                  <Button
-                    type="primary"
-                    icon={<EyeOutlined />}
-                    onClick={handleOpenModal}
-                  >
+                  <Button type="primary" icon={<EyeOutlined />} onClick={handleOpenModal}>
                     Xem chi tiết
                   </Button>
                 ) : (
                   !inspectionResult &&
                   inspection.status !== "Completed" &&
                   inspection.status !== "Cancel" && (
-                    <Button
-                      type="primary"
-                      icon={<EditOutlined />}
-                      onClick={handleCreate}
-                    >
+                    <Button type="primary" icon={<EditOutlined />} onClick={handleCreate}>
                       Hoàn Thành
                     </Button>
                   )
@@ -531,22 +475,14 @@ export const InspectionsShow: React.FC = () => {
               }
             >
               {inspectionResult ? (
-                <Space
-                  direction="vertical"
-                  size="middle"
-                  style={{ width: "100%" }}
-                >
+                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
                   <Flex justify="space-between">
                     <Typography.Text strong>Đánh giá</Typography.Text>
-                    <InspectionResultTag
-                      value={inspectionResult.evaluated_result}
-                    />
+                    <InspectionResultTag value={inspectionResult.evaluated_result} />
                   </Flex>
                   <Flex justify="space-between">
                     <Typography.Text strong>Nội dung</Typography.Text>
-                    <Typography.Text>
-                      {inspectionResult.result_content || "N/A"}
-                    </Typography.Text>
+                    <Typography.Text>{inspectionResult.result_content || "N/A"}</Typography.Text>
                   </Flex>
                 </Space>
               ) : inspection.status === "Cancel" ? (
@@ -556,11 +492,7 @@ export const InspectionsShow: React.FC = () => {
                   showIcon
                 />
               ) : (
-                <Alert
-                  type="info"
-                  message="Chưa có kết quả kiểm nghiệm."
-                  showIcon
-                />
+                <Alert type="info" message="Chưa có kết quả kiểm nghiệm." showIcon />
               )}
             </Card>
           </Space>
@@ -585,21 +517,14 @@ export const InspectionsShow: React.FC = () => {
                 borderBottom: `1px solid ${token.colorBorderSecondary}`,
               }}
             >
-              <Space
-                direction="vertical"
-                size="middle"
-                style={{ width: "100%" }}
-              >
+              <Space direction="vertical" size="middle" style={{ width: "100%" }}>
                 <Flex justify="space-between">
                   <Typography.Text strong>Hoàn thành</Typography.Text>
                   <Typography.Text>
                     {inspection.complete_date ? (
                       <>
-                        {dayjs(inspection.complete_date).format("DD/MM/YYYY")}{" "}
-                        lúc{" "}
-                        <Tag color="red">
-                          {dayjs(inspection.complete_date).format("HH:mm:ss")}
-                        </Tag>
+                        {dayjs(inspection.complete_date).format("DD/MM/YYYY")} lúc{" "}
+                        <Tag color="red">{dayjs(inspection.complete_date).format("HH:mm:ss")}</Tag>
                       </>
                     ) : (
                       "N/A"
@@ -610,16 +535,12 @@ export const InspectionsShow: React.FC = () => {
                   <Typography.Text strong>Tạo lúc</Typography.Text>
                   <Typography.Text>
                     {dayjs(inspection.created_at).format("DD/MM/YYYY")} lúc{" "}
-                    <Tag color="red">
-                      {dayjs(inspection.created_at).format("HH:mm:ss")}
-                    </Tag>
+                    <Tag color="red">{dayjs(inspection.created_at).format("HH:mm:ss")}</Tag>
                   </Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
                   <Typography.Text strong>Tạo bởi</Typography.Text>
-                  <Typography.Text>
-                    {inspection.created_by || "N/A"}
-                  </Typography.Text>
+                  <Typography.Text>{inspection.created_by || "N/A"}</Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
                   <Typography.Text strong>Cập nhật</Typography.Text>
@@ -631,9 +552,7 @@ export const InspectionsShow: React.FC = () => {
                 </Flex>
                 <Flex justify="space-between">
                   <Typography.Text strong>Cập nhật bởi</Typography.Text>
-                  <Typography.Text>
-                    {inspection.updated_by || "N/A"}
-                  </Typography.Text>
+                  <Typography.Text>{inspection.updated_by || "N/A"}</Typography.Text>
                 </Flex>
               </Space>
             </Card>

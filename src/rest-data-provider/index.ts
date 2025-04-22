@@ -1,19 +1,40 @@
-/* eslint-disable prettier/prettier */
 import { axiosInstance, generateSort, generateFilter } from "./utils";
 import { stringify } from "query-string";
-import type { AxiosInstance } from "axios";
-import type { DataProvider } from "@refinedev/core";
+import type { AxiosInstance, AxiosResponse } from "axios";
+import type { DataProvider, BaseRecord } from "@refinedev/core";
 
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";
 
+interface ApiResponse<T = any> {
+  status: number;
+  message: string;
+  data: T;
+}
+
+const handleApiResponse = <T extends BaseRecord>(
+  response: AxiosResponse<ApiResponse<T>>,
+  isArray: boolean = false,
+): ApiResponse<T | T[]> => {
+  const responseData = response.data;
+
+  if (responseData?.status && responseData.status !== 200) {
+    throw new Error(responseData.message || "API request failed");
+  }
+
+  const data = responseData?.data !== undefined ? responseData.data : responseData;
+
+  return {
+    status: responseData?.status || 200,
+    message: responseData?.message || "",
+    data: isArray ? (Array.isArray(data) ? data : []) : (data as T),
+  };
+};
+
 export const dataProvider = (
   apiUrl: string,
-  httpClient: AxiosInstance = axiosInstance
-): Omit<
-  Required<DataProvider>,
-  "createMany" | "updateMany" | "deleteMany"
-> => ({
+  httpClient: AxiosInstance = axiosInstance,
+): Omit<Required<DataProvider>, "createMany" | "updateMany" | "deleteMany"> => ({
   getList: async ({ resource, pagination, filters, sorters, meta }) => {
     const url = `${apiUrl}/${resource}`;
 
@@ -48,23 +69,20 @@ export const dataProvider = (
       ? `${url}?${stringify(combinedQuery)}`
       : url;
 
-    const { data, headers } = await httpClient[requestMethod](urlWithQuery, {
+    const response = await httpClient[requestMethod](urlWithQuery, {
       headers: headersFromMeta,
     });
 
-    const responseData = data.data !== undefined ? data.data : data;
+    const { data } = handleApiResponse(response, true);
 
-    const total =
-      headers["x-total-count"] !== undefined
-        ? parseInt(headers["x-total-count"], 10)
-        : data.total !== undefined
-          ? data.total
-          : Array.isArray(responseData)
-            ? responseData.length
-            : 0;
+    const total = response.headers["x-total-count"]
+      ? parseInt(response.headers["x-total-count"], 10)
+      : Array.isArray(data)
+        ? data.length
+        : 0;
 
     return {
-      data: responseData,
+      data: data as any[],
       total,
     };
   },
@@ -73,15 +91,15 @@ export const dataProvider = (
     const { headers, method } = meta ?? {};
     const requestMethod = (method as MethodTypes) ?? "get";
 
-    const { data } = await httpClient[requestMethod](
+    const response = await httpClient[requestMethod](
       `${apiUrl}/${resource}?${stringify({ id: ids })}`,
-      { headers }
+      { headers },
     );
 
-    const responseData = data.data !== undefined ? data.data : data;
+    const { data } = handleApiResponse(response, true);
 
     return {
-      data: responseData,
+      data: data as any[],
     };
   },
 
@@ -91,14 +109,14 @@ export const dataProvider = (
     const { headers, method } = meta ?? {};
     const requestMethod = (method as MethodTypesWithBody) ?? "post";
 
-    const { data } = await httpClient[requestMethod](url, variables, {
+    const response = await httpClient[requestMethod](url, variables, {
       headers,
     });
 
-    const responseData = data.data !== undefined ? data.data : data;
+    const { data } = handleApiResponse(response);
 
     return {
-      data: responseData,
+      data: data as any,
     };
   },
 
@@ -108,14 +126,14 @@ export const dataProvider = (
     const { headers, method } = meta ?? {};
     const requestMethod = (method as MethodTypesWithBody) ?? "put";
 
-    const { data } = await httpClient[requestMethod](url, variables, {
+    const response = await httpClient[requestMethod](url, variables, {
       headers,
     });
 
-    const responseData = data.data !== undefined ? data.data : data;
+    const { data } = handleApiResponse(response);
 
     return {
-      data: responseData,
+      data: data as any,
     };
   },
 
@@ -125,12 +143,12 @@ export const dataProvider = (
     const { headers, method } = meta ?? {};
     const requestMethod = (method as MethodTypes) ?? "get";
 
-    const { data } = await httpClient[requestMethod](url, { headers });
+    const response = await httpClient[requestMethod](url, { headers });
 
-    const responseData = data.data !== undefined ? data.data : data;
+    const { data } = handleApiResponse(response);
 
     return {
-      data: responseData,
+      data: data as any,
     };
   },
 
@@ -140,15 +158,15 @@ export const dataProvider = (
     const { headers, method } = meta ?? {};
     const requestMethod = (method as MethodTypesWithBody) ?? "delete";
 
-    const { data } = await httpClient[requestMethod](url, {
+    const response = await httpClient[requestMethod](url, {
       data: variables,
       headers,
     });
 
-    const responseData = data.data !== undefined ? data.data : data;
+    const { data } = handleApiResponse(response);
 
     return {
-      data: responseData,
+      data: data as any,
     };
   },
 
@@ -156,15 +174,7 @@ export const dataProvider = (
     return apiUrl;
   },
 
-  custom: async ({
-    url,
-    method,
-    filters,
-    sorters,
-    payload,
-    query,
-    headers,
-  }) => {
+  custom: async ({ url, method, filters, sorters, payload, query, headers }) => {
     let requestUrl = `${url}?`;
 
     if (sorters) {
@@ -190,7 +200,7 @@ export const dataProvider = (
 
     let axiosResponse;
     switch (method) {
-      case "put":
+      case "patch":
       case "post":
       case "put":
         axiosResponse = await httpClient[method](url, payload, {
@@ -210,10 +220,8 @@ export const dataProvider = (
         break;
     }
 
-    const { data } = axiosResponse;
+    const { data } = handleApiResponse(axiosResponse);
 
-    const responseData = data.data !== undefined ? data.data : data;
-
-    return Promise.resolve({ data: responseData });
+    return Promise.resolve({ data: data as any });
   },
 });
