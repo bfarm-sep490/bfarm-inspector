@@ -1,19 +1,15 @@
 import React from "react";
-import { useTable } from "@refinedev/antd";
-import { getDefaultFilter, type HttpError, useGetIdentity, useGo, useList } from "@refinedev/core";
-import { Table, Button, InputNumber, Typography, Space } from "antd";
+import { type HttpError, useGetIdentity, useList } from "@refinedev/core";
+import { Table, Button, Typography, Space } from "antd";
 import {
   EyeOutlined,
   SearchOutlined,
   CalendarOutlined,
-  BankOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   HourglassOutlined,
-  PictureOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { PaginationTotal } from "@/components/paginationTotal";
 import { IIdentity, IInspectingForm } from "@/interfaces";
 import { InspectionStatusTag } from "../status";
 import dayjs from "dayjs";

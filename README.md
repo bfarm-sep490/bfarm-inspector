@@ -1,4 +1,4 @@
-# BFarm Expert
+# BFarmX Inspector
 
 ## 🛠️ Tech Stack
 

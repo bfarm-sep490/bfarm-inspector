@@ -152,7 +152,6 @@ export const InspectionsShow: React.FC = () => {
   const { queryResult: resultQueryResult } = useShow<{ data: IInspectingResult[] }, HttpError>({
     resource: "inspecting-results",
     id,
-    queryOptions: { enabled: !!id },
   });
 
   const inspection = useMemo(
@@ -279,12 +278,6 @@ export const InspectionsShow: React.FC = () => {
   const handleOpenModal = () => setIsModalVisible(true);
   const handleCloseModal = () => setIsModalVisible(false);
 
-  if (!id) return <Alert type="error" message="No inspection ID provided" />;
-  if (isLoading) return <Spin size="large" />;
-  if (formQueryResult.error || resultQueryResult.error)
-    return <Alert type="error" message="Failed to load inspection data" />;
-  if (!inspection) return <Typography.Text>Không có dữ liệu.</Typography.Text>;
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "Completed":
@@ -311,7 +304,7 @@ export const InspectionsShow: React.FC = () => {
         onBack={handleBack}
         title={
           <Typography.Title level={4} style={{ margin: 0 }}>
-            #{inspection.id} - {inspection.task_name}
+            #{inspection?.id} - {inspection?.task_name}
           </Typography.Title>
         }
       />
@@ -392,13 +385,13 @@ export const InspectionsShow: React.FC = () => {
                       <Col xs={24} md={12}>
                         <Flex justify="space-between" align="center">
                           <Typography.Text strong>Tên kế hoạch</Typography.Text>
-                          <Typography.Text>{inspection.plan_name || "N/A"}</Typography.Text>
+                          <Typography.Text>{inspection?.plan_name || "N/A"}</Typography.Text>
                         </Flex>
                       </Col>
                       <Col xs={24} md={12}>
                         <Flex justify="space-between" align="center">
                           <Typography.Text strong>Trung tâm kiểm định</Typography.Text>
-                          <Typography.Text>{inspection.inspector_name || "N/A"}</Typography.Text>
+                          <Typography.Text>{inspection?.inspector_name || "N/A"}</Typography.Text>
                         </Flex>
                       </Col>
                     </Row>
@@ -410,9 +403,9 @@ export const InspectionsShow: React.FC = () => {
                         <Flex justify="space-between" align="center">
                           <Typography.Text strong>Ngày bắt đầu</Typography.Text>
                           <Typography.Text>
-                            {dayjs(inspection.start_date).format("DD/MM/YYYY")} lúc{" "}
+                            {dayjs(inspection?.start_date).format("DD/MM/YYYY")} lúc{" "}
                             <Tag color="red" style={{ marginLeft: 4 }}>
-                              {dayjs(inspection.start_date).format("HH:mm:ss")}
+                              {dayjs(inspection?.start_date).format("HH:mm:ss")}
                             </Tag>
                           </Typography.Text>
                         </Flex>
@@ -421,9 +414,9 @@ export const InspectionsShow: React.FC = () => {
                         <Flex justify="space-between" align="center">
                           <Typography.Text strong>Ngày kết thúc</Typography.Text>
                           <Typography.Text>
-                            {dayjs(inspection.end_date).format("DD/MM/YYYY")} lúc{" "}
+                            {dayjs(inspection?.end_date).format("DD/MM/YYYY")} lúc{" "}
                             <Tag color="red" style={{ marginLeft: 4 }}>
-                              {dayjs(inspection.end_date).format("HH:mm:ss")}
+                              {dayjs(inspection?.end_date).format("HH:mm:ss")}
                             </Tag>
                           </Typography.Text>
                         </Flex>
@@ -437,8 +430,8 @@ export const InspectionsShow: React.FC = () => {
                         <Flex justify="space-between" align="center">
                           <Typography.Text strong>Trạng thái</Typography.Text>
                           <Flex align="center" gap={8}>
-                            {getStatusIcon(inspection.status)}
-                            <InspectionStatusTag value={inspection.status} />
+                            {getStatusIcon(inspection?.status || "")}
+                            <InspectionStatusTag value={inspection?.status || ""} />
                           </Flex>
                         </Flex>
                       </Col>
@@ -465,8 +458,8 @@ export const InspectionsShow: React.FC = () => {
                   </Button>
                 ) : (
                   !inspectionResult &&
-                  inspection.status !== "Completed" &&
-                  inspection.status !== "Cancel" && (
+                  inspection?.status !== "Completed" &&
+                  inspection?.status !== "Cancel" && (
                     <Button type="primary" icon={<EditOutlined />} onClick={handleCreate}>
                       Hoàn Thành
                     </Button>
@@ -485,7 +478,7 @@ export const InspectionsShow: React.FC = () => {
                     <Typography.Text>{inspectionResult.result_content || "N/A"}</Typography.Text>
                   </Flex>
                 </Space>
-              ) : inspection.status === "Cancel" ? (
+              ) : inspection?.status === "Cancel" ? (
                 <Alert
                   type="error"
                   message="Đợt kiểm nghiệm đã bị hủy. Không thể tạo kết quả."
@@ -521,10 +514,10 @@ export const InspectionsShow: React.FC = () => {
                 <Flex justify="space-between">
                   <Typography.Text strong>Hoàn thành</Typography.Text>
                   <Typography.Text>
-                    {inspection.complete_date ? (
+                    {inspection?.complete_date ? (
                       <>
-                        {dayjs(inspection.complete_date).format("DD/MM/YYYY")} lúc{" "}
-                        <Tag color="red">{dayjs(inspection.complete_date).format("HH:mm:ss")}</Tag>
+                        {dayjs(inspection?.complete_date).format("DD/MM/YYYY")} lúc{" "}
+                        <Tag color="red">{dayjs(inspection?.complete_date).format("HH:mm:ss")}</Tag>
                       </>
                     ) : (
                       "N/A"
@@ -534,25 +527,25 @@ export const InspectionsShow: React.FC = () => {
                 <Flex justify="space-between">
                   <Typography.Text strong>Tạo lúc</Typography.Text>
                   <Typography.Text>
-                    {dayjs(inspection.created_at).format("DD/MM/YYYY")} lúc{" "}
-                    <Tag color="red">{dayjs(inspection.created_at).format("HH:mm:ss")}</Tag>
+                    {dayjs(inspection?.created_at).format("DD/MM/YYYY")} lúc{" "}
+                    <Tag color="red">{dayjs(inspection?.created_at).format("HH:mm:ss")}</Tag>
                   </Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
                   <Typography.Text strong>Tạo bởi</Typography.Text>
-                  <Typography.Text>{inspection.created_by || "N/A"}</Typography.Text>
+                  <Typography.Text>{inspection?.created_by || "N/A"}</Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
                   <Typography.Text strong>Cập nhật</Typography.Text>
                   <Typography.Text>
-                    {inspection.updated_at
-                      ? dayjs(inspection.updated_at).format("DD/MM/YYYY")
+                    {inspection?.updated_at
+                      ? dayjs(inspection?.updated_at).format("DD/MM/YYYY")
                       : "N/A"}
                   </Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
                   <Typography.Text strong>Cập nhật bởi</Typography.Text>
-                  <Typography.Text>{inspection.updated_by || "N/A"}</Typography.Text>
+                  <Typography.Text>{inspection?.updated_by || "N/A"}</Typography.Text>
                 </Flex>
               </Space>
             </Card>
@@ -576,8 +569,8 @@ export const InspectionsShow: React.FC = () => {
 
       {isEditing &&
         selectedResult &&
-        inspection.status !== "Completed" &&
-        inspection.status !== "Cancel" && (
+        inspection?.status !== "Completed" &&
+        inspection?.status !== "Cancel" && (
           <InspectionModalForm
             type={plant?.type}
             id={selectedResult.id}
