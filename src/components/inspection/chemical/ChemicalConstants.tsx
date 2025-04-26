@@ -1,23 +1,33 @@
+/* eslint-disable prettier/prettier */
 import { IInspectingResult } from "@/interfaces";
-import { Typography, Tag, Space, Divider, Flex } from "antd";
+import { Typography, Tag, Space, Divider, Flex, Table } from "antd";
+
+// Define the type for chemical data items (used in the Table)
+interface ChemicalData {
+  key: string;
+  label: string;
+  unit: string;
+  value: number;
+  limit: number;
+}
 
 export const LIMITS: Record<string, number> = {
-  arsen: 1,
-  plumbum: 0.3,
-  cadmi: 0.05,
-  hydragyrum: 0.01,
-  glyphosate_glufosinate: 0.01,
-  sulfur_dioxide: 10,
-  methyl_bromide: 0.01,
-  hydrogen_phosphide: 0.05,
-  dithiocarbamate: 1.0,
-  nitrat: 9,
-  nano3_kno3: 15,
-  chlorate: 0.01,
-  perchlorate: 0.01,
-  salmonella: 0,
-  ecoli: 100,
-  coliforms: 10,
+  arsen:0.5, // Theo VietGAP, giữ nguyên vì không có trong initialContaminants
+  plumbum: 0.3, // Khớp với initialContaminants
+  cadmi: 0.05, // Khớp với initialContaminants
+  hydragyrum: 0.03, // Theo VietGAP, giữ nguyên vì không có trong initialContaminants
+  glyphosate_glufosinate: 0.01, // Khớp với initialContaminants
+  sulfur_dioxide: 10, // Khớp với initialContaminants
+  methyl_bromide: 0, // Khớp với initialContaminants (bị cấm)
+  hydrogen_phosphide: 0, // Khớp với initialContaminants (bị cấm)
+  dithiocarbamate: 2.0, // Khớp với initialContaminants
+  nitrat: 9, // Giữ nguyên vì không có trong initialContaminants
+  nano3_kno3: 15, // Giữ nguyên vì không có trong initialContaminants
+  chlorate: 0.01, // Khớp với initialContaminants
+  perchlorate: 0.01, // Khớp với initialContaminants
+  salmonella: 0, // Khớp với initialContaminants
+  ecoli: 100, // Khớp với initialContaminants
+  coliforms: 100, // Khớp với initialContaminants
 };
 
 export const UNITS: Record<string, string> = {
@@ -49,7 +59,7 @@ export const chemicalGroups: ChemicalCategory[] = [
   {
     title: "Kim loại nặng",
     keys: ["arsen", "plumbum", "cadmi", "hydragyrum"],
-    color: "#722ed1 ",
+    color: "#722ed1",
   },
   {
     title: "Vi sinh vật gây bệnh",
@@ -72,7 +82,6 @@ export const chemicalGroups: ChemicalCategory[] = [
     color: "#722ed1",
   },
 ];
-
 export const getChemicalData = (inspectionResult?: IInspectingResult) => {
   if (!inspectionResult) return [];
 
@@ -81,112 +90,112 @@ export const getChemicalData = (inspectionResult?: IInspectingResult) => {
       key: "arsen",
       label: `Arsen`,
       unit: UNITS["arsen"],
-      value: inspectionResult.arsen,
+      value: inspectionResult.arsen ?? 0, // Thêm giá trị mặc định nếu không có dữ liệu
       limit: LIMITS["arsen"],
     },
     {
       key: "plumbum",
       label: `Plumbum`,
       unit: UNITS["plumbum"],
-      value: inspectionResult.plumbum,
+      value: inspectionResult.plumbum ?? 0,
       limit: LIMITS["plumbum"],
     },
     {
       key: "cadmi",
       label: `Cadmium`,
       unit: UNITS["cadmi"],
-      value: inspectionResult.cadmi,
+      value: inspectionResult.cadmi ?? 0,
       limit: LIMITS["cadmi"],
     },
     {
-      key: "hydragyrum",
+      key: "hydrargyrum",
       label: `Thủy ngân`,
-      unit: UNITS["hydragyrum"],
-      value: inspectionResult.hydrargyrum,
-      limit: LIMITS["hydragyrum"],
+      unit: UNITS["hydrargyrum"],
+      value: inspectionResult.hydrargyrum ?? 0,
+      limit: LIMITS["hydrargyrum"],
     },
     {
       key: "salmonella",
       label: `Salmonella`,
       unit: UNITS["salmonella"],
-      value: inspectionResult.salmonella,
+      value: inspectionResult.salmonella ?? 0,
       limit: LIMITS["salmonella"],
     },
     {
       key: "coliforms",
       label: `Coliforms`,
       unit: UNITS["coliforms"],
-      value: inspectionResult.coliforms,
+      value: inspectionResult.coliforms ?? 0,
       limit: LIMITS["coliforms"],
     },
     {
       key: "ecoli",
       label: `E. Coli`,
       unit: UNITS["ecoli"],
-      value: inspectionResult.ecoli,
+      value: inspectionResult.ecoli ?? 0,
       limit: LIMITS["ecoli"],
     },
     {
       key: "glyphosate_glufosinate",
       label: `Glyphosate/Glufosinate`,
       unit: UNITS["glyphosate_glufosinate"],
-      value: inspectionResult.glyphosate_glufosinate,
+      value: inspectionResult.glyphosate_glufosinate ?? 0,
       limit: LIMITS["glyphosate_glufosinate"],
     },
     {
       key: "sulfur_dioxide",
       label: `Sulfur Dioxide`,
       unit: UNITS["sulfur_dioxide"],
-      value: inspectionResult.sulfur_dioxide,
+      value: inspectionResult.sulfur_dioxide ?? 0,
       limit: LIMITS["sulfur_dioxide"],
     },
     {
       key: "methyl_bromide",
       label: `Methyl Bromide`,
       unit: UNITS["methyl_bromide"],
-      value: inspectionResult.methyl_bromide,
+      value: inspectionResult.methyl_bromide ?? 0,
       limit: LIMITS["methyl_bromide"],
     },
     {
       key: "hydrogen_phosphide",
       label: `Hydrogen Phosphide`,
       unit: UNITS["hydrogen_phosphide"],
-      value: inspectionResult.hydrogen_phosphide,
+      value: inspectionResult.hydrogen_phosphide ?? 0,
       limit: LIMITS["hydrogen_phosphide"],
     },
     {
       key: "dithiocarbamate",
       label: `Dithiocarbamate`,
       unit: UNITS["dithiocarbamate"],
-      value: inspectionResult.dithiocarbamate,
+      value: inspectionResult.dithiocarbamate ?? 0,
       limit: LIMITS["dithiocarbamate"],
     },
     {
       key: "nitrat",
       label: `Nitrat`,
       unit: UNITS["nitrat"],
-      value: inspectionResult.nitrat,
+      value: inspectionResult.nitrat ?? 0,
       limit: LIMITS["nitrat"],
     },
     {
       key: "nano3_kno3",
       label: `NaNO3/KNO3`,
       unit: UNITS["nano3_kno3"],
-      value: inspectionResult.nano3_kno3,
+      value: inspectionResult.nano3_kno3 ?? 0,
       limit: LIMITS["nano3_kno3"],
     },
     {
       key: "chlorate",
       label: `Chlorate`,
       unit: UNITS["chlorate"],
-      value: inspectionResult.chlorate,
+      value: inspectionResult.chlorate ?? 0,
       limit: LIMITS["chlorate"],
     },
     {
       key: "perchlorate",
       label: `Perchlorate`,
       unit: UNITS["perchlorate"],
-      value: inspectionResult.perchlorate,
+      value: inspectionResult.perchlorate ?? 0,
       limit: LIMITS["perchlorate"],
     },
   ];
@@ -194,16 +203,36 @@ export const getChemicalData = (inspectionResult?: IInspectingResult) => {
   return chemicalData;
 };
 
+// Define the columns for the Table component
 export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResult }> = ({
   inspectionResult,
 }) => {
   const chemicalData = getChemicalData(inspectionResult);
 
+  // Tạo một object để dễ tra cứu giá trị của từng chất
+  const chemicalDataMap = chemicalData.reduce((map, item) => {
+    map[item.key] = item;
+    return map;
+  }, {} as Record<string, ChemicalData>);
+
   return (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
       {chemicalGroups.map((group) => {
-        const groupData = chemicalData.filter((item) => group.keys.includes(item.key));
-        if (groupData.length === 0) return null;
+        // Lấy tất cả các chất trong nhóm, kể cả khi không có dữ liệu
+        const groupData = group.keys.map((key) => {
+          const data = chemicalDataMap[key];
+          return (
+            data || {
+              key,
+              label: key
+                .replace(/_/g, " ")
+                .replace(/\b\w/g, (char) => char.toUpperCase()), // Tạo label mặc định nếu không có dữ liệu
+              unit: UNITS[key] || "",
+              value: 0, // Giá trị mặc định nếu không có dữ liệu
+              limit: LIMITS[key] || 0,
+            }
+          );
+        });
 
         return (
           <div key={group.title}>
@@ -223,9 +252,17 @@ export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResul
                   <Typography.Text>{item.label}</Typography.Text>
                   <Space>
                     <Typography.Text>
-                      {item.value} {item.unit}
+                      {item.value === 0 && !chemicalDataMap[item.key]
+                        ? "N/A"
+                        : `${item.value} ${item.unit}`}
                     </Typography.Text>
-                    <Tag color={isExceed ? "red" : "green"}>{isExceed ? "Vượt mức" : "Đạt"}</Tag>
+                    <Tag color={isExceed ? "red" : "green"}>
+                      {item.value === 0 && !chemicalDataMap[item.key]
+                        ? "Chưa có dữ liệu"
+                        : isExceed
+                          ? "Vượt mức"
+                          : "Đạt"}
+                    </Tag>
                   </Space>
                 </Flex>
               );
