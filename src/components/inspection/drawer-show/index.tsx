@@ -1,10 +1,15 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useMemo } from "react";
-import { type HttpError, useOne, useShow, useTranslate, useCustomMutation } from "@refinedev/core";
+import {
+  type HttpError,
+  useOne,
+  useShow,
+  useTranslate,
+  useCustomMutation,
+} from "@refinedev/core";
 import {
   Button,
   Typography,
-  Spin,
   Alert,
   Modal,
   theme,
@@ -20,7 +25,6 @@ import {
   Table,
   Tooltip,
   Tabs,
-  Badge,
   message,
 } from "antd";
 import {
@@ -32,9 +36,6 @@ import {
   CloseCircleOutlined,
   ExperimentOutlined,
   CloseOutlined,
-  BarChartOutlined,
-  FileTextOutlined,
-  EllipsisOutlined,
 } from "@ant-design/icons";
 import { IInspectingForm, IInspectingResult } from "@/interfaces";
 import { InspectionModalForm } from "../drawer-form";
@@ -46,16 +47,11 @@ import {
   getChemicalData,
   UNITS,
   LIMITS,
+  Contaminant,
+  initialContaminants,
 } from "../chemical/ChemicalConstants";
 import { InspectionResultTag } from "../result";
 import { PageHeader } from "@refinedev/antd";
-
-interface Contaminant {
-  key: string;
-  name: string;
-  value: string;
-  standard?: string;
-}
 
 interface ContaminantCheckCardProps {
   type: string;
@@ -63,62 +59,7 @@ interface ContaminantCheckCardProps {
   contaminants: Contaminant[];
 }
 
-const initialContaminants: Contaminant[] = [
-  { key: "arsen", name: "Arsen", value: "< 0.5 mg/kg", standard: "Max" },
-  { key: "plumbum", name: "Plumbum", value: "< 0.3 mg/kg", standard: "Max" },
-  { key: "cadmi", name: "Cadmium", value: "< 0.05 mg/kg", standard: "Max" },
-  { key: "hydragyrum", name: "Thủy ngân", value: "< 0.03 mg/kg", standard: "Max" },
-  {
-    key: "salmonella",
-    name: "Salmonella",
-    value: "< 0 CFU/25g",
-    standard: "Max",
-  },
-  { key: "coliforms", name: "Coliforms", value: "< 100 CFU/g", standard: "Max" },
-  {
-    key: "ecoli",
-    name: "E.coli",
-    value: "< 100 CFU/g",
-    standard: "Max",
-  },
-  {
-    key: "glyphosate_glufosinate",
-    name: "Glyphosate, Glufosinate",
-    value: "< 0.01 mg/kg",
-    standard: "Max",
-  },
-  {
-    key: "sulfur_dioxide",
-    name: "Sulfur Dioxide",
-    value: "< 10 mg/kg",
-    standard: "Max",
-  },
-  {
-    key: "methyl_bromide",
-    name: "Methyl Bromide",
-    value: "< 0 mg/kg",
-    standard: "Max",
-  },
-  {
-    key: "hydrogen_phosphide",
-    name: "Hydrogen Phosphide",
-    value: "< 0 mg/kg",
-    standard: "Max",
-  },
-  {
-    key: "dithiocarbamate",
-    name: "Dithiocarbamate",
-    value: "< 2.0 mg/kg",
-    standard: "Max",
-  },
-  { key: "nitrat", name: "Nitrat", value: "< 9 mg/kg", standard: "Max" },
-  { key: "nano3_kno3", name: "NaNO3/KNO3", value: "< 15 mg/kg", standard: "Max" },
-  { key: "chlorate", name: "Chlorate", value: "< 0.01 mg/kg", standard: "Max" },
-  { key: "perchlorate", name: "Perchlorate", value: "< 0.01 mg/kg", standard: "Max" },
-];
-
 const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
-  type,
   style,
   contaminants,
 }) => {
@@ -126,7 +67,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
 
   return (
     <Card
-      bordered={false}
+      variant="borderless"
       style={{
         borderRadius: token.borderRadiusLG,
         boxShadow: token.boxShadow,
@@ -135,7 +76,9 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
       }}
     >
       <Flex align="center" gap={8} style={{ marginBottom: 24 }}>
-        <ExperimentOutlined style={{ color: token.colorPrimary, fontSize: 24 }} />
+        <ExperimentOutlined
+          style={{ color: token.colorPrimary, fontSize: 24 }}
+        />
         <Typography.Title
           level={3}
           style={{ margin: 0, color: token.colorPrimary }}
@@ -172,12 +115,16 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                   </Typography.Title>
                 </Flex>
               }
-              headStyle={{
-                borderBottom: `2px solid ${group.color}`,
-                padding: "12px 16px",
-                backgroundColor: token.colorBgElevated,
+              styles={{
+                header: {
+                  borderBottom: `2px solid ${group.color}`,
+                  padding: "12px 16px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "16px",
+                },
               }}
-              bodyStyle={{ padding: "16px" }}
               style={{
                 borderRadius: token.borderRadiusLG,
                 boxShadow: token.boxShadow,
@@ -213,11 +160,10 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                             borderRadius: token.borderRadiusSM,
                           }}
                         >
-                          ≤ {LIMITS[record.key] || "N/A"} {UNITS[record.key] || ""}
+                          ≤ {LIMITS[record.key] || "N/A"}{" "}
+                          {UNITS[record.key] || ""}
                         </Tag>
-                        <Tooltip
-                          title={`Giới hạn an toàn cho ${record.name}`}
-                        >
+                        <Tooltip title={`Giới hạn an toàn cho ${record.name}`}>
                           <InfoCircleOutlined
                             style={{
                               color: token.colorPrimary,
@@ -283,7 +229,8 @@ export const InspectionsShow: React.FC = () => {
 
   const inspection = useMemo(
     () =>
-      (formQueryResult.data as { data: IInspectingForm[] } | undefined)?.data?.[0],
+      (formQueryResult.data as { data: IInspectingForm[] } | undefined)
+        ?.data?.[0],
     [formQueryResult.data]
   );
 
@@ -309,7 +256,8 @@ export const InspectionsShow: React.FC = () => {
 
   const inspectionResult = useMemo(
     () =>
-      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)?.data?.[0],
+      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)
+        ?.data?.[0],
     [resultQueryResult.data]
   );
 
@@ -325,7 +273,7 @@ export const InspectionsShow: React.FC = () => {
 
   const chemicalData = useMemo(() => {
     const data = getChemicalData(inspectionResult);
-    return data.map(item => ({
+    return data.map((item) => ({
       ...item,
       name: item.label,
       value: item.value !== undefined ? item.value.toString() : "N/A",
@@ -397,10 +345,19 @@ export const InspectionsShow: React.FC = () => {
         return <CloseCircleOutlined style={{ color: token.colorError }} />;
       case "Pending":
         return <ClockCircleOutlined style={{ color: token.colorInfo }} />;
+      case "Incomplete":
+        return <ClockCircleOutlined style={{ color: token.colorInfo }} />;
       default:
         return <InfoCircleOutlined style={{ color: token.colorInfo }} />;
     }
   };
+  const now = dayjs();
+  const isBeforeStart = inspection?.start_date
+    ? now.isBefore(dayjs(inspection.start_date))
+    : false;
+  const isAfterEnd = inspection?.end_date
+    ? now.isAfter(dayjs(inspection.end_date))
+    : false;
 
   return (
     <div
@@ -441,12 +398,16 @@ export const InspectionsShow: React.FC = () => {
                   </Typography.Title>
                 </Flex>
               }
-              headStyle={{
-                borderBottom: `2px solid ${token.colorPrimary}`,
-                padding: "16px 24px",
-                backgroundColor: token.colorBgElevated,
+              styles={{
+                header: {
+                  borderBottom: `2px solid ${token.colorPrimary}`,
+                  padding: "16px 24px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "24px",
+                },
               }}
-              bodyStyle={{ padding: "24px" }}
               style={{
                 borderRadius: token.borderRadiusLG,
                 boxShadow: token.boxShadow,
@@ -468,7 +429,11 @@ export const InspectionsShow: React.FC = () => {
                   />
                 </Col>
                 <Col xs={24} md={16}>
-                  <Space direction="vertical" size={16} style={{ width: "100%" }}>
+                  <Space
+                    direction="vertical"
+                    size={16}
+                    style={{ width: "100%" }}
+                  >
                     <Flex justify="space-between" align="center">
                       <Typography.Text
                         strong
@@ -540,12 +505,16 @@ export const InspectionsShow: React.FC = () => {
                   </Typography.Title>
                 </Flex>
               }
-              headStyle={{
-                borderBottom: `2px solid ${token.colorPrimary}`,
-                padding: "16px 24px",
-                backgroundColor: token.colorBgElevated,
+              styles={{
+                header: {
+                  borderBottom: `2px solid ${token.colorPrimary}`,
+                  padding: "16px 24px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "24px",
+                },
               }}
-              bodyStyle={{ padding: "24px" }}
               style={{
                 borderRadius: token.borderRadiusLG,
                 boxShadow: token.boxShadow,
@@ -566,11 +535,17 @@ export const InspectionsShow: React.FC = () => {
                     Xem chi tiết
                   </Button>
                 ) : (
-                  inspection?.status === "Draft" && (
+                  (inspection?.status === "Ongoing" ||
+                    inspection?.status === "Incomplete") && (
                     <Button
                       type="primary"
                       icon={<EditOutlined />}
                       onClick={handleCreate}
+                      disabled={
+                        isBeforeStart ||
+                        isAfterEnd ||
+                        inspection?.status === "Incomplete"
+                      }
                       style={{
                         borderRadius: token.borderRadiusSM,
                         backgroundColor: token.colorPrimary,
@@ -584,26 +559,44 @@ export const InspectionsShow: React.FC = () => {
               }
             >
               {inspectionResult ? (
-                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+                <Space
+                  direction="vertical"
+                  size="middle"
+                  style={{ width: "100%" }}
+                >
                   <Flex justify="space-between">
                     <Typography.Text strong style={{ fontSize: 16 }}>
                       Đánh giá
                     </Typography.Text>
-                    <InspectionResultTag value={inspectionResult.evaluated_result} />
+                    <InspectionResultTag
+                      value={inspectionResult.evaluated_result}
+                    />
                   </Flex>
                   <Flex justify="space-between">
                     <Typography.Text strong style={{ fontSize: 16 }}>
                       Nội dung
                     </Typography.Text>
-                    <Typography.Text>{inspectionResult.result_content}</Typography.Text>
+                    <Typography.Text>
+                      {inspectionResult.result_content}
+                    </Typography.Text>
                   </Flex>
                 </Space>
-              ) : inspection?.status === "Draft" ? (
-                <Alert
-                  type="info"
-                  message="Chưa có kết quả kiểm nghiệm. Nhấn 'Hoàn Thành' để nhập kết quả."
-                  showIcon
-                />
+              ) : inspection?.status === "Ongoing" ? (
+                isBeforeStart ? (
+                  <Alert
+                    type="warning"
+                    message="Chưa đến ngày kiểm nghiệm"
+                    showIcon
+                  />
+                ) : (
+                  <Alert
+                    type="info"
+                    message="Chưa có kết quả kiểm nghiệm. Nhấn 'Hoàn Thành' để nhập kết quả."
+                    showIcon
+                  />
+                )
+              ) : inspection?.status === "Incomplete" ? (
+                <Alert type="error" message="Đã quá hạn kiểm nghiệm" showIcon />
               ) : (
                 <Alert
                   type="warning"
@@ -612,8 +605,6 @@ export const InspectionsShow: React.FC = () => {
                 />
               )}
             </Card>
-
-            {/* Task Information Card */}
             <Card
               title={
                 <Flex align="center" gap={12}>
@@ -628,12 +619,16 @@ export const InspectionsShow: React.FC = () => {
                   </Typography.Title>
                 </Flex>
               }
-              headStyle={{
-                borderBottom: `2px solid ${token.colorPrimary}`,
-                padding: "16px 24px",
-                backgroundColor: token.colorBgElevated,
+              styles={{
+                header: {
+                  borderBottom: `2px solid ${token.colorPrimary}`,
+                  padding: "16px 24px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "24px",
+                },
               }}
-              bodyStyle={{ padding: "24px" }}
               style={{
                 borderRadius: token.borderRadiusLG,
                 boxShadow: token.boxShadow,
@@ -777,12 +772,16 @@ export const InspectionsShow: React.FC = () => {
                   </Typography.Title>
                 </Flex>
               }
-              headStyle={{
-                borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                padding: "12px 16px",
-                backgroundColor: token.colorBgElevated,
+              styles={{
+                header: {
+                  borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                  padding: "12px 16px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "16px",
+                },
               }}
-              bodyStyle={{ padding: "16px" }}
               style={{
                 borderRadius: token.borderRadiusLG,
                 boxShadow: token.boxShadow,
@@ -876,15 +875,17 @@ export const InspectionsShow: React.FC = () => {
         footer={null}
         width={1000}
         mask={true}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.45)",
-          backdropFilter: "blur(4px)",
+        styles={{
+          mask: {
+            backgroundColor: "rgba(0, 0, 0, 0.45)",
+            backdropFilter: "blur(4px)",
+          },
+          body: {
+            padding: 24,
+          },
         }}
         style={{
           top: 20,
-        }}
-        bodyStyle={{
-          padding: 24,
         }}
         centered
         closeIcon={
@@ -896,19 +897,27 @@ export const InspectionsShow: React.FC = () => {
           contaminants={initialContaminants}
         />
       </Modal>
+
       <Modal
         open={isModalVisible}
         onCancel={handleCloseModal}
         footer={null}
         width={1000}
         mask={true}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.45)",
-          backdropFilter: "blur(4px)",
+        styles={{
+          mask: {
+            backgroundColor: "rgba(0, 0, 0, 0.45)",
+            backdropFilter: "blur(4px)",
+          },
+          body: {
+            padding: 24,
+          },
         }}
         title={
           <Flex align="center" gap={12}>
-            <ExperimentOutlined style={{ color: token.colorPrimary, fontSize: 20 }} />
+            <ExperimentOutlined
+              style={{ color: token.colorPrimary, fontSize: 20 }}
+            />
             <Typography.Title level={4} style={{ margin: 0 }}>
               Chi tiết kết quả kiểm nghiệm
             </Typography.Title>
@@ -917,18 +926,15 @@ export const InspectionsShow: React.FC = () => {
         style={{
           top: 20,
         }}
-        bodyStyle={{
-          padding: 24,
-        }}
         centered
         closeIcon={
           <CloseOutlined style={{ color: token.colorTextSecondary }} />
         }
       >
-        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+        <Space direction="vertical" size={24} style={{ width: "100%" }}>
           {/* Summary Card */}
           <Card
-            bordered={false}
+            variant="borderless"
             style={{
               background: token.colorPrimaryBg,
               borderRadius: token.borderRadiusLG,
@@ -946,97 +952,115 @@ export const InspectionsShow: React.FC = () => {
           <Tabs
             type="card"
             items={chemicalGroups
-              .filter(group => chemicalData.some(item => group.keys.includes(item.key)))
+              .filter((group) =>
+                chemicalData.some((item) => group.keys.includes(item.key))
+              )
               .map((group) => ({
                 key: group.title,
                 label: (
                   <Flex align="center" gap={8}>
-                    <div style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: '50%',
-                      backgroundColor: group.color
-                    }} />
+                    <div
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        backgroundColor: group.color,
+                      }}
+                    />
                     <span>{group.title}</span>
                   </Flex>
                 ),
                 children: (
                   <Table
                     rowKey="key"
-                    dataSource={chemicalData.filter(item => group.keys.includes(item.key))}
+                    dataSource={chemicalData.filter((item) =>
+                      group.keys.includes(item.key)
+                    )}
                     columns={[
                       {
-                        title: 'Tên chất',
-                        dataIndex: 'name',
-                        key: 'name',
+                        title: "Tên chất",
+                        dataIndex: "name",
+                        key: "name",
                         render: (text, record) => (
                           <Flex align="center" gap={8}>
                             <Typography.Text strong>{text}</Typography.Text>
                             <Tooltip
-                              title={`Giới hạn an toàn: ${LIMITS[record.key] ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ''}` : 'Không có dữ liệu'}`}
+                              title={`Giới hạn an toàn: ${LIMITS[record.key] ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""}` : "Không có dữ liệu"}`}
                             >
                               <InfoCircleOutlined
                                 style={{
                                   color: token.colorPrimary,
-                                  cursor: 'pointer',
-                                  fontSize: 14
+                                  cursor: "pointer",
+                                  fontSize: 14,
                                 }}
                               />
                             </Tooltip>
                           </Flex>
                         ),
-                        width: '40%'
+                        width: "40%",
                       },
                       {
-                        title: 'Giá trị',
-                        dataIndex: 'value',
-                        key: 'value',
+                        title: "Giá trị",
+                        dataIndex: "value",
+                        key: "value",
                         render: (value, record) => {
                           const limit = LIMITS[record.key];
-                          const numericValue = typeof value === 'string' ? parseFloat(value) : record.value;
-                          const isPassed = limit ? parseFloat(numericValue as string) <= limit : true;
+                          const numericValue =
+                            typeof value === "string"
+                              ? parseFloat(value)
+                              : record.value;
+                          const isPassed = limit
+                            ? parseFloat(numericValue as string) <= limit
+                            : true;
 
                           return (
                             <Tag
-                              color={isPassed ? 'green' : 'red'}
-                              icon={isPassed ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+                              color={isPassed ? "green" : "red"}
+                              icon={
+                                isPassed ? (
+                                  <CheckCircleOutlined />
+                                ) : (
+                                  <CloseCircleOutlined />
+                                )
+                              }
                               style={{
                                 width: 120,
-                                textAlign: 'center',
-                                display: 'inline-flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
+                                textAlign: "center",
+                                display: "inline-flex",
+                                justifyContent: "center",
+                                alignItems: "center",
                               }}
                             >
-                              {value} {UNITS[record.key] || ''}
+                              {value} {UNITS[record.key] || ""}
                             </Tag>
                           );
                         },
-                        width: '30%'
+                        width: "30%",
                       },
                       {
-                        title: 'Tiêu chuẩn',
-                        key: 'standard',
+                        title: "Tiêu chuẩn",
+                        key: "standard",
                         render: (_, record) => (
                           <Typography.Text strong>
-                            ≤ {LIMITS[record.key] || 'N/A'} {UNITS[record.key] || ''}
+                            ≤ {LIMITS[record.key] || "N/A"}{" "}
+                            {UNITS[record.key] || ""}
                           </Typography.Text>
                         ),
-                        width: '30%'
-                      }
+                        width: "30%",
+                      },
                     ]}
                     pagination={false}
                     bordered
                     size="middle"
                     style={{
                       marginTop: 12,
-                      borderRadius: token.borderRadiusLG
+                      borderRadius: token.borderRadiusLG,
                     }}
                     rowClassName={(_, index) =>
-                      index % 2 === 0 ? 'table-row-light' : 'table-row-dark'
+                      index % 2 === 0 ? "table-row-light" : "table-row-dark"
                     }
                   />
-                )
+                ),
               }))}
           />
         </Space>

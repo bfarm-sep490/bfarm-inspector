@@ -1,6 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { SaveButton } from "@refinedev/antd";
-import { BaseKey, useCustomMutation, useGetToPath, useGo } from "@refinedev/core";
+import {
+  BaseKey,
+  useCustomMutation,
+  useGetToPath,
+  useGo,
+} from "@refinedev/core";
 import {
   Form,
   InputNumber,
@@ -23,8 +28,6 @@ import {
   UploadOutlined,
   CloseOutlined,
   InfoCircleOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -59,8 +62,12 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     if (props.open && props.initialValues) {
       const formattedData = {
         ...props.initialValues,
-        start_date: props.initialValues.start_date ? dayjs(props.initialValues.start_date) : null,
-        end_date: props.initialValues.end_date ? dayjs(props.initialValues.end_date) : null,
+        start_date: props.initialValues.start_date
+          ? dayjs(props.initialValues.start_date)
+          : null,
+        end_date: props.initialValues.end_date
+          ? dayjs(props.initialValues.end_date)
+          : null,
       };
       form.setFieldsValue(formattedData);
     }
@@ -85,9 +92,8 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     setFormLoading(true);
     const payload = { ...values, inspect_images: imageList };
 
-    // Kiểm tra các giá trị vượt giới hạn
     const exceedingLimits = Object.keys(values).filter((key) => {
-      if (key === "result_content") return false; // Bỏ qua result_content
+      if (key === "result_content") return false;
       const value = parseFloat(values[key]);
       const limit = key === "salmonella" ? 0 : LIMITS[key];
       return limit !== undefined && !isNaN(value) && value > limit;
@@ -127,37 +133,35 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     }
   };
 
-  const handleImageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setImageList([...imageList, e.target.value]);
-  };
-
-  const filteredChemicalGroups = chemicalGroups.map((x: any) => {
-    if (x?.title === "Kim loại nặng") {
-      const types = props?.type
-        ? getContaminantLimitsByVegetableType(
-          props.type as
-          | "Rau họ thập tự"
-          | "Hành"
-          | "Rau ăn lá"
-          | "Rau ăn quả"
-          | "Rau ăn củ"
-          | "Nấm"
-          | "Rau củ quả"
-          | "Rau khô"
-        )
-        : [];
+  const filteredChemicalGroups = chemicalGroups
+    .map((x: any) => {
+      if (x?.title === "Kim loại nặng") {
+        const types = props?.type
+          ? getContaminantLimitsByVegetableType(
+              props.type as
+                | "Rau họ thập tự"
+                | "Hành"
+                | "Rau ăn lá"
+                | "Rau ăn quả"
+                | "Rau ăn củ"
+                | "Nấm"
+                | "Rau củ quả"
+                | "Rau khô"
+            )
+          : [];
+        return {
+          title: x?.title,
+          keys: types,
+          color: x?.color,
+        };
+      }
       return {
         title: x?.title,
-        keys: types,
+        keys: x?.keys,
         color: x?.color,
       };
-    }
-    return {
-      title: x?.title,
-      keys: x?.keys,
-      color: x?.color,
-    };
-  }).filter(group => group.keys.length > 0);
+    })
+    .filter((group) => group.keys.length > 0);
 
   const overviewTab = {
     title: "Tổng quan",
@@ -172,9 +176,14 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       footer={null}
       width={1000}
       mask={true}
-      maskStyle={{
-        backgroundColor: "rgba(0, 0, 0, 0.45)",
-        backdropFilter: "blur(4px)",
+      styles={{
+        mask: {
+          backgroundColor: "rgba(0, 0, 0, 0.45)",
+          backdropFilter: "blur(4px)",
+        },
+        body: {
+          padding: 24,
+        },
       }}
       title={
         <Flex align="center" gap={12}>
@@ -186,9 +195,6 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       }
       style={{
         top: 20,
-      }}
-      bodyStyle={{
-        padding: 24,
       }}
       centered
       closeIcon={<CloseOutlined style={{ color: token.colorTextSecondary }} />}
@@ -229,7 +235,10 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                           width: "40%",
                           render: (text: string, record: any) => (
                             <Flex align="center" gap={8}>
-                              <Typography.Text strong style={{ textTransform: "capitalize" }}>
+                              <Typography.Text
+                                strong
+                                style={{ textTransform: "capitalize" }}
+                              >
                                 {text.split(" (")[0]}
                               </Typography.Text>
                               <Tooltip
@@ -259,12 +268,20 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                               rules={[
                                 {
                                   validator: async (_, value) => {
-                                    if (value === undefined || value === null) return;
-                                    const limit = record.key === "salmonella" ? 0 : LIMITS[record.key];
+                                    if (value === undefined || value === null)
+                                      return;
+                                    const limit =
+                                      record.key === "salmonella"
+                                        ? 0
+                                        : LIMITS[record.key];
                                     if (limit !== undefined && value > limit) {
                                       return Promise.reject(
-                                        <Tag color="red" icon={<WarningOutlined />}>
-                                          Vượt quá giới hạn: ≤ {limit} {UNITS[record.key] || ""}
+                                        <Tag
+                                          color="red"
+                                          icon={<WarningOutlined />}
+                                        >
+                                          Vượt quá giới hạn: ≤ {limit}{" "}
+                                          {UNITS[record.key] || ""}
                                         </Tag>
                                       );
                                     }
@@ -310,15 +327,27 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                     </Flex>
                   ),
                   children: (
-                    <Space direction="vertical" size="middle" style={{ width: "100%", padding: 16 }}>
+                    <Space
+                      direction="vertical"
+                      size="middle"
+                      style={{ width: "100%", padding: 16 }}
+                    >
                       <Form.Item
-                        label={<Typography.Text strong>Nội dung kết quả</Typography.Text>}
+                        label={
+                          <Typography.Text strong>
+                            Nội dung kết quả
+                          </Typography.Text>
+                        }
                         name="result_content"
                       >
                         <Input.TextArea rows={4} />
                       </Form.Item>
                       <Form.Item
-                        label={<Typography.Text strong>Chọn ảnh từ máy</Typography.Text>}
+                        label={
+                          <Typography.Text strong>
+                            Chọn ảnh từ máy
+                          </Typography.Text>
+                        }
                       >
                         <Upload
                           name="file"

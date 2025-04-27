@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   DashboardOutlined,
   LogoutOutlined,
@@ -27,7 +28,15 @@ import {
   pickNotDeprecated,
   useWarnAboutChange,
 } from "@refinedev/core";
-import { Layout, Menu, Grid, Drawer, Button, theme, ConfigProvider } from "antd";
+import {
+  Layout,
+  Menu,
+  Grid,
+  Drawer,
+  Button,
+  theme,
+  ConfigProvider,
+} from "antd";
 import React, { CSSProperties, useContext } from "react";
 
 const modernStyles = {
@@ -75,8 +84,12 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
   activeItemDisabled = false,
 }) => {
   const { token } = theme.useToken();
-  const { siderCollapsed, setSiderCollapsed, mobileSiderOpen, setMobileSiderOpen } =
-    useThemedLayoutContext();
+  const {
+    siderCollapsed,
+    setSiderCollapsed,
+    mobileSiderOpen,
+    setMobileSiderOpen,
+  } = useThemedLayoutContext();
 
   const isExistAuthentication = useIsExistAuthentication();
   const direction = useContext(ConfigProvider.ConfigContext)?.direction;
@@ -95,13 +108,24 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
     v3LegacyAuthProviderCompatible: Boolean(authProvider?.isLegacy),
   });
 
-  const isMobile = typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
+  const isMobile =
+    typeof breakpoint.lg === "undefined" ? false : !breakpoint.lg;
 
   const RenderToTitle = TitleFromProps ?? TitleFromContext ?? ThemedTitleV2;
 
   const renderTreeView = (tree: ITreeMenu[], selectedKey?: string) => {
     return tree.map((item: ITreeMenu) => {
-      const { icon, label, route, key, name, children, parentName, meta, options } = item;
+      const {
+        icon,
+        label,
+        route,
+        key,
+        name,
+        children,
+        parentName,
+        meta,
+        options,
+      } = item;
 
       if (children.length > 0) {
         return (
@@ -115,7 +139,9 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
           >
             <Menu.SubMenu
               key={item.key}
-              icon={icon ?? <UnorderedListOutlined style={modernStyles.menuIcon} />}
+              icon={
+                icon ?? <UnorderedListOutlined style={modernStyles.menuIcon} />
+              }
               title={label}
             >
               {renderTreeView(children, selectedKey)}
@@ -125,8 +151,8 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
       }
       const isSelected = key === selectedKey;
       const isRoute = !(
-        pickNotDeprecated(meta?.parent, options?.parent, parentName) !== undefined &&
-        children.length === 0
+        pickNotDeprecated(meta?.parent, options?.parent, parentName) !==
+          undefined && children.length === 0
       );
 
       const linkStyle: React.CSSProperties =
@@ -143,13 +169,20 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
         >
           <Menu.Item
             key={item.key}
-            icon={icon ?? (isRoute && <UnorderedListOutlined style={modernStyles.menuIcon} />)}
+            icon={
+              icon ??
+              (isRoute && (
+                <UnorderedListOutlined style={modernStyles.menuIcon} />
+              ))
+            }
             style={linkStyle}
           >
             <Link to={route ?? ""} style={linkStyle}>
               {label}
             </Link>
-            {!siderCollapsed && isSelected && <div className="ant-menu-tree-arrow" />}
+            {!siderCollapsed && isSelected && (
+              <div className="ant-menu-tree-arrow" />
+            )}
           </Menu.Item>
         </CanAccess>
       );
@@ -161,8 +194,8 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
       const confirm = window.confirm(
         translate(
           "warnWhenUnsavedChanges",
-          "Are you sure you want to leave? You have unsaved changes.",
-        ),
+          "Are you sure you want to leave? You have unsaved changes."
+        )
       );
 
       if (confirm) {
@@ -175,7 +208,11 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
   };
 
   const logout = isExistAuthentication && (
-    <Menu.Item key="logout" onClick={() => handleLogout()} icon={<LogoutOutlined />}>
+    <Menu.Item
+      key="logout"
+      onClick={() => handleLogout()}
+      icon={<LogoutOutlined />}
+    >
       {translate("buttons.logout", "Logout")}
     </Menu.Item>
   );
@@ -183,7 +220,9 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
   const dashboard = hasDashboard ? (
     <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
       <Link to="/">{translate("dashboard.title", "Dashboard")}</Link>
-      {!siderCollapsed && selectedKey === "/" && <div className="ant-menu-tree-arrow" />}
+      {!siderCollapsed && selectedKey === "/" && (
+        <div className="ant-menu-tree-arrow" />
+      )}
     </Menu.Item>
   ) : null;
 
@@ -237,9 +276,11 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
           placement={direction === "rtl" ? "right" : "left"}
           closable={false}
           width={240}
-          bodyStyle={{
-            padding: 0,
-            backgroundColor: token.colorBgContainer,
+          styles={{
+            body: {
+              padding: 0,
+              backgroundColor: token.colorBgContainer,
+            },
           }}
           maskClosable={true}
         >

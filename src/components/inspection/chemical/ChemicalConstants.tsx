@@ -54,6 +54,66 @@ export type ChemicalCategory = {
   keys: string[];
   color: string;
 };
+export interface Contaminant {
+  key: string;
+  name: string;
+  value: string;
+  standard?: string;
+};
+
+export const initialContaminants: Contaminant[] = [
+  { key: "arsen", name: "Arsen", value: "< 0.5 mg/kg", standard: "Max" },
+  { key: "plumbum", name: "Plumbum", value: "< 0.3 mg/kg", standard: "Max" },
+  { key: "cadmi", name: "Cadmium", value: "< 0.05 mg/kg", standard: "Max" },
+  { key: "hydragyrum", name: "Thủy ngân", value: "< 0.03 mg/kg", standard: "Max" },
+  {
+    key: "salmonella",
+    name: "Salmonella",
+    value: "< 0 CFU/25g",
+    standard: "Max",
+  },
+  { key: "coliforms", name: "Coliforms", value: "< 100 CFU/g", standard: "Max" },
+  {
+    key: "ecoli",
+    name: "E.coli",
+    value: "< 100 CFU/g",
+    standard: "Max",
+  },
+  {
+    key: "glyphosate_glufosinate",
+    name: "Glyphosate, Glufosinate",
+    value: "< 0.01 mg/kg",
+    standard: "Max",
+  },
+  {
+    key: "sulfur_dioxide",
+    name: "Sulfur Dioxide",
+    value: "< 10 mg/kg",
+    standard: "Max",
+  },
+  {
+    key: "methyl_bromide",
+    name: "Methyl Bromide",
+    value: "< 0 mg/kg",
+    standard: "Max",
+  },
+  {
+    key: "hydrogen_phosphide",
+    name: "Hydrogen Phosphide",
+    value: "< 0 mg/kg",
+    standard: "Max",
+  },
+  {
+    key: "dithiocarbamate",
+    name: "Dithiocarbamate",
+    value: "< 2.0 mg/kg",
+    standard: "Max",
+  },
+  { key: "nitrat", name: "Nitrat", value: "< 9 mg/kg", standard: "Max" },
+  { key: "nano3_kno3", name: "NaNO3/KNO3", value: "< 15 mg/kg", standard: "Max" },
+  { key: "chlorate", name: "Chlorate", value: "< 0.01 mg/kg", standard: "Max" },
+  { key: "perchlorate", name: "Perchlorate", value: "< 0.01 mg/kg", standard: "Max" },
+];
 
 export const chemicalGroups: ChemicalCategory[] = [
   {

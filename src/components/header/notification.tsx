@@ -1,7 +1,22 @@
 // NotificationComponent.tsx
+/* eslint-disable prettier/prettier */
 import React, { useState } from "react";
-import { Modal, List, Avatar, Typography, Button, Tabs, Badge, Space, Spin } from "antd";
-import { NotificationOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
+import {
+  Modal,
+  List,
+  Avatar,
+  Typography,
+  Button,
+  Tabs,
+  Badge,
+  Space,
+  Spin,
+} from "antd";
+import {
+  NotificationOutlined,
+  CloseOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
 import { useTranslate } from "@refinedev/core";
 
 const { Text } = Typography;
@@ -82,9 +97,18 @@ export const NotificationPopup: React.FC<NotificationProps> = ({
         width={400}
         height={800}
         style={{ borderRadius: 0, left: "20%", bottom: "10%" }}
-        bodyStyle={{ padding: 0, overflow: "auto" }}
+        styles={{
+          body: {
+            padding: "0px0px",
+            overflow: "auto", // Nếu bạn muốn giữ cả hai kiểu
+          },
+        }}
       >
-        <Tabs activeKey={activeTab} onChange={setActiveTab} style={{ marginBottom: 0 }}>
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          style={{ marginBottom: 0 }}
+        >
           <TabPane tab={t("notifications.all", "Tất cả")} key="1" />
           <TabPane tab={t("notifications.unread", "Chưa đọc")} key="2" />
         </Tabs>
@@ -95,7 +119,9 @@ export const NotificationPopup: React.FC<NotificationProps> = ({
             <List.Item
               style={{
                 padding: "12px 24px",
-                backgroundColor: item.read ? "transparent" : "rgba(0, 114, 229, 0.05)",
+                backgroundColor: item.read
+                  ? "transparent"
+                  : "rgba(0, 114, 229, 0.05)",
                 cursor: "pointer",
               }}
               onClick={() => onMarkAsRead(item.id)}
@@ -113,7 +139,11 @@ export const NotificationPopup: React.FC<NotificationProps> = ({
                 }
                 title={<Text strong>{item.title}</Text>}
                 description={
-                  <Space direction="vertical" size={4} style={{ width: "100%" }}>
+                  <Space
+                    direction="vertical"
+                    size={4}
+                    style={{ width: "100%" }}
+                  >
                     <Text>{item.message}</Text>
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {item.time}
@@ -124,10 +154,15 @@ export const NotificationPopup: React.FC<NotificationProps> = ({
             </List.Item>
           )}
           locale={{
-            emptyText: t("notifications.noNotifications", "Không có thông báo nào"),
+            emptyText: t(
+              "notifications.noNotifications",
+              "Không có thông báo nào"
+            ),
           }}
           footer={
-            <div style={{ padding: "12px 24px", borderTop: "1px solid #f0f0f0" }}>
+            <div
+              style={{ padding: "12px 24px", borderTop: "1px solid #f0f0f0" }}
+            >
               {unreadCount > 0 ? (
                 <Button type="link" block onClick={onMarkAllAsRead}>
                   {t("notifications.markAllAsRead", "Đánh dấu đã đọc tất cả")}

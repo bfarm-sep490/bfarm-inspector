@@ -3,7 +3,15 @@ import React from "react";
 import { useTable } from "@refinedev/antd";
 import { getDefaultFilter, type HttpError, useGo } from "@refinedev/core";
 import { Table, Button, InputNumber, Typography, Space, theme } from "antd";
-import { EyeOutlined, SearchOutlined, CalendarOutlined, HourglassOutlined, CheckCircleOutlined, CloseCircleOutlined, SettingOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  SearchOutlined,
+  CalendarOutlined,
+  HourglassOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import { PaginationTotal } from "@/components/paginationTotal";
 import { IInspectingForm } from "@/interfaces";
 import { InspectionStatusTag } from "../status";
@@ -16,7 +24,10 @@ export const InspectionListTable: React.FC = () => {
   const { t } = useTranslation();
   const go = useGo();
 
-  const { tableProps, filters, setFilters } = useTable<IInspectingForm, HttpError>({
+  const { tableProps, filters, setFilters } = useTable<
+    IInspectingForm,
+    HttpError
+  >({
     resource: "inspecting-forms",
     filters: {
       initial: [
@@ -44,7 +55,9 @@ export const InspectionListTable: React.FC = () => {
         ...tableProps.pagination,
         showSizeChanger: true,
         showQuickJumper: true,
-        showTotal: (total) => <PaginationTotal total={total} entityName="inspections" />,
+        showTotal: (total) => (
+          <PaginationTotal total={total} entityName="inspections" />
+        ),
       }}
     >
       <Table.Column
@@ -53,14 +66,18 @@ export const InspectionListTable: React.FC = () => {
         key="id"
         width={80}
         filterIcon={(filtered) => (
-          <SearchOutlined style={{ color: filtered ? token.colorPrimary : undefined }} />
+          <SearchOutlined
+            style={{ color: filtered ? token.colorPrimary : undefined }}
+          />
         )}
         defaultFilteredValue={getDefaultFilter("id", filters, "eq")}
         filterDropdown={(props) => (
           <InputNumber
             style={{ width: "100%" }}
             placeholder={t("inspections.search_id")}
-            onChange={(value) => setFilters([{ field: "id", operator: "eq", value }])}
+            onChange={(value) =>
+              setFilters([{ field: "id", operator: "eq", value }])
+            }
           />
         )}
       />
@@ -75,7 +92,9 @@ export const InspectionListTable: React.FC = () => {
         title={t("inspections.task_name")}
         dataIndex="task_name"
         key="task_name"
-        render={(value: string) => value.charAt(0).toUpperCase() + value.slice(1)}
+        render={(value: string) =>
+          value.charAt(0).toUpperCase() + value.slice(1)
+        }
       />
 
       <Table.Column
@@ -109,7 +128,9 @@ export const InspectionListTable: React.FC = () => {
                 transition={{ duration: 0.8, repeat: Infinity }}
                 style={{ display: "inline-block" }}
               >
-                <HourglassOutlined style={{ color: "#faad14", marginRight: 5 }} />
+                <HourglassOutlined
+                  style={{ color: "#faad14", marginRight: 5 }}
+                />
               </motion.span>
               {date}
               <span style={{ color: "#ff4d4f", marginLeft: 5 }}>{time}</span>
@@ -119,7 +140,7 @@ export const InspectionListTable: React.FC = () => {
       />
 
       <Table.Column
-        title="Trạng thái"
+        title={t("inspections.status")}
         dataIndex="status"
         key="status"
         render={(status: string) => {
@@ -127,19 +148,31 @@ export const InspectionListTable: React.FC = () => {
           let color = "";
           switch (status) {
             case "Complete":
-              icon = <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 18 }} />;
+              icon = (
+                <CheckCircleOutlined
+                  style={{ color: "#52c41a", fontSize: 18 }}
+                />
+              );
               color = "green";
               break;
             case "Pending":
-              icon = <HourglassOutlined style={{ color: "#faad14", fontSize: 18 }} />;
+              icon = (
+                <HourglassOutlined style={{ color: "#faad14", fontSize: 18 }} />
+              );
               color = "orange";
               break;
             case "Ongoing":
-              icon = <SettingOutlined style={{ color: "blue", fontSize: 18 }} />;
+              icon = (
+                <SettingOutlined style={{ color: "blue", fontSize: 18 }} />
+              );
               color = "blue";
               break;
             default:
-              icon = <CloseCircleOutlined style={{ color: "#f5222d", fontSize: 18 }} />;
+              icon = (
+                <CloseCircleOutlined
+                  style={{ color: "#f5222d", fontSize: 18 }}
+                />
+              );
               color = "red";
           }
           return (
@@ -151,16 +184,18 @@ export const InspectionListTable: React.FC = () => {
         }}
       />
 
-
       <Table.Column
-        title={t("fertilizers.actions")}
+        title={t("inspections.actions")}
         key="actions"
         fixed="right"
         align="center"
         render={(_, record: IInspectingForm) => (
           <Space>
             {record.id ? (
-              <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)} />
+              <Button
+                icon={<EyeOutlined />}
+                onClick={() => handleView(record.id)}
+              />
             ) : (
               <Typography.Text type="secondary">N/A</Typography.Text>
             )}

@@ -1,7 +1,11 @@
-import { InspectionListCard, InspectionListTable } from "@/components/inspection";
+/* eslint-disable prettier/prettier */
+import {
+  InspectionListCard,
+  InspectionListTable,
+} from "@/components/inspection";
 import { AppstoreOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { List } from "@refinedev/antd";
-import { useNavigation } from "@refinedev/core";
+import { useNavigation, useTranslate } from "@refinedev/core";
 import { Segmented } from "antd";
 import { type PropsWithChildren, useState } from "react";
 import { Outlet, useLocation } from "react-router";
@@ -13,19 +17,20 @@ export const InspectionsList = ({ children }: PropsWithChildren) => {
   const { pathname } = useLocation();
 
   const [view, setView] = useState<View>(
-    (localStorage.getItem("inspector-view") as View) || "table",
+    (localStorage.getItem("inspector-view") as View) || "table"
   );
 
   const handleViewChange = (value: View) => {
-    // remove query params (pagination, filters, etc.) when changing view
     replace("");
     setView(value);
     localStorage.setItem("inspector-view", value);
   };
+  const t = useTranslate();
 
   return (
     <List
       breadcrumb={false}
+      title={t("inspections.name")}
       headerButtons={() => [
         <Segmented<View>
           key="view"
