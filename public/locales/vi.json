@@ -382,5 +382,15 @@
     "suggestErrorDescription": "Đã xảy ra lỗi khi lấy gợi ý. Vui lòng thử lại sau.",
     "type": "Loại",
     "unavailable": "Không khả dụng"
+  },
+  "inspections": {
+    "search_id": "Tìm ID",
+    "name": "Mẫu kiểm định",
+    "plan_name": "Kế hoạch kiểm nghiệm",
+    "task_name": "Nhiệm vụ kiểm nghiệm",
+    "start_date": "Ngày bắt đầu",
+    "end_date": "Ngày kết thúc",
+    "actions": "Hành động",
+    "status": "Trạng thái"
   }
 }

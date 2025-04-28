@@ -1,9 +1,15 @@
+/* eslint-disable prettier/prettier */
 import React, { useState, useMemo } from "react";
-import { type HttpError, useOne, useShow, useTranslate } from "@refinedev/core";
+import {
+  type HttpError,
+  useOne,
+  useShow,
+  useTranslate,
+  useCustomMutation,
+} from "@refinedev/core";
 import {
   Button,
   Typography,
-  Spin,
   Alert,
   Modal,
   theme,
@@ -16,6 +22,10 @@ import {
   Tag,
   Row,
   Col,
+  Table,
+  Tooltip,
+  Tabs,
+  message,
 } from "antd";
 import {
   EditOutlined,
@@ -25,6 +35,7 @@ import {
   ClockCircleOutlined,
   CloseCircleOutlined,
   ExperimentOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { IInspectingForm, IInspectingResult } from "@/interfaces";
 import { InspectionModalForm } from "../drawer-form";
@@ -34,99 +45,208 @@ import dayjs from "dayjs";
 import {
   chemicalGroups,
   getChemicalData,
-  ChemicalDataDisplay,
+  UNITS,
+  LIMITS,
+  Contaminant,
+  initialContaminants,
+  getMustBeZeroKeys,
+  mustBeZeroKeys,
 } from "../chemical/ChemicalConstants";
 import { InspectionResultTag } from "../result";
 import { PageHeader } from "@refinedev/antd";
-
-interface Contaminant {
-  key: string;
-  name: string;
-  value: string;
-  standard?: string;
-}
+import { contaminantBasedVegetableType } from "@/utils/inspectingKind";
 
 interface ContaminantCheckCardProps {
-  type: string;
+  type: string | undefined; // Sửa type để chấp nhận undefined như trong định nghĩa ban đầu
   style?: React.CSSProperties;
   contaminants: Contaminant[];
 }
 
 const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
-  type,
   style,
   contaminants,
 }) => {
   const { token } = theme.useToken();
-
+  const mustBeZeroKeys = getMustBeZeroKeys();
   return (
     <Card
-      title={
-        <Flex align="center" gap={8}>
-          <ExperimentOutlined style={{ color: token.colorError }} />
-          <span>Tiêu chí kiểm định</span>
-        </Flex>
-      }
-      headStyle={{
-        borderBottom: `2px solid ${token.colorError}`,
-        backgroundColor: token.colorErrorBg,
-      }}
+      variant="borderless"
       style={{
-        ...style,
-        border: `1px solid ${token.colorBorderSecondary}`,
         borderRadius: token.borderRadiusLG,
+        boxShadow: token.boxShadow,
+        background: token.colorBgContainer,
+        ...style,
       }}
     >
-      <Space direction="vertical" style={{ width: "100%" }}>
+      <Flex align="center" gap={8} style={{ marginBottom: 16 }}>
+        <ExperimentOutlined
+          style={{ color: token.colorPrimary, fontSize: 24 }}
+        />
+        <Typography.Title
+          level={3}
+          style={{ margin: 0, color: token.colorPrimary }}
+        >
+          Tiêu chí kiểm định
+        </Typography.Title>
+      </Flex>
+      <Typography.Text
+        type="secondary"
+        italic
+        style={{
+          fontSize: 14,
+          display: "block",
+          marginTop: 4,
+          color: token.colorError,
+        }}
+      >
+        (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+      </Typography.Text>
+
+      <Space direction="vertical" size="large" style={{ width: "100%" }}>
         {chemicalGroups.map((group) => {
-          const groupContaminants = contaminants.filter((item) => group.keys.includes(item.key));
+          const groupContaminants = contaminants.filter((item) =>
+            group.keys.includes(item.key)
+          );
           if (groupContaminants.length === 0) return null;
 
           return (
-            <div key={group.title}>
-              <Flex align="center" gap={8} style={{ marginBottom: 12 }}>
-                <div
-                  style={{
-                    width: 4,
-                    height: 16,
-                    backgroundColor: group.color,
-                    borderRadius: 2,
-                  }}
-                />
-                <Typography.Text strong style={{ color: group.color, fontSize: 15 }}>
-                  {group.title}
-                </Typography.Text>
-              </Flex>
-
-              {groupContaminants.map((contaminant) => (
-                <Flex
-                  key={contaminant.key}
-                  justify="space-between"
-                  style={{
-                    marginBottom: 8,
-                    padding: "6px 8px",
-                    backgroundColor: token.colorFillAlter,
-                    borderRadius: token.borderRadiusSM,
-                  }}
-                >
-                  <Typography.Text>{contaminant.name}</Typography.Text>
-                  <Flex gap={8} align="center">
-                    {contaminant.standard && (
-                      <Typography.Text
-                        strong
-                        style={{
-                          color: token.colorError,
-                          marginRight: 8,
-                        }}
-                      >
-                        {contaminant.standard}
-                      </Typography.Text>
-                    )}
-                    <Typography.Text>{contaminant.value}</Typography.Text>
-                  </Flex>
+            <Card
+              key={group.title}
+              title={
+                <Flex align="center" gap={8}>
+                  <div
+                    style={{
+                      width: 14,
+                      height: 14,
+                      borderRadius: "50%",
+                      backgroundColor: group.color,
+                    }}
+                  />
+                  <Typography.Title
+                    level={4}
+                    style={{ margin: 0, color: group.color, fontSize: 18 }}
+                  >
+                    {group.title}
+                  </Typography.Title>
                 </Flex>
-              ))}
-            </div>
+              }
+              styles={{
+                header: {
+                  borderBottom: `2px solid ${group.color}`,
+                  padding: "12px 16px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "16px",
+                },
+              }}
+              style={{
+                borderRadius: token.borderRadiusLG,
+                boxShadow: token.boxShadow,
+                backgroundColor: token.colorBgElevated,
+              }}
+            >
+              <Table
+                rowKey="key"
+                dataSource={groupContaminants}
+                columns={[
+                  {
+                    title: "Tên chất",
+                    dataIndex: "name",
+                    key: "name",
+                    render: (text, record) => {
+                      const mustBeZero = mustBeZeroKeys.includes(record.key);
+                      return (
+                        <Flex align="center" gap={8}>
+                          <Typography.Text strong>
+                            {text}
+                            {mustBeZero && (
+                              <Typography.Text
+                                type="danger"
+                                strong
+                                style={{ marginLeft: 4 }}
+                              >
+                                (*)
+                              </Typography.Text>
+                            )}
+                          </Typography.Text>
+                          <Tooltip
+                            title={`Giới hạn an toàn: ${LIMITS[record.key]
+                              ? mustBeZero
+                                ? "Bắt buộc = 0"
+                                : `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
+                                }`
+                              : "Không có dữ liệu"
+                              }`}
+                          >
+                            <InfoCircleOutlined
+                              style={{
+                                color: token.colorPrimary,
+                                cursor: "pointer",
+                                fontSize: 14,
+                              }}
+                            />
+                          </Tooltip>
+                        </Flex>
+                      );
+                    },
+                    width: "40%",
+                  },
+                  {
+                    title: "Giới hạn",
+                    dataIndex: "standard",
+                    key: "standard",
+                    render: (text: string, record: Contaminant) => {
+                      const mustBeZero = mustBeZeroKeys.includes(record.key);
+                      return (
+                        <Flex align="center" gap={8}>
+                          <Tag
+                            color="blue"
+                            style={{
+                              fontSize: 14,
+                              padding: "4px 8px",
+                              borderRadius: token.borderRadiusSM,
+                            }}
+                          >
+                            {mustBeZero
+                              ? "Bắt buộc = 0"
+                              : `≤ ${LIMITS[record.key] || "N/A"} ${UNITS[record.key] || ""
+                              }`}
+                          </Tag>
+                          <Tooltip
+                            title={`Giới hạn an toàn cho ${record.name}: ${mustBeZero
+                              ? "Bắt buộc = 0"
+                              : LIMITS[record.key]
+                                ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
+                                }`
+                                : "Không có dữ liệu"
+                              }`}
+                          >
+                            <InfoCircleOutlined
+                              style={{
+                                color: token.colorPrimary,
+                                fontSize: 14,
+                              }}
+                            />
+                          </Tooltip>
+                        </Flex>
+                      );
+                    },
+                    width: "50%",
+                  },
+                ]}
+                pagination={false}
+                bordered
+                size="middle"
+                style={{
+                  marginTop: 12,
+                  borderRadius: token.borderRadiusLG,
+                }}
+                rowClassName={(_, index) =>
+                  index % 2 === 0 ? "table-row-light" : "table-row-dark"
+                }
+              />
+            </Card>
           );
         })}
       </Space>
@@ -136,27 +256,40 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
 
 export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const { token } = theme.useToken();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(null);
+  const [isCriteriaModalVisible, setIsCriteriaModalVisible] = useState(false);
+  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(
+    null
+  );
+  const { token } = theme.useToken();
   const breakpoints = Grid.useBreakpoint();
   const { id } = useParams();
   const navigate = useNavigate();
   const t = useTranslate();
-  const { queryResult: formQueryResult } = useShow<{ data: IInspectingForm[] }, HttpError>({
+
+  const { queryResult: formQueryResult } = useShow<
+    { data: IInspectingForm[] },
+    HttpError
+  >({
     resource: "inspecting-forms",
     id,
     queryOptions: { enabled: !!id },
   });
 
-  const { queryResult: resultQueryResult } = useShow<{ data: IInspectingResult[] }, HttpError>({
+  const { queryResult: resultQueryResult } = useShow<
+    { data: IInspectingResult[] },
+    HttpError
+  >({
     resource: "inspecting-results",
     id,
   });
 
+  const { mutate: updateInspectionStatus } = useCustomMutation();
+
   const inspection = useMemo(
-    () => (formQueryResult.data as { data: IInspectingForm[] } | undefined)?.data?.[0],
-    [formQueryResult.data],
+    () =>
+      (formQueryResult.data as { data: IInspectingForm[] } | undefined)?.data?.[0],
+    [formQueryResult.data]
   );
 
   const {
@@ -180,8 +313,9 @@ export const InspectionsShow: React.FC = () => {
   const plant = plantData?.data;
 
   const inspectionResult = useMemo(
-    () => (resultQueryResult.data as { data: IInspectingResult[] } | undefined)?.data?.[0],
-    [resultQueryResult.data],
+    () =>
+      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)?.data?.[0],
+    [resultQueryResult.data]
   );
 
   const isLoading =
@@ -194,75 +328,33 @@ export const InspectionsShow: React.FC = () => {
     isPlantLoading ||
     isPlantFetching;
 
-  const chemicalData = getChemicalData(inspectionResult);
-
-  const initialContaminants: Contaminant[] = [
-    { key: "cadmi", name: "Cadmium", value: "< 0.05 mg/kg", standard: "Max" },
-    { key: "plumbum", name: "Plumbum", value: "< 0.3 mg/kg", standard: "Max" },
-    {
-      key: "salmonella",
-      name: "Salmonella",
-      value: "< 0 CFU/25g",
-      standard: "Max",
-    },
-    {
-      key: "coliforms",
-      name: "Coliforms",
-      value: "< 10 CFU/g",
-      standard: "Max",
-    },
-    {
-      key: "ecoli",
-      name: "E.coli",
-      value: "100 - 1000 CFU/g",
-      standard: "Range",
-    },
-    {
-      key: "sulfur_dioxide",
-      name: "Sulfur Dioxide",
-      value: "< 10 mg/kg",
-      standard: "Max",
-    },
-    {
-      key: "glyphosate_glufosinate",
-      name: "Glyphosate, Glufosinate",
-      value: "< 0.01 mg/kg",
-      standard: "Max",
-    },
-    {
-      key: "methyl_bromide",
-      name: "Methyl Bromide",
-      value: "< 0.01 mg/kg",
-      standard: "Max",
-    },
-    {
-      key: "dithiocarbamate",
-      name: "Dithiocarbamate",
-      value: "< 1.0 mg/kg",
-      standard: "Max",
-    },
-    {
-      key: "chlorate",
-      name: "Chlorate",
-      value: "< 0.01 mg/kg",
-      standard: "Max",
-    },
-    {
-      key: "perchlorate",
-      name: "Perchlorate",
-      value: "< 0.01 mg/kg",
-      standard: "Max",
-    },
-  ];
+  const chemicalData = useMemo(() => {
+    const data = getChemicalData(inspectionResult);
+    return data.map((item) => ({
+      ...item,
+      key: item.key,
+      name: item.label,
+      value: item.value !== undefined ? item.value.toString() : "N/A",
+    }));
+  }, [inspectionResult]);
 
   const handleBack = () => navigate("/inspection-forms");
+
   const handleCreate = () => {
-    if (inspection && inspection.status !== "Completed" && inspection.status !== "Cancel") {
+    if (
+      inspection &&
+      inspection.status !== "Completed" &&
+      inspection.status !== "Cancel"
+    ) {
       const { id, ...rest } = inspection;
       const newInspection = {
         ...rest,
-        start_date: inspection.start_date ? dayjs(inspection.start_date).toISOString() : "",
-        end_date: inspection.end_date ? dayjs(inspection.end_date).toISOString() : "",
+        start_date: inspection.start_date
+          ? dayjs(inspection.start_date).toISOString()
+          : "",
+        end_date: inspection.end_date
+          ? dayjs(inspection.end_date).toISOString()
+          : "",
       } as IInspectingForm;
 
       setSelectedResult({ ...newInspection, id });
@@ -277,6 +369,29 @@ export const InspectionsShow: React.FC = () => {
 
   const handleOpenModal = () => setIsModalVisible(true);
   const handleCloseModal = () => setIsModalVisible(false);
+  const handleOpenCriteriaModal = () => setIsCriteriaModalVisible(true);
+  const handleCloseCriteriaModal = () => setIsCriteriaModalVisible(false);
+
+  const handleMutationSuccess = () => {
+    updateInspectionStatus(
+      {
+        url: `https://api.outfit4rent.online/api/inspecting-forms/${id}/status`,
+        method: "patch",
+        values: { status: "Pending" },
+      },
+      {
+        onSuccess: () => {
+          message.success("Đã gửi kết quả kiểm nghiệm chờ duyệt");
+          formQueryResult.refetch();
+          resultQueryResult.refetch();
+        },
+        onError: (error) => {
+          message.error("Cập nhật trạng thái thất bại");
+          console.error(error);
+        },
+      }
+    );
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -286,46 +401,81 @@ export const InspectionsShow: React.FC = () => {
         return <ClockCircleOutlined style={{ color: token.colorWarning }} />;
       case "Cancel":
         return <CloseCircleOutlined style={{ color: token.colorError }} />;
+      case "Pending":
+        return <ClockCircleOutlined style={{ color: token.colorInfo }} />;
+      case "Incomplete":
+        return <ClockCircleOutlined style={{ color: token.colorInfo }} />;
       default:
         return <InfoCircleOutlined style={{ color: token.colorInfo }} />;
     }
   };
+
+  const now = dayjs();
+  const isBeforeStart = inspection?.start_date
+    ? now.isBefore(dayjs(inspection.start_date))
+    : false;
+  const isAfterEnd = inspection?.end_date
+    ? now.isAfter(dayjs(inspection.end_date))
+    : false;
+  const kimloaichecked = contaminantBasedVegetableType[plant?.type as keyof typeof contaminantBasedVegetableType];
+  console.log("kimloaichecked", kimloaichecked);
+  console
   return (
     <div
       style={{
-        padding: "16px",
+        padding: "24px",
         background: token.colorBgContainer,
         maxWidth: 1200,
         margin: "0 auto",
       }}
     >
-      {/* Header */}
       <PageHeader
         onBack={handleBack}
         title={
-          <Typography.Title level={4} style={{ margin: 0 }}>
+          <Typography.Title
+            level={2}
+            style={{ margin: 0, color: token.colorPrimary }}
+          >
             #{inspection?.id} - {inspection?.task_name}
           </Typography.Title>
         }
       />
 
-      <Row gutter={[24, 24]} style={{ marginTop: 16 }}>
+      <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
         <Col xs={24} md={16}>
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
+            {/* Plant Information Card */}
             <Card
               title={
-                <Flex align="center" gap={8}>
-                  <InfoCircleOutlined style={{ color: token.colorPrimary }} />
-                  <span>Thông tin giống cây kiểm nghiệm</span>
+                <Flex align="center" gap={12}>
+                  <InfoCircleOutlined
+                    style={{ color: token.colorPrimary, fontSize: 24 }}
+                  />
+                  <Typography.Title
+                    level={4}
+                    style={{ margin: 0, color: token.colorTextHeading }}
+                  >
+                    Thông tin giống cây kiểm nghiệm
+                  </Typography.Title>
                 </Flex>
               }
-              headStyle={{
-                borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                padding: "12px 16px",
+              styles={{
+                header: {
+                  borderBottom: `2px solid ${token.colorPrimary}`,
+                  padding: "16px 24px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "24px",
+                },
               }}
-              bodyStyle={{ padding: "16px" }}
+              style={{
+                borderRadius: token.borderRadiusLG,
+                boxShadow: token.boxShadow,
+                backgroundColor: token.colorBgElevated,
+              }}
             >
-              <Row gutter={[16, 16]}>
+              <Row gutter={[24, 24]}>
                 <Col xs={24} md={8}>
                   <Image
                     width="100%"
@@ -340,21 +490,57 @@ export const InspectionsShow: React.FC = () => {
                   />
                 </Col>
                 <Col xs={24} md={16}>
-                  <Space direction="vertical" size={16} style={{ width: "100%" }}>
+                  <Space
+                    direction="vertical"
+                    size={16}
+                    style={{ width: "100%" }}
+                  >
                     <Flex justify="space-between" align="center">
-                      <Typography.Text strong>Tên cây trồng</Typography.Text>
-                      <Typography.Text>{plant?.plant_name || "N/A"}</Typography.Text>
+                      <Typography.Text
+                        strong
+                        style={{
+                          fontSize: 16,
+                          color: token.colorTextHeading,
+                        }}
+                      >
+                        Tên cây trồng
+                      </Typography.Text>
+                      <Typography.Text style={{ fontSize: 16 }}>
+                        {plant?.plant_name || "N/A"}
+                      </Typography.Text>
                     </Flex>
                     <Flex justify="space-between" align="center">
-                      <Typography.Text strong>Loại cây trồng</Typography.Text>
-                      <Typography.Text>{plant?.type || "N/A"}</Typography.Text>
+                      <Typography.Text
+                        strong
+                        style={{
+                          fontSize: 16,
+                          color: token.colorTextHeading,
+                        }}
+                      >
+                        Loại cây trồng
+                      </Typography.Text>
+                      <Typography.Text style={{ fontSize: 16 }}>
+                        {plant?.type || "N/A"}
+                      </Typography.Text>
                     </Flex>
                     {plant?.description && (
                       <div>
-                        <Typography.Text strong>Mô tả</Typography.Text>
+                        <Typography.Text
+                          strong
+                          style={{
+                            fontSize: 16,
+                            color: token.colorTextHeading,
+                          }}
+                        >
+                          Mô tả
+                        </Typography.Text>
                         <Typography.Paragraph
                           ellipsis={{ rows: 3, expandable: true }}
-                          style={{ marginBottom: 0 }}
+                          style={{
+                            marginBottom: 0,
+                            fontSize: 14,
+                            color: token.colorTextDescription,
+                          }}
                         >
                           {plant.description}
                         </Typography.Paragraph>
@@ -365,102 +551,67 @@ export const InspectionsShow: React.FC = () => {
               </Row>
             </Card>
 
+            {/* Results Card */}
             <Card
               title={
-                <Flex align="center" gap={8}>
-                  <InfoCircleOutlined style={{ color: token.colorPrimary }} />
-                  <span>Thông tin công việc</span>
+                <Flex align="center" gap={12}>
+                  <InfoCircleOutlined
+                    style={{ color: token.colorPrimary, fontSize: 24 }}
+                  />
+                  <Typography.Title
+                    level={4}
+                    style={{ margin: 0, color: token.colorTextHeading }}
+                  >
+                    Kết quả
+                  </Typography.Title>
                 </Flex>
               }
-              headStyle={{
-                borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                padding: "12px 16px",
+              styles={{
+                header: {
+                  borderBottom: `2px solid ${token.colorPrimary}`,
+                  padding: "16px 24px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "24px",
+                },
               }}
-              bodyStyle={{ padding: "16px" }}
-            >
-              <Row gutter={[16, 16]}>
-                <Col span={24}>
-                  <Space direction="vertical" size={12} style={{ width: "100%" }}>
-                    <Row gutter={[16, 16]}>
-                      <Col xs={24} md={12}>
-                        <Flex justify="space-between" align="center">
-                          <Typography.Text strong>Tên kế hoạch</Typography.Text>
-                          <Typography.Text>{inspection?.plan_name || "N/A"}</Typography.Text>
-                        </Flex>
-                      </Col>
-                      <Col xs={24} md={12}>
-                        <Flex justify="space-between" align="center">
-                          <Typography.Text strong>Trung tâm kiểm định</Typography.Text>
-                          <Typography.Text>{inspection?.inspector_name || "N/A"}</Typography.Text>
-                        </Flex>
-                      </Col>
-                    </Row>
-
-                    <Divider style={{ margin: "8px 0" }} />
-
-                    <Row gutter={[16, 16]}>
-                      <Col xs={24} md={12}>
-                        <Flex justify="space-between" align="center">
-                          <Typography.Text strong>Ngày bắt đầu</Typography.Text>
-                          <Typography.Text>
-                            {dayjs(inspection?.start_date).format("DD/MM/YYYY")} lúc{" "}
-                            <Tag color="red" style={{ marginLeft: 4 }}>
-                              {dayjs(inspection?.start_date).format("HH:mm:ss")}
-                            </Tag>
-                          </Typography.Text>
-                        </Flex>
-                      </Col>
-                      <Col xs={24} md={12}>
-                        <Flex justify="space-between" align="center">
-                          <Typography.Text strong>Ngày kết thúc</Typography.Text>
-                          <Typography.Text>
-                            {dayjs(inspection?.end_date).format("DD/MM/YYYY")} lúc{" "}
-                            <Tag color="red" style={{ marginLeft: 4 }}>
-                              {dayjs(inspection?.end_date).format("HH:mm:ss")}
-                            </Tag>
-                          </Typography.Text>
-                        </Flex>
-                      </Col>
-                    </Row>
-
-                    <Divider style={{ margin: "8px 0" }} />
-
-                    <Row gutter={[16, 16]}>
-                      <Col xs={24} md={12}>
-                        <Flex justify="space-between" align="center">
-                          <Typography.Text strong>Trạng thái</Typography.Text>
-                          <Flex align="center" gap={8}>
-                            {getStatusIcon(inspection?.status || "")}
-                            <InspectionStatusTag value={inspection?.status || ""} />
-                          </Flex>
-                        </Flex>
-                      </Col>
-                    </Row>
-                  </Space>
-                </Col>
-              </Row>
-            </Card>
-
-            <Card
-              title={
-                <Flex align="center" gap={8}>
-                  <InfoCircleOutlined style={{ color: token.colorPrimary }} />
-                  <span>Kết quả</span>
-                </Flex>
-              }
-              headStyle={{
-                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+              style={{
+                borderRadius: token.borderRadiusLG,
+                boxShadow: token.boxShadow,
+                backgroundColor: token.colorBgElevated,
               }}
               extra={
                 inspectionResult ? (
-                  <Button type="primary" icon={<EyeOutlined />} onClick={handleOpenModal}>
+                  <Button
+                    type="primary"
+                    icon={<EyeOutlined />}
+                    onClick={handleOpenModal}
+                    style={{
+                      borderRadius: token.borderRadiusSM,
+
+                    }}
+                  >
                     Xem chi tiết
                   </Button>
                 ) : (
-                  !inspectionResult &&
-                  inspection?.status !== "Completed" &&
-                  inspection?.status !== "Cancel" && (
-                    <Button type="primary" icon={<EditOutlined />} onClick={handleCreate}>
+                  (inspection?.status === "Ongoing" ||
+                    inspection?.status === "Incomplete") && (
+                    <Button
+                      type="primary"
+                      icon={<EditOutlined />}
+                      onClick={handleCreate}
+                      disabled={
+                        isBeforeStart ||
+                        isAfterEnd ||
+                        inspection?.status === "Incomplete"
+                      }
+                      style={{
+                        borderRadius: token.borderRadiusSM,
+                        backgroundColor: token.colorPrimary,
+                        borderColor: token.colorPrimary,
+                      }}
+                    >
                       Hoàn Thành
                     </Button>
                   )
@@ -468,56 +619,255 @@ export const InspectionsShow: React.FC = () => {
               }
             >
               {inspectionResult ? (
-                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+                <Space
+                  direction="vertical"
+                  size="middle"
+                  style={{ width: "100%" }}
+                >
                   <Flex justify="space-between">
-                    <Typography.Text strong>Đánh giá</Typography.Text>
-                    <InspectionResultTag value={inspectionResult.evaluated_result} />
+                    <Typography.Text strong style={{ fontSize: 16 }}>
+                      Đánh giá
+                    </Typography.Text>
+                    <InspectionResultTag
+                      value={inspectionResult.evaluated_result}
+                    />
                   </Flex>
                   <Flex justify="space-between">
-                    <Typography.Text strong>Nội dung</Typography.Text>
-                    <Typography.Text>{inspectionResult.result_content || "N/A"}</Typography.Text>
+                    <Typography.Text strong style={{ fontSize: 16 }}>
+                      Nội dung
+                    </Typography.Text>
+                    <Typography.Text>
+                      {inspectionResult.result_content}
+                    </Typography.Text>
                   </Flex>
                 </Space>
-              ) : inspection?.status === "Cancel" ? (
+              ) : inspection?.status === "Ongoing" ? (
+                isBeforeStart ? (
+                  <Alert
+                    type="warning"
+                    message="Chưa đến ngày kiểm nghiệm"
+                    showIcon
+                  />
+                ) : (
+                  <Alert
+                    type="info"
+                    message="Chưa có kết quả kiểm nghiệm. Nhấn 'Hoàn Thành' để nhập kết quả."
+                    showIcon
+                  />
+                )
+              ) : inspection?.status === "Incomplete" ? (
+                <Alert type="error" message="Đã quá hạn kiểm nghiệm" showIcon />
+              ) : (
                 <Alert
-                  type="error"
-                  message="Đợt kiểm nghiệm đã bị hủy. Không thể tạo kết quả."
+                  type="warning"
+                  message="Không thể tạo kết quả trong trạng thái hiện tại"
                   showIcon
                 />
-              ) : (
-                <Alert type="info" message="Chưa có kết quả kiểm nghiệm." showIcon />
               )}
+            </Card>
+            <Card
+              title={
+                <Flex align="center" gap={12}>
+                  <InfoCircleOutlined
+                    style={{ color: token.colorPrimary, fontSize: 24 }}
+                  />
+                  <Typography.Title
+                    level={4}
+                    style={{ margin: 0, color: token.colorTextHeading }}
+                  >
+                    Thông tin công việc
+                  </Typography.Title>
+                </Flex>
+              }
+              styles={{
+                header: {
+                  borderBottom: `2px solid ${token.colorPrimary}`,
+                  padding: "16px 24px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "24px",
+                },
+              }}
+              style={{
+                borderRadius: token.borderRadiusLG,
+                boxShadow: token.boxShadow,
+                backgroundColor: token.colorBgElevated,
+              }}
+            >
+              <Space direction="vertical" size={16} style={{ width: "100%" }}>
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} md={12}>
+                    <Flex justify="space-between" align="center">
+                      <Typography.Text
+                        strong
+                        style={{
+                          fontSize: 16,
+                          color: token.colorTextHeading,
+                        }}
+                      >
+                        Tên kế hoạch
+                      </Typography.Text>
+                      <Typography.Text style={{ fontSize: 16 }}>
+                        {inspection?.plan_name || "N/A"}
+                      </Typography.Text>
+                    </Flex>
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <Flex justify="space-between" align="center">
+                      <Typography.Text
+                        strong
+                        style={{
+                          fontSize: 16,
+                          color: token.colorTextHeading,
+                        }}
+                      >
+                        Trung tâm kiểm định
+                      </Typography.Text>
+                      <Typography.Text style={{ fontSize: 16 }}>
+                        {inspection?.inspector_name || "N/A"}
+                      </Typography.Text>
+                    </Flex>
+                  </Col>
+                </Row>
+
+                <Divider style={{ margin: "12px 0" }} />
+
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} md={12}>
+                    <Flex justify="space-between" align="center">
+                      <Typography.Text
+                        strong
+                        style={{
+                          fontSize: 16,
+                          color: token.colorTextHeading,
+                        }}
+                      >
+                        Ngày bắt đầu
+                      </Typography.Text>
+                      <Typography.Text style={{ fontSize: 16 }}>
+                        {dayjs(inspection?.start_date).format("DD/MM/YYYY")} lúc{" "}
+                        <Tag color="red">
+                          {dayjs(inspection?.start_date).format("HH:mm:ss")}
+                        </Tag>
+                      </Typography.Text>
+                    </Flex>
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <Flex justify="space-between" align="center">
+                      <Typography.Text
+                        strong
+                        style={{
+                          fontSize: 16,
+                          color: token.colorTextHeading,
+                        }}
+                      >
+                        Ngày kết thúc
+                      </Typography.Text>
+                      <Typography.Text style={{ fontSize: 16 }}>
+                        {dayjs(inspection?.end_date).format("DD/MM/YYYY")} lúc{" "}
+                        <Tag color="red">
+                          {dayjs(inspection?.end_date).format("HH:mm:ss")}
+                        </Tag>
+                      </Typography.Text>
+                    </Flex>
+                  </Col>
+                </Row>
+
+                <Divider style={{ margin: "12px 0" }} />
+
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} md={12}>
+                    <Flex justify="space-between" align="center">
+                      <Typography.Text
+                        strong
+                        style={{
+                          fontSize: 16,
+                          color: token.colorTextHeading,
+                        }}
+                      >
+                        Trạng thái
+                      </Typography.Text>
+                      <Flex align="center" gap={8}>
+                        {getStatusIcon(inspection?.status || "")}
+                        <InspectionStatusTag value={inspection?.status || ""} />
+                      </Flex>
+                    </Flex>
+                  </Col>
+                </Row>
+              </Space>
             </Card>
           </Space>
         </Col>
 
         <Col xs={24} md={8}>
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
-            <ContaminantCheckCard
-              type={plant?.type}
-              contaminants={initialContaminants}
-              style={{ height: "100%" }}
-            />
+            <Button
+              type="primary"
+              icon={<ExperimentOutlined />}
+              onClick={handleOpenCriteriaModal}
+              style={{
+                width: "100%",
+                borderRadius: token.borderRadiusSM,
+                backgroundColor: token.colorPrimary,
+                borderColor: token.colorPrimary,
+                padding: "8px 16px",
+                fontSize: 16,
+              }}
+            >
+              Xem tiêu chí kiểm định
+            </Button>
 
             <Card
               title={
                 <Flex align="center" gap={8}>
-                  <InfoCircleOutlined style={{ color: token.colorPrimary }} />
-                  <span>Thời gian</span>
+                  <InfoCircleOutlined
+                    style={{ color: token.colorPrimary, fontSize: 20 }}
+                  />
+                  <Typography.Title
+                    level={4}
+                    style={{ margin: 0, color: token.colorTextHeading }}
+                  >
+                    Thời gian
+                  </Typography.Title>
                 </Flex>
               }
-              headStyle={{
-                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+              styles={{
+                header: {
+                  borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                  padding: "12px 16px",
+                  backgroundColor: token.colorBgElevated,
+                },
+                body: {
+                  padding: "16px",
+                },
+              }}
+              style={{
+                borderRadius: token.borderRadiusLG,
+                boxShadow: token.boxShadow,
+                backgroundColor: token.colorBgElevated,
               }}
             >
-              <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+              <Space
+                direction="vertical"
+                size="small"
+                style={{ width: "100%" }}
+              >
                 <Flex justify="space-between">
-                  <Typography.Text strong>Hoàn thành</Typography.Text>
-                  <Typography.Text>
+                  <Typography.Text
+                    strong
+                    style={{ fontSize: 14, color: token.colorTextHeading }}
+                  >
+                    Hoàn thành
+                  </Typography.Text>
+                  <Typography.Text style={{ fontSize: 14 }}>
                     {inspection?.complete_date ? (
                       <>
-                        {dayjs(inspection?.complete_date).format("DD/MM/YYYY")} lúc{" "}
-                        <Tag color="red">{dayjs(inspection?.complete_date).format("HH:mm:ss")}</Tag>
+                        {dayjs(inspection?.complete_date).format("DD/MM/YYYY")}{" "}
+                        lúc{" "}
+                        <Tag color="red">
+                          {dayjs(inspection?.complete_date).format("HH:mm:ss")}
+                        </Tag>
                       </>
                     ) : (
                       "N/A"
@@ -525,28 +875,54 @@ export const InspectionsShow: React.FC = () => {
                   </Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
-                  <Typography.Text strong>Tạo lúc</Typography.Text>
-                  <Typography.Text>
+                  <Typography.Text
+                    strong
+                    style={{ fontSize: 14, color: token.colorTextHeading }}
+                  >
+                    Tạo lúc
+                  </Typography.Text>
+                  <Typography.Text style={{ fontSize: 14 }}>
                     {dayjs(inspection?.created_at).format("DD/MM/YYYY")} lúc{" "}
-                    <Tag color="red">{dayjs(inspection?.created_at).format("HH:mm:ss")}</Tag>
+                    <Tag color="red">
+                      {dayjs(inspection?.created_at).format("HH:mm:ss")}
+                    </Tag>
                   </Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
-                  <Typography.Text strong>Tạo bởi</Typography.Text>
-                  <Typography.Text>{inspection?.created_by || "N/A"}</Typography.Text>
+                  <Typography.Text
+                    strong
+                    style={{ fontSize: 14, color: token.colorTextHeading }}
+                  >
+                    Tạo bởi
+                  </Typography.Text>
+                  <Typography.Text style={{ fontSize: 14 }}>
+                    {inspection?.created_by || "N/A"}
+                  </Typography.Text>
                 </Flex>
-                <Flex justify="space-between">
-                  <Typography.Text strong>Cập nhật</Typography.Text>
-                  <Typography.Text>
+                {/* <Flex justify="space-between">
+                  <Typography.Text
+                    strong
+                    style={{ fontSize: 14, color: token.colorTextHeading }}
+                  >
+                    Cập nhật
+                  </Typography.Text>
+                  <Typography.Text style={{ fontSize: 14 }}>
                     {inspection?.updated_at
                       ? dayjs(inspection?.updated_at).format("DD/MM/YYYY")
                       : "N/A"}
                   </Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
-                  <Typography.Text strong>Cập nhật bởi</Typography.Text>
-                  <Typography.Text>{inspection?.updated_by || "N/A"}</Typography.Text>
-                </Flex>
+                  <Typography.Text
+                    strong
+                    style={{ fontSize: 14, color: token.colorTextHeading }}
+                  >
+                    Cập nhật bởi
+                  </Typography.Text>
+                  <Typography.Text style={{ fontSize: 14 }}>
+                    {inspection?.updated_by || "N/A"}
+                  </Typography.Text>
+                </Flex> */}
               </Space>
             </Card>
           </Space>
@@ -554,23 +930,272 @@ export const InspectionsShow: React.FC = () => {
       </Row>
 
       <Modal
+        open={isCriteriaModalVisible}
+        onCancel={handleCloseCriteriaModal}
+        footer={null}
+        width={1000}
+        mask={true}
+        styles={{
+          mask: {
+            backgroundColor: "rgba(0, 0, 0, 0.45)",
+            backdropFilter: "blur(4px)",
+          },
+          body: {
+            padding: 24,
+          },
+        }}
+        style={{
+          top: 20,
+        }}
+        centered
+        closeIcon={
+          <CloseOutlined style={{ color: token.colorTextSecondary }} />
+        }
+      >
+        <ContaminantCheckCard
+          type={plant?.type}
+          contaminants={initialContaminants}
+        />
+      </Modal>
+
+      <Modal
         open={isModalVisible}
         onCancel={handleCloseModal}
         footer={null}
-        width={750}
+        width={1000}
+        mask={true}
+        styles={{
+          mask: {
+            backgroundColor: "rgba(0, 0, 0, 0.45)",
+            backdropFilter: "blur(4px)",
+          },
+          body: {
+            padding: 24,
+          },
+        }}
         title={
-          <Typography.Title level={3} style={{ margin: 0 }}>
-            Chi tiết kết quả kiểm nghiệm
-          </Typography.Title>
+          <Flex align="center" gap={12}>
+            <ExperimentOutlined
+              style={{ color: token.colorPrimary, fontSize: 20 }}
+            />
+            <div>
+              <Typography.Title level={4} style={{ margin: 0 }}>
+                Chi tiết kết quả kiểm nghiệm
+              </Typography.Title>
+              <Typography.Text
+                type="secondary"
+                italic
+                style={{
+                  fontSize: 14,
+                  display: "block",
+                  marginTop: 4,
+                  color: token.colorError,
+                }}
+              >
+                (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+              </Typography.Text>
+            </div>
+          </Flex>
+        }
+        style={{
+          top: 20,
+        }}
+        centered
+        closeIcon={
+          <CloseOutlined style={{ color: token.colorTextSecondary }} />
         }
       >
-        <ChemicalDataDisplay inspectionResult={inspectionResult} />
-      </Modal>
+        <Space direction="vertical" size={24} style={{ width: "100%" }}>
+          {/* Summary Card */}
+          <Card
+            variant="borderless"
+            style={{
+              background: token.colorPrimaryBg,
+              borderRadius: token.borderRadiusLG,
+            }}
+          >
+            <Typography.Paragraph strong style={{ marginBottom: 8 }}>
+              Kết luận kiểm nghiệm:
+            </Typography.Paragraph>
+            <Typography.Text>
+              {inspectionResult?.result_content || "Không có nhận xét"}
+            </Typography.Text>
+          </Card>
 
+          <Tabs
+            type="card"
+            items={chemicalGroups
+              .filter((group) =>
+                chemicalData.some((item) => group.keys?.includes(item.key))
+              )
+              .map((group) => ({
+                key: group.title,
+                label: (
+                  <Flex align="center" gap={8}>
+                    <div
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        backgroundColor: group.color,
+                      }}
+                    />
+                    <span>{group.title}</span>
+                  </Flex>
+                ),
+                children: (
+                  <Table
+                    rowKey="key"
+                    dataSource={chemicalData.filter((item) =>{
+                     if(group?.title === "Kim loại nặng")
+                     {
+                      const key = item.key;
+                      return kimloaichecked?.includes(key);
+                     }
+                    else
+                    {
+                    return group.keys.includes(item.key);
+                    }
+                  }
+                    )}
+                    columns={[
+                      {
+                        title: "Tên chất",
+                        dataIndex: "name",
+                        key: "name",
+                        render: (text, record) => {
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
+                          return (
+                            <Flex align="center" gap={8}>
+                              <Typography.Text strong>
+                                {text}
+                                {mustBeZero && (
+                                  <Typography.Text
+                                    type="danger"
+                                    strong
+                                    style={{ marginLeft: 4 }}
+                                  >
+                                    (*)
+                                  </Typography.Text>
+                                )}
+                              </Typography.Text>
+                              <Tooltip
+                                title={`Giới hạn an toàn: ${LIMITS[record.key]
+                                  ? mustBeZero
+                                    ? "Bắt buộc = 0"
+                                    : `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
+                                    }`
+                                  : "Không có dữ liệu"
+                                  }`}
+                              >
+                                <InfoCircleOutlined
+                                  style={{
+                                    color: token.colorPrimary,
+                                    cursor: "pointer",
+                                    fontSize: 14,
+                                  }}
+                                />
+                              </Tooltip>
+                            </Flex>
+                          );
+                        },
+                        width: "40%",
+                      },
+                      {
+                        title: "Giá trị",
+                        dataIndex: "value",
+                        key: "value",
+                        render: (value, record) => {
+                          const limit = LIMITS[record.key];
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
+                          const numericValue =
+                            typeof value === "string" ? parseFloat(value) : value;
+                          const isPassed = mustBeZero
+                            ? numericValue === 0
+                            : limit
+                              ? numericValue <= limit
+                              : true;
+
+                          return (
+                            <Tag
+                              color={isPassed ? "green" : "red"}
+                              icon={
+                                isPassed ? (
+                                  <CheckCircleOutlined />
+                                ) : (
+                                  <CloseCircleOutlined />
+                                )
+                              }
+                              style={{
+                                width: 120,
+                                textAlign: "center",
+                                display: "inline-flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              {value} {UNITS[record.key] || ""}
+                            </Tag>
+                          );
+                        },
+                        width: "30%",
+                      },
+                      {
+                        title: "Tiêu chuẩn",
+                        key: "standard",
+                        render: (_, record) => {
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
+                          return (
+                            <Flex align="center" gap={8}>
+                              <Typography.Text strong>
+                                {mustBeZero
+                                  ? "Bắt buộc = 0"
+                                  : `≤ ${LIMITS[record.key] || "N/A"} ${UNITS[record.key] || ""
+                                  }`}
+                              </Typography.Text>
+                              <Tooltip
+                                title={`Giới hạn an toàn cho ${record.name}: ${mustBeZero
+                                  ? "Bắt buộc = 0"
+                                  : LIMITS[record.key]
+                                    ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
+                                    }`
+                                    : "Không có dữ liệu"
+                                  }`}
+                              >
+                                <InfoCircleOutlined
+                                  style={{
+                                    color: token.colorPrimary,
+                                    fontSize: 14,
+                                  }}
+                                />
+                              </Tooltip>
+                            </Flex>
+                          );
+                        },
+                        width: "30%",
+                      },
+                    ]}
+                    pagination={false}
+                    bordered
+                    size="middle"
+                    style={{
+                      marginTop: 12,
+                      borderRadius: token.borderRadiusLG,
+                    }}
+                    rowClassName={(_, index) =>
+                      index % 2 === 0 ? "table-row-light" : "table-row-dark"
+                    }
+                  />
+                ),
+              }))}
+          />
+        </Space>
+      </Modal>
       {isEditing &&
         selectedResult &&
         inspection?.status !== "Completed" &&
-        inspection?.status !== "Cancel" && (
+        inspection?.status !== "Cancel" &&
+        inspection?.status !== "Pending" && (
           <InspectionModalForm
             type={plant?.type}
             id={selectedResult.id}
@@ -578,11 +1203,7 @@ export const InspectionsShow: React.FC = () => {
             open={isEditing}
             initialValues={selectedResult}
             onClose={handleCloseDrawer}
-            onMutationSuccess={() => {
-              formQueryResult.refetch();
-              resultQueryResult.refetch();
-              handleCloseDrawer();
-            }}
+            onMutationSuccess={handleMutationSuccess}
           />
         )}
     </div>

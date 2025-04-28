@@ -1,89 +1,150 @@
+/* eslint-disable prettier/prettier */
 import React from "react";
-import { type HttpError, useGetIdentity, useList } from "@refinedev/core";
-import { Table, Button, Typography, Space } from "antd";
+import { useTable } from "@refinedev/antd";
+import { getDefaultFilter, type HttpError, useGetIdentity, useGo } from "@refinedev/core";
+import { Table, Button, InputNumber, Typography, Space, theme } from "antd";
 import {
   EyeOutlined,
   SearchOutlined,
   CalendarOutlined,
+  HourglassOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  HourglassOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { PaginationTotal } from "@/components/paginationTotal";
 import { IIdentity, IInspectingForm } from "@/interfaces";
 import { InspectionStatusTag } from "../status";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router";
 
 export const InspectionListTable: React.FC = () => {
-  const navigate = useNavigate();
-  const { data: user } = useGetIdentity<IIdentity>();
-  const { data, isLoading } = useList<IInspectingForm, HttpError>({
+  const { token } = theme.useToken();
+  const { t } = useTranslation();
+  const go = useGo();
+  const {data: user} = useGetIdentity<IIdentity>();
+  const { tableProps, filters, setFilters } = useTable<
+    IInspectingForm,
+    HttpError
+  >({
     resource: "inspecting-forms",
-    filters: [{ field: "inspector_id", operator: "eq", value: user?.id }],
+    filters: {
+      initial: [
+        { field: "id", operator: "eq", value: "" },
+        { field: "task_type", operator: "contains", value: "" },
+        { field: "inspector_id", operator: "eq", value: user?.id },
+      ],
+    },
   });
 
   const handleView = (id?: number) => {
     if (id) {
-      navigate(`/inspection-forms/${id}`);
+      go({
+        to: `/inspection-forms/${id}`,
+        type: "push",
+      });
     }
   };
 
   return (
     <Table
-      loading={isLoading}
-      dataSource={data?.data?.filter((x) => x.status !== "Draft")}
-      pagination={{ pageSize: 10 }}
+      {...tableProps}
+      dataSource={tableProps.dataSource?.filter((item) => item.status !== "Draft")}
       rowKey="id"
       scroll={{ x: true }}
+      pagination={{
+        ...tableProps.pagination,
+        showSizeChanger: true,
+        showQuickJumper: true,
+        showTotal: (total) => (
+          <PaginationTotal total={total} entityName="inspections" />
+        ),
+      }}
     >
+
       <Table.Column
         title="ID"
         dataIndex="id"
         key="id"
         width={80}
         filterIcon={(filtered) => (
-          <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+          <SearchOutlined
+            style={{ color: filtered ? token.colorPrimary : undefined }}
+          />
+        )}
+        defaultFilteredValue={getDefaultFilter("id", filters, "eq")}
+        filterDropdown={(props) => (
+          <InputNumber
+            style={{ width: "100%" }}
+            placeholder={t("inspections.search_id")}
+            onChange={(value) =>
+              setFilters([{ field: "id", operator: "eq", value }])
+            }
+          />
         )}
       />
 
-      <Table.Column title="📋 Tên kế hoạch" dataIndex="plan_name" key="plan_name" />
       <Table.Column
-        title="✏️ Nhiệm vụ"
-        dataIndex="task_name"
-        key="task_name"
-        render={(value) => <span>{value.charAt(0).toUpperCase() + value.slice(1)}</span>}
+        title={t("inspections.plan_name")}
+        dataIndex="plan_name"
+        key="plan_name"
       />
 
       <Table.Column
-        title="📅 Ngày bắt đầu"
+        title={t("inspections.task_name")}
+        dataIndex="task_name"
+        key="task_name"
+        render={(value: string) =>
+          value.charAt(0).toUpperCase() + value.slice(1)
+        }
+      />
+      <Table.Column
+        title={t("inspections.start_date")}
         dataIndex="start_date"
         key="start_date"
         render={(value: string) => {
-          const formattedDate = dayjs(value);
-          const date = formattedDate.format("DD/MM/YYYY");
-          const time = formattedDate.format("HH:mm");
+          const now = dayjs();
+          const startDate = dayjs(value);
+          const isStarted = now.isAfter(startDate) || now.isSame(startDate);
+          const date = startDate.format("DD/MM/YYYY");
+          const time = startDate.format("HH:mm");
 
           return (
             <span>
-              <CalendarOutlined style={{ color: "#52c41a", marginRight: 5 }} />
-              <span>{date}</span>
-              <span style={{ color: "#ff4d4f", marginLeft: 5 }}>{time}</span>{" "}
+              <CalendarOutlined
+                style={{
+                  color: isStarted ? "#52c41a" : "#d9d9d9",
+                  marginRight: 5,
+                }}
+              />
+              <span
+                style={{
+                  color: isStarted ? "#52c41a" : "#d9d9d9",
+                }}
+              >
+                {date}
+              </span>
+              <span
+                style={{
+                  color: isStarted ? "#ff4d4f" : "#8c8c8c",
+                  marginLeft: 5,
+                }}
+              >
+                {time}
+              </span>
             </span>
           );
         }}
       />
 
       <Table.Column
-        title="⏰ Ngày kết thúc"
+        title={t("inspections.end_date")}
         dataIndex="end_date"
         key="end_date"
         render={(value: string) => {
-          const formattedDate = dayjs(value);
-          const date = formattedDate.format("DD/MM/YYYY");
-          const time = formattedDate.format("HH:mm");
-
+          const date = dayjs(value).format("DD/MM/YYYY");
+          const time = dayjs(value).format("HH:mm");
           return (
             <span>
               <motion.span
@@ -91,55 +152,76 @@ export const InspectionListTable: React.FC = () => {
                 transition={{ duration: 0.8, repeat: Infinity }}
                 style={{ display: "inline-block" }}
               >
-                <HourglassOutlined style={{ color: "#faad14", marginRight: 5 }} />
+                <HourglassOutlined
+                  style={{ color: "#faad14", marginRight: 5 }}
+                />
               </motion.span>
-              <span>{date}</span>
-              <span style={{ color: "#ff4d4f", marginLeft: 5 }}>{time}</span>{" "}
+              {date}
+              <span style={{ color: "#ff4d4f", marginLeft: 5 }}>{time}</span>
             </span>
           );
         }}
       />
 
       <Table.Column
-        title="🔄 Trạng thái"
+        title={t("inspections.status")}
         dataIndex="status"
         key="status"
-        render={(status) => {
-          let icon;
-          let color;
-          if (status === "Complete") {
-            icon = <CheckCircleOutlined style={{ color: "#52c41a", marginRight: 5 }} />;
-            color = "green";
-          } else if (status === "Pending") {
-            icon = <HourglassOutlined style={{ color: "#faad14", marginRight: 5 }} />;
-            color = "orange";
-          } else if (status === "Ongoing") {
-            icon = <SettingOutlined style={{ color: "blue", marginRight: 5 }} />;
-            color = "blue";
-          } else {
-            icon = <CloseCircleOutlined style={{ color: "#f5222d", marginRight: 5 }} />;
-            color = "red";
+        render={(status: string) => {
+          let icon = null;
+          let color = "";
+          switch (status) {
+            case "Complete":
+              icon = (
+                <CheckCircleOutlined
+                  style={{ color: "#52c41a", fontSize: 18 }}
+                />
+              );
+              color = "green";
+              break;
+            case "Pending":
+              icon = (
+                <HourglassOutlined style={{ color: "#faad14", fontSize: 18 }} />
+              );
+              color = "orange";
+              break;
+            case "Ongoing":
+              icon = (
+                <SettingOutlined style={{ color: "blue", fontSize: 18 }} />
+              );
+              color = "blue";
+              break;
+            default:
+              icon = (
+                <CloseCircleOutlined
+                  style={{ color: "#f5222d", fontSize: 18 }}
+                />
+              );
+              color = "red";
           }
           return (
-            <span style={{ color }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               {icon}
               <InspectionStatusTag value={status} />
-            </span>
+            </div>
           );
         }}
       />
 
       <Table.Column
-        title="Chi tiết"
+        title={t("inspections.actions")}
         key="actions"
         fixed="right"
         align="center"
         render={(_, record: IInspectingForm) => (
           <Space>
             {record.id ? (
-              <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)} />
+              <Button
+                icon={<EyeOutlined />}
+                onClick={() => handleView(record.id)}
+              />
             ) : (
-              <Typography.Text type="secondary">Không có</Typography.Text>
+              <Typography.Text type="secondary">N/A</Typography.Text>
             )}
           </Space>
         )}

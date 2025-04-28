@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React from "react";
 import { Tag } from "antd";
 
@@ -5,7 +6,9 @@ interface InspectionStatusTagProps {
   value?: string;
 }
 
-export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({ value }) => {
+export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({
+  value,
+}) => {
   const normalizedValue = value === "Complete" ? "Completed" : value;
 
   let color = "default";
@@ -19,6 +22,10 @@ export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({ value 
     case "Pending":
       text = "Chờ duyệt";
       color = "orange";
+      break;
+    case "Incomplete":
+      text = "Chưa hoàn thành";
+      color = "yellow";
       break;
     case "Ongoing":
       text = "Đang thực hiện";
@@ -38,4 +45,6 @@ export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({ value 
   }
 
   return <Tag color={color}>{text}</Tag>;
+
+  
 };
