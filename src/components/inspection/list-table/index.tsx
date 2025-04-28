@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React from "react";
 import { useTable } from "@refinedev/antd";
-import { getDefaultFilter, type HttpError, useGo } from "@refinedev/core";
+import { getDefaultFilter, type HttpError, useGetIdentity, useGo } from "@refinedev/core";
 import { Table, Button, InputNumber, Typography, Space, theme } from "antd";
 import {
   EyeOutlined,
@@ -13,7 +13,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { PaginationTotal } from "@/components/paginationTotal";
-import { IInspectingForm } from "@/interfaces";
+import { IIdentity, IInspectingForm } from "@/interfaces";
 import { InspectionStatusTag } from "../status";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ export const InspectionListTable: React.FC = () => {
   const { token } = theme.useToken();
   const { t } = useTranslation();
   const go = useGo();
-
+  const {data: user} = useGetIdentity<IIdentity>();
   const { tableProps, filters, setFilters } = useTable<
     IInspectingForm,
     HttpError
@@ -33,6 +33,7 @@ export const InspectionListTable: React.FC = () => {
       initial: [
         { field: "id", operator: "eq", value: "" },
         { field: "task_type", operator: "contains", value: "" },
+        { field: "inspector_id", operator: "eq", value: user?.id },
       ],
     },
   });
@@ -49,6 +50,7 @@ export const InspectionListTable: React.FC = () => {
   return (
     <Table
       {...tableProps}
+      dataSource={tableProps.dataSource?.filter((item) => item.status !== "Draft")}
       rowKey="id"
       scroll={{ x: true }}
       pagination={{
@@ -60,6 +62,7 @@ export const InspectionListTable: React.FC = () => {
         ),
       }}
     >
+
       <Table.Column
         title="ID"
         dataIndex="id"
@@ -96,19 +99,40 @@ export const InspectionListTable: React.FC = () => {
           value.charAt(0).toUpperCase() + value.slice(1)
         }
       />
-
       <Table.Column
         title={t("inspections.start_date")}
         dataIndex="start_date"
         key="start_date"
         render={(value: string) => {
-          const date = dayjs(value).format("DD/MM/YYYY");
-          const time = dayjs(value).format("HH:mm");
+          const now = dayjs();
+          const startDate = dayjs(value);
+          const isStarted = now.isAfter(startDate) || now.isSame(startDate);
+          const date = startDate.format("DD/MM/YYYY");
+          const time = startDate.format("HH:mm");
+
           return (
             <span>
-              <CalendarOutlined style={{ color: "#52c41a", marginRight: 5 }} />
-              {date}
-              <span style={{ color: "#ff4d4f", marginLeft: 5 }}>{time}</span>
+              <CalendarOutlined
+                style={{
+                  color: isStarted ? "#52c41a" : "#d9d9d9",
+                  marginRight: 5,
+                }}
+              />
+              <span
+                style={{
+                  color: isStarted ? "#52c41a" : "#d9d9d9",
+                }}
+              >
+                {date}
+              </span>
+              <span
+                style={{
+                  color: isStarted ? "#ff4d4f" : "#8c8c8c",
+                  marginLeft: 5,
+                }}
+              >
+                {time}
+              </span>
             </span>
           );
         }}

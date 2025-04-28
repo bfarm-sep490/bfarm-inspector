@@ -49,12 +49,15 @@ import {
   LIMITS,
   Contaminant,
   initialContaminants,
+  getMustBeZeroKeys,
+  mustBeZeroKeys,
 } from "../chemical/ChemicalConstants";
 import { InspectionResultTag } from "../result";
 import { PageHeader } from "@refinedev/antd";
+import { contaminantBasedVegetableType } from "@/utils/inspectingKind";
 
 interface ContaminantCheckCardProps {
-  type: string;
+  type: string | undefined; // Sửa type để chấp nhận undefined như trong định nghĩa ban đầu
   style?: React.CSSProperties;
   contaminants: Contaminant[];
 }
@@ -64,7 +67,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
   contaminants,
 }) => {
   const { token } = theme.useToken();
-
+  const mustBeZeroKeys = getMustBeZeroKeys();
   return (
     <Card
       variant="borderless"
@@ -75,7 +78,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
         ...style,
       }}
     >
-      <Flex align="center" gap={8} style={{ marginBottom: 24 }}>
+      <Flex align="center" gap={8} style={{ marginBottom: 16 }}>
         <ExperimentOutlined
           style={{ color: token.colorPrimary, fontSize: 24 }}
         />
@@ -86,6 +89,18 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
           Tiêu chí kiểm định
         </Typography.Title>
       </Flex>
+      <Typography.Text
+        type="secondary"
+        italic
+        style={{
+          fontSize: 14,
+          display: "block",
+          marginTop: 4,
+          color: token.colorError,
+        }}
+      >
+        (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+      </Typography.Text>
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         {chemicalGroups.map((group) => {
@@ -139,40 +154,84 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                     title: "Tên chất",
                     dataIndex: "name",
                     key: "name",
-                    render: (text: string) => (
-                      <Typography.Text strong style={{ fontSize: 16 }}>
-                        {text}
-                      </Typography.Text>
-                    ),
-                    width: "50%",
+                    render: (text, record) => {
+                      const mustBeZero = mustBeZeroKeys.includes(record.key);
+                      return (
+                        <Flex align="center" gap={8}>
+                          <Typography.Text strong>
+                            {text}
+                            {mustBeZero && (
+                              <Typography.Text
+                                type="danger"
+                                strong
+                                style={{ marginLeft: 4 }}
+                              >
+                                (*)
+                              </Typography.Text>
+                            )}
+                          </Typography.Text>
+                          <Tooltip
+                            title={`Giới hạn an toàn: ${LIMITS[record.key]
+                              ? mustBeZero
+                                ? "Bắt buộc = 0"
+                                : `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
+                                }`
+                              : "Không có dữ liệu"
+                              }`}
+                          >
+                            <InfoCircleOutlined
+                              style={{
+                                color: token.colorPrimary,
+                                cursor: "pointer",
+                                fontSize: 14,
+                              }}
+                            />
+                          </Tooltip>
+                        </Flex>
+                      );
+                    },
+                    width: "40%",
                   },
                   {
                     title: "Giới hạn",
                     dataIndex: "standard",
                     key: "standard",
-                    render: (text: string, record: Contaminant) => (
-                      <Flex align="center" gap={8}>
-                        <Tag
-                          color="blue"
-                          style={{
-                            fontSize: 14,
-                            padding: "4px 8px",
-                            borderRadius: token.borderRadiusSM,
-                          }}
-                        >
-                          ≤ {LIMITS[record.key] || "N/A"}{" "}
-                          {UNITS[record.key] || ""}
-                        </Tag>
-                        <Tooltip title={`Giới hạn an toàn cho ${record.name}`}>
-                          <InfoCircleOutlined
+                    render: (text: string, record: Contaminant) => {
+                      const mustBeZero = mustBeZeroKeys.includes(record.key);
+                      return (
+                        <Flex align="center" gap={8}>
+                          <Tag
+                            color="blue"
                             style={{
-                              color: token.colorPrimary,
                               fontSize: 14,
+                              padding: "4px 8px",
+                              borderRadius: token.borderRadiusSM,
                             }}
-                          />
-                        </Tooltip>
-                      </Flex>
-                    ),
+                          >
+                            {mustBeZero
+                              ? "Bắt buộc = 0"
+                              : `≤ ${LIMITS[record.key] || "N/A"} ${UNITS[record.key] || ""
+                              }`}
+                          </Tag>
+                          <Tooltip
+                            title={`Giới hạn an toàn cho ${record.name}: ${mustBeZero
+                              ? "Bắt buộc = 0"
+                              : LIMITS[record.key]
+                                ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
+                                }`
+                                : "Không có dữ liệu"
+                              }`}
+                          >
+                            <InfoCircleOutlined
+                              style={{
+                                color: token.colorPrimary,
+                                fontSize: 14,
+                              }}
+                            />
+                          </Tooltip>
+                        </Flex>
+                      );
+                    },
                     width: "50%",
                   },
                 ]}
@@ -229,8 +288,7 @@ export const InspectionsShow: React.FC = () => {
 
   const inspection = useMemo(
     () =>
-      (formQueryResult.data as { data: IInspectingForm[] } | undefined)
-        ?.data?.[0],
+      (formQueryResult.data as { data: IInspectingForm[] } | undefined)?.data?.[0],
     [formQueryResult.data]
   );
 
@@ -256,8 +314,7 @@ export const InspectionsShow: React.FC = () => {
 
   const inspectionResult = useMemo(
     () =>
-      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)
-        ?.data?.[0],
+      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)?.data?.[0],
     [resultQueryResult.data]
   );
 
@@ -275,6 +332,7 @@ export const InspectionsShow: React.FC = () => {
     const data = getChemicalData(inspectionResult);
     return data.map((item) => ({
       ...item,
+      key: item.key,
       name: item.label,
       value: item.value !== undefined ? item.value.toString() : "N/A",
     }));
@@ -351,6 +409,7 @@ export const InspectionsShow: React.FC = () => {
         return <InfoCircleOutlined style={{ color: token.colorInfo }} />;
     }
   };
+
   const now = dayjs();
   const isBeforeStart = inspection?.start_date
     ? now.isBefore(dayjs(inspection.start_date))
@@ -358,7 +417,9 @@ export const InspectionsShow: React.FC = () => {
   const isAfterEnd = inspection?.end_date
     ? now.isAfter(dayjs(inspection.end_date))
     : false;
-
+  const kimloaichecked = contaminantBasedVegetableType[plant?.type as keyof typeof contaminantBasedVegetableType];
+  console.log("kimloaichecked", kimloaichecked);
+  console
   return (
     <div
       style={{
@@ -528,8 +589,7 @@ export const InspectionsShow: React.FC = () => {
                     onClick={handleOpenModal}
                     style={{
                       borderRadius: token.borderRadiusSM,
-                      backgroundColor: token.colorPrimary,
-                      borderColor: token.colorPrimary,
+
                     }}
                   >
                     Xem chi tiết
@@ -839,7 +899,7 @@ export const InspectionsShow: React.FC = () => {
                     {inspection?.created_by || "N/A"}
                   </Typography.Text>
                 </Flex>
-                <Flex justify="space-between">
+                {/* <Flex justify="space-between">
                   <Typography.Text
                     strong
                     style={{ fontSize: 14, color: token.colorTextHeading }}
@@ -862,7 +922,7 @@ export const InspectionsShow: React.FC = () => {
                   <Typography.Text style={{ fontSize: 14 }}>
                     {inspection?.updated_by || "N/A"}
                   </Typography.Text>
-                </Flex>
+                </Flex> */}
               </Space>
             </Card>
           </Space>
@@ -918,9 +978,23 @@ export const InspectionsShow: React.FC = () => {
             <ExperimentOutlined
               style={{ color: token.colorPrimary, fontSize: 20 }}
             />
-            <Typography.Title level={4} style={{ margin: 0 }}>
-              Chi tiết kết quả kiểm nghiệm
-            </Typography.Title>
+            <div>
+              <Typography.Title level={4} style={{ margin: 0 }}>
+                Chi tiết kết quả kiểm nghiệm
+              </Typography.Title>
+              <Typography.Text
+                type="secondary"
+                italic
+                style={{
+                  fontSize: 14,
+                  display: "block",
+                  marginTop: 4,
+                  color: token.colorError,
+                }}
+              >
+                (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+              </Typography.Text>
+            </div>
           </Flex>
         }
         style={{
@@ -948,12 +1022,11 @@ export const InspectionsShow: React.FC = () => {
             </Typography.Text>
           </Card>
 
-          {/* Chemical Results */}
           <Tabs
             type="card"
             items={chemicalGroups
               .filter((group) =>
-                chemicalData.some((item) => group.keys.includes(item.key))
+                chemicalData.some((item) => group.keys?.includes(item.key))
               )
               .map((group) => ({
                 key: group.title,
@@ -973,30 +1046,59 @@ export const InspectionsShow: React.FC = () => {
                 children: (
                   <Table
                     rowKey="key"
-                    dataSource={chemicalData.filter((item) =>
-                      group.keys.includes(item.key)
+                    dataSource={chemicalData.filter((item) =>{
+                     if(group?.title === "Kim loại nặng")
+                     {
+                      const key = item.key;
+                      return kimloaichecked?.includes(key);
+                     }
+                    else
+                    {
+                    return group.keys.includes(item.key);
+                    }
+                  }
                     )}
                     columns={[
                       {
                         title: "Tên chất",
                         dataIndex: "name",
                         key: "name",
-                        render: (text, record) => (
-                          <Flex align="center" gap={8}>
-                            <Typography.Text strong>{text}</Typography.Text>
-                            <Tooltip
-                              title={`Giới hạn an toàn: ${LIMITS[record.key] ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""}` : "Không có dữ liệu"}`}
-                            >
-                              <InfoCircleOutlined
-                                style={{
-                                  color: token.colorPrimary,
-                                  cursor: "pointer",
-                                  fontSize: 14,
-                                }}
-                              />
-                            </Tooltip>
-                          </Flex>
-                        ),
+                        render: (text, record) => {
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
+                          return (
+                            <Flex align="center" gap={8}>
+                              <Typography.Text strong>
+                                {text}
+                                {mustBeZero && (
+                                  <Typography.Text
+                                    type="danger"
+                                    strong
+                                    style={{ marginLeft: 4 }}
+                                  >
+                                    (*)
+                                  </Typography.Text>
+                                )}
+                              </Typography.Text>
+                              <Tooltip
+                                title={`Giới hạn an toàn: ${LIMITS[record.key]
+                                  ? mustBeZero
+                                    ? "Bắt buộc = 0"
+                                    : `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
+                                    }`
+                                  : "Không có dữ liệu"
+                                  }`}
+                              >
+                                <InfoCircleOutlined
+                                  style={{
+                                    color: token.colorPrimary,
+                                    cursor: "pointer",
+                                    fontSize: 14,
+                                  }}
+                                />
+                              </Tooltip>
+                            </Flex>
+                          );
+                        },
                         width: "40%",
                       },
                       {
@@ -1005,13 +1107,14 @@ export const InspectionsShow: React.FC = () => {
                         key: "value",
                         render: (value, record) => {
                           const limit = LIMITS[record.key];
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
                           const numericValue =
-                            typeof value === "string"
-                              ? parseFloat(value)
-                              : record.value;
-                          const isPassed = limit
-                            ? parseFloat(numericValue as string) <= limit
-                            : true;
+                            typeof value === "string" ? parseFloat(value) : value;
+                          const isPassed = mustBeZero
+                            ? numericValue === 0
+                            : limit
+                              ? numericValue <= limit
+                              : true;
 
                           return (
                             <Tag
@@ -1040,12 +1143,35 @@ export const InspectionsShow: React.FC = () => {
                       {
                         title: "Tiêu chuẩn",
                         key: "standard",
-                        render: (_, record) => (
-                          <Typography.Text strong>
-                            ≤ {LIMITS[record.key] || "N/A"}{" "}
-                            {UNITS[record.key] || ""}
-                          </Typography.Text>
-                        ),
+                        render: (_, record) => {
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
+                          return (
+                            <Flex align="center" gap={8}>
+                              <Typography.Text strong>
+                                {mustBeZero
+                                  ? "Bắt buộc = 0"
+                                  : `≤ ${LIMITS[record.key] || "N/A"} ${UNITS[record.key] || ""
+                                  }`}
+                              </Typography.Text>
+                              <Tooltip
+                                title={`Giới hạn an toàn cho ${record.name}: ${mustBeZero
+                                  ? "Bắt buộc = 0"
+                                  : LIMITS[record.key]
+                                    ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
+                                    }`
+                                    : "Không có dữ liệu"
+                                  }`}
+                              >
+                                <InfoCircleOutlined
+                                  style={{
+                                    color: token.colorPrimary,
+                                    fontSize: 14,
+                                  }}
+                                />
+                              </Tooltip>
+                            </Flex>
+                          );
+                        },
                         width: "30%",
                       },
                     ]}

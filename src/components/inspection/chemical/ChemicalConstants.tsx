@@ -10,24 +10,30 @@ interface ChemicalData {
   value: number;
   limit: number;
 }
+export const mustBeZeroKeys = [
+  "methyl_bromide",
+  "hydrogen_phosphide",
+  "salmonella",
+];
 
+export const getMustBeZeroKeys = (): string[] => mustBeZeroKeys;
 export const LIMITS: Record<string, number> = {
-  arsen:0.5, // Theo VietGAP, giữ nguyên vì không có trong initialContaminants
-  plumbum: 0.3, // Khớp với initialContaminants
-  cadmi: 0.05, // Khớp với initialContaminants
-  hydragyrum: 0.03, // Theo VietGAP, giữ nguyên vì không có trong initialContaminants
-  glyphosate_glufosinate: 0.01, // Khớp với initialContaminants
-  sulfur_dioxide: 10, // Khớp với initialContaminants
-  methyl_bromide: 0, // Khớp với initialContaminants (bị cấm)
-  hydrogen_phosphide: 0, // Khớp với initialContaminants (bị cấm)
-  dithiocarbamate: 2.0, // Khớp với initialContaminants
-  nitrat: 9, // Giữ nguyên vì không có trong initialContaminants
-  nano3_kno3: 15, // Giữ nguyên vì không có trong initialContaminants
-  chlorate: 0.01, // Khớp với initialContaminants
-  perchlorate: 0.01, // Khớp với initialContaminants
-  salmonella: 0, // Khớp với initialContaminants
-  ecoli: 100, // Khớp với initialContaminants
-  coliforms: 100, // Khớp với initialContaminants
+  arsen: 1, 
+  plumbum: 0.3, 
+  cadmi: 0.05, 
+  hydrargyrum: 0.03, 
+  glyphosate_glufosinate: 0.01, 
+  sulfur_dioxide: 10,
+  methyl_bromide: 0, 
+  hydrogen_phosphide: 0,
+  dithiocarbamate: 2.0,
+  nitrat: 9, 
+  nano3_kno3: 15, 
+  chlorate: 0.01,
+  perchlorate: 0.01, 
+  salmonella: 0, 
+  ecoli: 100,
+  coliforms: 100,
 };
 
 export const UNITS: Record<string, string> = {
@@ -65,7 +71,7 @@ export const initialContaminants: Contaminant[] = [
   { key: "arsen", name: "Arsen", value: "< 0.5 mg/kg", standard: "Max" },
   { key: "plumbum", name: "Plumbum", value: "< 0.3 mg/kg", standard: "Max" },
   { key: "cadmi", name: "Cadmium", value: "< 0.05 mg/kg", standard: "Max" },
-  { key: "hydragyrum", name: "Thủy ngân", value: "< 0.03 mg/kg", standard: "Max" },
+  { key: "hydrargyrum", name: "Thủy ngân", value: "< 0.03 mg/kg", standard: "Max" },
   {
     key: "salmonella",
     name: "Salmonella",
@@ -118,7 +124,7 @@ export const initialContaminants: Contaminant[] = [
 export const chemicalGroups: ChemicalCategory[] = [
   {
     title: "Kim loại nặng",
-    keys: ["arsen", "plumbum", "cadmi", "hydragyrum"],
+    keys: ["arsen", "plumbum", "cadmi", "hydrargyrum"],
     color: "#722ed1",
   },
   {
@@ -150,7 +156,7 @@ export const getChemicalData = (inspectionResult?: IInspectingResult) => {
       key: "arsen",
       label: `Arsen`,
       unit: UNITS["arsen"],
-      value: inspectionResult.arsen ?? 0, // Thêm giá trị mặc định nếu không có dữ liệu
+      value: inspectionResult.arsen ?? 0, 
       limit: LIMITS["arsen"],
     },
     {

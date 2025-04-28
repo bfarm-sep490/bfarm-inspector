@@ -16,6 +16,7 @@ import {
   Contaminant,
   LIMITS,
   UNITS,
+  getMustBeZeroKeys,
 } from "../chemical/ChemicalConstants";
 
 interface ContaminantCheckCardProps {
@@ -23,11 +24,13 @@ interface ContaminantCheckCardProps {
   style?: React.CSSProperties;
   contaminants: Contaminant[];
 }
+
 const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
   style,
   contaminants,
 }) => {
   const { token } = theme.useToken();
+  const mustBeZeroKeys = getMustBeZeroKeys(); // Sử dụng hàm từ ChemicalConstants
 
   return (
     <Card
@@ -39,7 +42,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
         ...style,
       }}
     >
-      <Flex align="center" gap={8} style={{ marginBottom: 24 }}>
+      <Flex align="center" gap={8} style={{ marginBottom: 16 }}>
         <ExperimentOutlined
           style={{ color: token.colorPrimary, fontSize: 24 }}
         />
@@ -50,6 +53,14 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
           Tiêu chí kiểm định
         </Typography.Title>
       </Flex>
+      <Typography.Text
+        type="secondary"
+        italic
+        style={{ marginBottom: 16, display: "block" }}
+      >
+        Các chất hóa học được nhóm theo loại để dễ dàng theo dõi và đánh giá. (*)
+        Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+      </Typography.Text>
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         {chemicalGroups.map((group) => {
@@ -101,40 +112,89 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                     title: "Tên chất",
                     dataIndex: "name",
                     key: "name",
-                    render: (text: string) => (
-                      <Typography.Text strong style={{ fontSize: 16 }}>
-                        {text}
-                      </Typography.Text>
-                    ),
+                    render: (text: string, record: Contaminant) => {
+                      const mustBeZero = mustBeZeroKeys.includes(record.key);
+                      return (
+                        <Flex align="center" gap={8}>
+                          <Typography.Text strong style={{ fontSize: 16 }}>
+                            {text}
+                            {mustBeZero && (
+                              <Typography.Text
+                                type="danger"
+                                strong
+                                style={{ marginLeft: 4 }}
+                              >
+                                (*)
+                              </Typography.Text>
+                            )}
+                          </Typography.Text>
+                          <Tooltip
+                            title={`Giới hạn an toàn: ${
+                              LIMITS[record.key]
+                                ? mustBeZero
+                                  ? "Bắt buộc = 0"
+                                  : `≤ ${LIMITS[record.key]} ${
+                                      UNITS[record.key] || ""
+                                    }`
+                                : "Không có dữ liệu"
+                            }`}
+                          >
+                            <InfoCircleOutlined
+                              style={{
+                                color: token.colorPrimary,
+                                cursor: "pointer",
+                                fontSize: 14,
+                              }}
+                            />
+                          </Tooltip>
+                        </Flex>
+                      );
+                    },
                     width: "50%",
                   },
                   {
                     title: "Giới hạn",
                     dataIndex: "standard",
                     key: "standard",
-                    render: (text: string, record: Contaminant) => (
-                      <Flex align="center" gap={8}>
-                        <Tag
-                          color="blue"
-                          style={{
-                            fontSize: 14,
-                            padding: "4px 8px",
-                            borderRadius: token.borderRadiusSM,
-                          }}
-                        >
-                          ≤ {LIMITS[record.key] || "N/A"}{" "}
-                          {UNITS[record.key] || ""}
-                        </Tag>
-                        <Tooltip title={`Giới hạn an toàn cho ${record.name}`}>
-                          <InfoCircleOutlined
+                    render: (text: string, record: Contaminant) => {
+                      const mustBeZero = mustBeZeroKeys.includes(record.key);
+                      return (
+                        <Flex align="center" gap={8}>
+                          <Tag
+                            color="blue"
                             style={{
-                              color: token.colorPrimary,
                               fontSize: 14,
+                              padding: "4px 8px",
+                              borderRadius: token.borderRadiusSM,
                             }}
-                          />
-                        </Tooltip>
-                      </Flex>
-                    ),
+                          >
+                            {mustBeZero
+                              ? "Bắt buộc = 0"
+                              : `≤ ${LIMITS[record.key] || "N/A"} ${
+                                  UNITS[record.key] || ""
+                                }`}
+                          </Tag>
+                          <Tooltip
+                            title={`Giới hạn an toàn cho ${record.name}: ${
+                              mustBeZero
+                                ? "Bắt buộc = 0"
+                                : LIMITS[record.key]
+                                ? `≤ ${LIMITS[record.key]} ${
+                                    UNITS[record.key] || ""
+                                  }`
+                                : "Không có dữ liệu"
+                            }`}
+                          >
+                            <InfoCircleOutlined
+                              style={{
+                                color: token.colorPrimary,
+                                fontSize: 14,
+                              }}
+                            />
+                          </Tooltip>
+                        </Flex>
+                      );
+                    },
                     width: "50%",
                   },
                 ]}

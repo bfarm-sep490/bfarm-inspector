@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { DashboardOutlined, ScheduleOutlined } from "@ant-design/icons";
 import "dayjs/locale/vi";
 
@@ -82,14 +83,14 @@ const App: React.FC = () => {
               notificationProvider={useNotificationProvider}
               liveProvider={liveProvider(ablyClient)}
               resources={[
-                {
-                  name: "dashboard",
-                  list: "/",
-                  meta: {
-                    label: "Dashboard",
-                    icon: <DashboardOutlined />,
-                  },
-                },
+                // {
+                //   name: "dashboard",
+                //   list: "/",
+                //   meta: {
+                //     label: "Dashboard",
+                //     icon: <DashboardOutlined />,
+                //   },
+                // },
                 {
                   name: "inspection-forms",
                   list: "/inspection-forms",
@@ -144,15 +145,11 @@ const App: React.FC = () => {
                     element={
                       <AuthPage
                         type="login"
-                        formProps={{
-                          initialValues: {
-                            email: "inspector@gmail.com",
-                            password: "1@",
-                          },
-                        }}
+                      
                       />
                     }
                   />
+
                   <Route
                     path="/register"
                     element={
@@ -160,8 +157,8 @@ const App: React.FC = () => {
                         type="register"
                         formProps={{
                           initialValues: {
-                            email: "expert@gmail.com",
-                            password: "1@",
+                            email: "",
+                            password: "",
                           },
                         }}
                       />

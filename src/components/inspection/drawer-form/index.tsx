@@ -33,7 +33,7 @@ import {
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import dayjs from "dayjs";
-import { chemicalGroups, UNITS, LIMITS } from "../chemical/ChemicalConstants";
+import { chemicalGroups, UNITS, LIMITS, mustBeZeroKeys } from "../chemical/ChemicalConstants";
 import { getContaminantLimitsByVegetableType } from "@/utils/inspectingKind";
 
 type Props = {
@@ -138,16 +138,16 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       if (x?.title === "Kim loại nặng") {
         const types = props?.type
           ? getContaminantLimitsByVegetableType(
-              props.type as
-                | "Rau họ thập tự"
-                | "Hành"
-                | "Rau ăn lá"
-                | "Rau ăn quả"
-                | "Rau ăn củ"
-                | "Nấm"
-                | "Rau củ quả"
-                | "Rau khô"
-            )
+            props.type as
+            | "Rau họ thập tự"
+            | "Hành"
+            | "Rau ăn lá"
+            | "Rau ăn quả"
+            | "Rau ăn củ"
+            | "Nấm"
+            | "Rau củ quả"
+            | "Rau khô"
+          )
           : [];
         return {
           title: x?.title,
@@ -188,9 +188,23 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       title={
         <Flex align="center" gap={12}>
           <UploadOutlined style={{ color: token.colorPrimary, fontSize: 20 }} />
-          <Typography.Title level={4} style={{ margin: 0 }}>
-            Tạo kết quả kiểm nghiệm
-          </Typography.Title>
+          <div>
+            <Typography.Title level={4} style={{ margin: 0 }}>
+              Tạo kết quả kiểm nghiệm
+            </Typography.Title>
+            <Typography.Text
+              type="secondary"
+              italic
+              style={{
+                fontSize: 14,
+                display: "block",
+                marginTop: 4,
+                color: token.colorError,
+              }}
+            >
+              (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+            </Typography.Text>
+          </div>
         </Flex>
       }
       style={{
@@ -233,27 +247,44 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                           dataIndex: "label",
                           key: "label",
                           width: "40%",
-                          render: (text: string, record: any) => (
-                            <Flex align="center" gap={8}>
-                              <Typography.Text
-                                strong
-                                style={{ textTransform: "capitalize" }}
-                              >
-                                {text.split(" (")[0]}
-                              </Typography.Text>
-                              <Tooltip
-                                title={`Giới hạn an toàn: ${LIMITS[record.key] || (record.key === "salmonella" ? 0 : "Không có dữ liệu")} ${UNITS[record.key] || ""}`}
-                              >
-                                <InfoCircleOutlined
-                                  style={{
-                                    color: token.colorPrimary,
-                                    cursor: "pointer",
-                                    fontSize: 14,
-                                  }}
-                                />
-                              </Tooltip>
-                            </Flex>
-                          ),
+                          render: (text: string, record: any) => {
+                            const mustBeZero = mustBeZeroKeys.includes(record.key);
+                            return (
+                              <Flex align="center" gap={8}>
+                                <Typography.Text
+                                  strong
+                                  style={{ textTransform: "capitalize" }}
+                                >
+                                  {text.split(" (")[0]}
+                                  {mustBeZero && (
+                                    <Typography.Text
+                                      type="danger"
+                                      strong
+                                      style={{ marginLeft: 4 }}
+                                    >
+                                      (*)
+                                    </Typography.Text>
+                                  )}
+                                </Typography.Text>
+                                <Tooltip
+                                  title={`Giới hạn an toàn: ${mustBeZero
+                                      ? "Bắt buộc = 0"
+                                      : LIMITS[record.key]
+                                        ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""}`
+                                        : "Không có dữ liệu"
+                                    }`}
+                                >
+                                  <InfoCircleOutlined
+                                    style={{
+                                      color: token.colorPrimary,
+                                      cursor: "pointer",
+                                      fontSize: 14,
+                                    }}
+                                  />
+                                </Tooltip>
+                              </Flex>
+                            );
+                          },
                         },
                         {
                           title: "Giá trị",
@@ -270,18 +301,15 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                                   validator: async (_, value) => {
                                     if (value === undefined || value === null)
                                       return;
-                                    const limit =
-                                      record.key === "salmonella"
-                                        ? 0
-                                        : LIMITS[record.key];
+                                    const mustBeZero = mustBeZeroKeys.includes(record.key);
+                                    const limit = mustBeZero ? 0 : LIMITS[record.key];
                                     if (limit !== undefined && value > limit) {
                                       return Promise.reject(
                                         <Tag
                                           color="red"
                                           icon={<WarningOutlined />}
                                         >
-                                          Vượt quá giới hạn: ≤ {limit}{" "}
-                                          {UNITS[record.key] || ""}
+                                          Vượt quá giới hạn: {mustBeZero ? "Bắt buộc = 0" : `≤ ${limit} ${UNITS[record.key] || ""}`}
                                         </Tag>
                                       );
                                     }
@@ -341,32 +369,6 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                         name="result_content"
                       >
                         <Input.TextArea rows={4} />
-                      </Form.Item>
-                      <Form.Item
-                        label={
-                          <Typography.Text strong>
-                            Chọn ảnh từ máy
-                          </Typography.Text>
-                        }
-                      >
-                        <Upload
-                          name="file"
-                          action="/upload"
-                          listType="picture"
-                          onChange={handleImageUpload}
-                        >
-                          <Button
-                            icon={<UploadOutlined />}
-                            style={{
-                              borderRadius: token.borderRadiusSM,
-                              backgroundColor: token.colorPrimary,
-                              borderColor: token.colorPrimary,
-                              color: token.colorWhite,
-                            }}
-                          >
-                            Tải ảnh lên
-                          </Button>
-                        </Upload>
                       </Form.Item>
                     </Space>
                   ),

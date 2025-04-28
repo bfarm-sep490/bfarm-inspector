@@ -20,7 +20,7 @@ type VegetableContaminantLimits = {
   [vegetableType: string]: ContaminantLimit;
 };
 
-const contaminantBasedVegetableType = {
+export const contaminantBasedVegetableType = {
   "Rau họ thập tự": ["cadmi"],
   Hành: ["cadmi"],
   "Rau ăn lá": ["cadmi", "plumbum"],
@@ -39,11 +39,11 @@ export const getContaminantLimitsByVegetableType = (
 
 const contaminantLimits: VegetableContaminantLimits = {
   "Rau họ thập tự": { Cadmi: 0.05 },
-  Hành: { Cadmi: 0.05 },
+  "Hành": { Cadmi: 0.05 },
   "Rau ăn lá": { Cadmi: 0.2, Plumbum: 0.3 },
   "Rau ăn quả": { Cadmi: 0.05, Plumbum: 0.1 },
   "Rau ăn củ": { Cadmi: 0.1, Plumbum: 0.1 },
-  Nấm: { Cadmi: 0.2 },
+  "Nấm": { Cadmi: 0.2 },
   "Rau củ quả": { Hydrargyrum: 0.02 },
   "Rau khô": { Arsen: 1.0 },
 };

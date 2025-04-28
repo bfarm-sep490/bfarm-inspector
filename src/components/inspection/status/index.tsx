@@ -45,4 +45,6 @@ export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({
   }
 
   return <Tag color={color}>{text}</Tag>;
+
+  
 };
