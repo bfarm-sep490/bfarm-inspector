@@ -1,9 +1,20 @@
+/* eslint-disable prettier/prettier */
 import { Column, type ColumnConfig } from "@ant-design/plots";
 import { useTranslate } from "@refinedev/core";
 import dayjs from "dayjs";
 import { Suspense } from "react";
 
 import { useConfigProvider } from "../../../context";
+
+type TooltipDatum = {
+  state:
+    | "activeSeasons"
+    | "cultivatedArea"
+    | "estimatedYield"
+    | "qualityInspections"
+    | string;
+  value: number;
+};
 
 type Props = {
   data: ColumnConfig["data"];
@@ -24,10 +35,13 @@ export const QuickStatsChart = ({ data, height }: Props) => {
     theme: mode,
     columnStyle: {
       radius: [4, 4, 0, 0],
-      fill: mode === "dark" ? "l(270) 0:#122849 1:#3C88E5" : "l(270) 0:#BAE0FF 1:#1677FF",
+      fill:
+        mode === "dark"
+          ? "l(270) 0:#122849 1:#3C88E5"
+          : "l(270) 0:#BAE0FF 1:#1677FF",
     },
     tooltip: {
-      formatter: (datum: { state: any; value: any }) => {
+      formatter: (datum: TooltipDatum) => {
         let tooltipLabel = "";
 
         switch (datum.state) {
@@ -49,7 +63,7 @@ export const QuickStatsChart = ({ data, height }: Props) => {
 
         return {
           name: tooltipLabel,
-          value: new Intl.NumberFormat().format(Number(datum.value)),
+          value: new Intl.NumberFormat().format(datum.value),
         };
       },
     },
@@ -60,7 +74,7 @@ export const QuickStatsChart = ({ data, height }: Props) => {
         },
       },
       label: {
-        formatter: (v: string | number | Date | dayjs.Dayjs | null | undefined) => {
+        formatter: (v: string | number | dayjs.Dayjs | null | undefined) => {
           if (data.length > 7) {
             return dayjs(v).format("MM/DD");
           }
@@ -71,7 +85,7 @@ export const QuickStatsChart = ({ data, height }: Props) => {
     },
     yAxis: {
       label: {
-        formatter: (v: any) => {
+        formatter: (v: number | string) => {
           return new Intl.NumberFormat().format(Number(v));
         },
       },

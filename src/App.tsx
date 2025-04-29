@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { DashboardOutlined, ScheduleOutlined } from "@ant-design/icons";
+import { ScheduleOutlined } from "@ant-design/icons";
 import "dayjs/locale/vi";
 
 import { useNotificationProvider, ThemedLayoutV2 } from "@refinedev/antd";
@@ -12,7 +12,7 @@ import routerProvider, {
   UnsavedChangesNotifier,
   DocumentTitleHandler,
 } from "@refinedev/react-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router";
 
@@ -25,10 +25,13 @@ import { App as AntdApp } from "antd";
 import { AuthPage } from "./pages/auth";
 import { DashboardPage } from "./pages/dashboard";
 import { dataProvider } from "./rest-data-provider";
-import { InspectionEdit, InspectionShow, InspectionsList } from "./pages/inspections";
+import {
+  InspectionEdit,
+  InspectionShow,
+  InspectionsList,
+} from "./pages/inspections";
 import { liveProvider } from "@refinedev/ably";
 import { ablyClient } from "./utils/ablyClient";
-import { fetchToken, onMessageListener } from "./utils/firebase";
 
 interface TitleHandlerOptions {
   resource?: IResourceItem;
@@ -46,7 +49,8 @@ const App: React.FC = () => {
   // This hook is used to automatically login the user.
   // const { loading } = useAutoLoginForDemo();
 
-  const API_URL = import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
 
   const appDataProvider = dataProvider(API_URL);
 
@@ -128,9 +132,18 @@ const App: React.FC = () => {
                   }
                 >
                   <Route index element={<DashboardPage />} />
-                  <Route path="/inspection-forms" element={<InspectionsList />} />
-                  <Route path="/inspection-forms/:id" element={<InspectionShow />} />
-                  <Route path="/inspection-forms/edit/:id" element={<InspectionEdit />} />
+                  <Route
+                    path="/inspection-forms"
+                    element={<InspectionsList />}
+                  />
+                  <Route
+                    path="/inspection-forms/:id"
+                    element={<InspectionShow />}
+                  />
+                  <Route
+                    path="/inspection-forms/edit/:id"
+                    element={<InspectionEdit />}
+                  />
                 </Route>
 
                 <Route
@@ -140,15 +153,7 @@ const App: React.FC = () => {
                     </Authenticated>
                   }
                 >
-                  <Route
-                    path="/login"
-                    element={
-                      <AuthPage
-                        type="login"
-                      
-                      />
-                    }
-                  />
+                  <Route path="/login" element={<AuthPage type="login" />} />
 
                   <Route
                     path="/register"
@@ -164,8 +169,14 @@ const App: React.FC = () => {
                       />
                     }
                   />
-                  <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
-                  <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
+                  <Route
+                    path="/forgot-password"
+                    element={<AuthPage type="forgotPassword" />}
+                  />
+                  <Route
+                    path="/update-password"
+                    element={<AuthPage type="updatePassword" />}
+                  />
                 </Route>
               </Routes>
 

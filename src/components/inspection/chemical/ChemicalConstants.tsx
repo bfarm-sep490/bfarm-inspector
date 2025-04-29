@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { IInspectingResult } from "@/interfaces";
-import { Typography, Tag, Space, Divider, Flex, Table } from "antd";
+import { Typography, Tag, Space, Divider, Flex } from "antd";
 
 // Define the type for chemical data items (used in the Table)
 interface ChemicalData {
@@ -18,20 +18,20 @@ export const mustBeZeroKeys = [
 
 export const getMustBeZeroKeys = (): string[] => mustBeZeroKeys;
 export const LIMITS: Record<string, number> = {
-  arsen: 1, 
-  plumbum: 0.3, 
-  cadmi: 0.05, 
-  hydrargyrum: 0.03, 
-  glyphosate_glufosinate: 0.01, 
+  arsen: 1,
+  plumbum: 0.3,
+  cadmi: 0.05,
+  hydrargyrum: 0.03,
+  glyphosate_glufosinate: 0.01,
   sulfur_dioxide: 10,
-  methyl_bromide: 0, 
+  methyl_bromide: 0,
   hydrogen_phosphide: 0,
   dithiocarbamate: 2.0,
-  nitrat: 9, 
-  nano3_kno3: 15, 
+  nitrat: 9,
+  nano3_kno3: 15,
   chlorate: 0.01,
-  perchlorate: 0.01, 
-  salmonella: 0, 
+  perchlorate: 0.01,
+  salmonella: 0,
   ecoli: 100,
   coliforms: 100,
 };
@@ -65,20 +65,30 @@ export interface Contaminant {
   name: string;
   value: string;
   standard?: string;
-};
+}
 
 export const initialContaminants: Contaminant[] = [
   { key: "arsen", name: "Arsen", value: "< 0.5 mg/kg", standard: "Max" },
   { key: "plumbum", name: "Plumbum", value: "< 0.3 mg/kg", standard: "Max" },
   { key: "cadmi", name: "Cadmium", value: "< 0.05 mg/kg", standard: "Max" },
-  { key: "hydrargyrum", name: "Thủy ngân", value: "< 0.03 mg/kg", standard: "Max" },
+  {
+    key: "hydrargyrum",
+    name: "Thủy ngân",
+    value: "< 0.03 mg/kg",
+    standard: "Max",
+  },
   {
     key: "salmonella",
     name: "Salmonella",
     value: "< 0 CFU/25g",
     standard: "Max",
   },
-  { key: "coliforms", name: "Coliforms", value: "< 100 CFU/g", standard: "Max" },
+  {
+    key: "coliforms",
+    name: "Coliforms",
+    value: "< 100 CFU/g",
+    standard: "Max",
+  },
   {
     key: "ecoli",
     name: "E.coli",
@@ -116,9 +126,19 @@ export const initialContaminants: Contaminant[] = [
     standard: "Max",
   },
   { key: "nitrat", name: "Nitrat", value: "< 9 mg/kg", standard: "Max" },
-  { key: "nano3_kno3", name: "NaNO3/KNO3", value: "< 15 mg/kg", standard: "Max" },
+  {
+    key: "nano3_kno3",
+    name: "NaNO3/KNO3",
+    value: "< 15 mg/kg",
+    standard: "Max",
+  },
   { key: "chlorate", name: "Chlorate", value: "< 0.01 mg/kg", standard: "Max" },
-  { key: "perchlorate", name: "Perchlorate", value: "< 0.01 mg/kg", standard: "Max" },
+  {
+    key: "perchlorate",
+    name: "Perchlorate",
+    value: "< 0.01 mg/kg",
+    standard: "Max",
+  },
 ];
 
 export const chemicalGroups: ChemicalCategory[] = [
@@ -134,7 +154,12 @@ export const chemicalGroups: ChemicalCategory[] = [
   },
   {
     title: "Thuốc trừ sâu & tồn dư BVTV",
-    keys: ["glyphosate_glufosinate", "dithiocarbamate", "chlorate", "perchlorate"],
+    keys: [
+      "glyphosate_glufosinate",
+      "dithiocarbamate",
+      "chlorate",
+      "perchlorate",
+    ],
     color: "#52c41a",
   },
   {
@@ -156,7 +181,7 @@ export const getChemicalData = (inspectionResult?: IInspectingResult) => {
       key: "arsen",
       label: `Arsen`,
       unit: UNITS["arsen"],
-      value: inspectionResult.arsen ?? 0, 
+      value: inspectionResult.arsen ?? 0,
       limit: LIMITS["arsen"],
     },
     {
@@ -270,16 +295,19 @@ export const getChemicalData = (inspectionResult?: IInspectingResult) => {
 };
 
 // Define the columns for the Table component
-export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResult }> = ({
-  inspectionResult,
-}) => {
+export const ChemicalDataDisplay: React.FC<{
+  inspectionResult?: IInspectingResult;
+}> = ({ inspectionResult }) => {
   const chemicalData = getChemicalData(inspectionResult);
 
   // Tạo một object để dễ tra cứu giá trị của từng chất
-  const chemicalDataMap = chemicalData.reduce((map, item) => {
-    map[item.key] = item;
-    return map;
-  }, {} as Record<string, ChemicalData>);
+  const chemicalDataMap = chemicalData.reduce(
+    (map, item) => {
+      map[item.key] = item;
+      return map;
+    },
+    {} as Record<string, ChemicalData>
+  );
 
   return (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
@@ -302,12 +330,16 @@ export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResul
 
         return (
           <div key={group.title}>
-            <Typography.Text strong style={{ color: group.color, fontSize: 16 }}>
+            <Typography.Text
+              strong
+              style={{ color: group.color, fontSize: 16 }}
+            >
               {group.title}
             </Typography.Text>
             <Divider style={{ margin: "8px 0" }} />
             {groupData.map((item) => {
-              const isExceed = item.limit !== undefined && item.value > item.limit;
+              const isExceed =
+                item.limit !== undefined && item.value > item.limit;
               return (
                 <Flex
                   key={item.key}

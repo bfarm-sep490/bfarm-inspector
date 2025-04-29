@@ -12,11 +12,7 @@ import {
   Space,
   Spin,
 } from "antd";
-import {
-  NotificationOutlined,
-  CloseOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
+import { NotificationOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useTranslate } from "@refinedev/core";
 
 const { Text } = Typography;
