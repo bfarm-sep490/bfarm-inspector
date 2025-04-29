@@ -47,212 +47,13 @@ import {
   getChemicalData,
   UNITS,
   LIMITS,
-  Contaminant,
   initialContaminants,
-  getMustBeZeroKeys,
   mustBeZeroKeys,
 } from "../chemical/ChemicalConstants";
 import { InspectionResultTag } from "../result";
 import { PageHeader } from "@refinedev/antd";
 import { contaminantBasedVegetableType } from "@/utils/inspectingKind";
-
-interface ContaminantCheckCardProps {
-  type: string | undefined; // Sửa type để chấp nhận undefined như trong định nghĩa ban đầu
-  style?: React.CSSProperties;
-  contaminants: Contaminant[];
-}
-
-const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
-  style,
-  contaminants,
-}) => {
-  const { token } = theme.useToken();
-  const mustBeZeroKeys = getMustBeZeroKeys();
-  return (
-    <Card
-      variant="borderless"
-      style={{
-        borderRadius: token.borderRadiusLG,
-        boxShadow: token.boxShadow,
-        background: token.colorBgContainer,
-        ...style,
-      }}
-    >
-      <Flex align="center" gap={8} style={{ marginBottom: 16 }}>
-        <ExperimentOutlined
-          style={{ color: token.colorPrimary, fontSize: 24 }}
-        />
-        <Typography.Title
-          level={3}
-          style={{ margin: 0, color: token.colorPrimary }}
-        >
-          Tiêu chí kiểm định
-        </Typography.Title>
-      </Flex>
-      <Typography.Text
-        type="secondary"
-        italic
-        style={{
-          fontSize: 14,
-          display: "block",
-          marginTop: 4,
-          color: token.colorError,
-        }}
-      >
-        (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
-      </Typography.Text>
-
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        {chemicalGroups.map((group) => {
-          const groupContaminants = contaminants.filter((item) =>
-            group.keys.includes(item.key)
-          );
-          if (groupContaminants.length === 0) return null;
-
-          return (
-            <Card
-              key={group.title}
-              title={
-                <Flex align="center" gap={8}>
-                  <div
-                    style={{
-                      width: 14,
-                      height: 14,
-                      borderRadius: "50%",
-                      backgroundColor: group.color,
-                    }}
-                  />
-                  <Typography.Title
-                    level={4}
-                    style={{ margin: 0, color: group.color, fontSize: 18 }}
-                  >
-                    {group.title}
-                  </Typography.Title>
-                </Flex>
-              }
-              styles={{
-                header: {
-                  borderBottom: `2px solid ${group.color}`,
-                  padding: "12px 16px",
-                  backgroundColor: token.colorBgElevated,
-                },
-                body: {
-                  padding: "16px",
-                },
-              }}
-              style={{
-                borderRadius: token.borderRadiusLG,
-                boxShadow: token.boxShadow,
-                backgroundColor: token.colorBgElevated,
-              }}
-            >
-              <Table
-                rowKey="key"
-                dataSource={groupContaminants}
-                columns={[
-                  {
-                    title: "Tên chất",
-                    dataIndex: "name",
-                    key: "name",
-                    render: (text, record) => {
-                      const mustBeZero = mustBeZeroKeys.includes(record.key);
-                      return (
-                        <Flex align="center" gap={8}>
-                          <Typography.Text strong>
-                            {text}
-                            {mustBeZero && (
-                              <Typography.Text
-                                type="danger"
-                                strong
-                                style={{ marginLeft: 4 }}
-                              >
-                                (*)
-                              </Typography.Text>
-                            )}
-                          </Typography.Text>
-                          <Tooltip
-                            title={`Giới hạn an toàn: ${LIMITS[record.key]
-                              ? mustBeZero
-                                ? "Bắt buộc = 0"
-                                : `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
-                                }`
-                              : "Không có dữ liệu"
-                              }`}
-                          >
-                            <InfoCircleOutlined
-                              style={{
-                                color: token.colorPrimary,
-                                cursor: "pointer",
-                                fontSize: 14,
-                              }}
-                            />
-                          </Tooltip>
-                        </Flex>
-                      );
-                    },
-                    width: "40%",
-                  },
-                  {
-                    title: "Giới hạn",
-                    dataIndex: "standard",
-                    key: "standard",
-                    render: (text: string, record: Contaminant) => {
-                      const mustBeZero = mustBeZeroKeys.includes(record.key);
-                      return (
-                        <Flex align="center" gap={8}>
-                          <Tag
-                            color="blue"
-                            style={{
-                              fontSize: 14,
-                              padding: "4px 8px",
-                              borderRadius: token.borderRadiusSM,
-                            }}
-                          >
-                            {mustBeZero
-                              ? "Bắt buộc = 0"
-                              : `≤ ${LIMITS[record.key] || "N/A"} ${UNITS[record.key] || ""
-                              }`}
-                          </Tag>
-                          <Tooltip
-                            title={`Giới hạn an toàn cho ${record.name}: ${mustBeZero
-                              ? "Bắt buộc = 0"
-                              : LIMITS[record.key]
-                                ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
-                                }`
-                                : "Không có dữ liệu"
-                              }`}
-                          >
-                            <InfoCircleOutlined
-                              style={{
-                                color: token.colorPrimary,
-                                fontSize: 14,
-                              }}
-                            />
-                          </Tooltip>
-                        </Flex>
-                      );
-                    },
-                    width: "50%",
-                  },
-                ]}
-                pagination={false}
-                bordered
-                size="middle"
-                style={{
-                  marginTop: 12,
-                  borderRadius: token.borderRadiusLG,
-                }}
-                rowClassName={(_, index) =>
-                  index % 2 === 0 ? "table-row-light" : "table-row-dark"
-                }
-              />
-            </Card>
-          );
-        })}
-      </Space>
-    </Card>
-  );
-};
+import { ContaminantCheckCard } from "../contaminantCheckCard";
 
 export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -288,7 +89,8 @@ export const InspectionsShow: React.FC = () => {
 
   const inspection = useMemo(
     () =>
-      (formQueryResult.data as { data: IInspectingForm[] } | undefined)?.data?.[0],
+      (formQueryResult.data as { data: IInspectingForm[] } | undefined)
+        ?.data?.[0],
     [formQueryResult.data]
   );
 
@@ -314,7 +116,8 @@ export const InspectionsShow: React.FC = () => {
 
   const inspectionResult = useMemo(
     () =>
-      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)?.data?.[0],
+      (resultQueryResult.data as { data: IInspectingResult[] } | undefined)
+        ?.data?.[0],
     [resultQueryResult.data]
   );
 
@@ -373,24 +176,9 @@ export const InspectionsShow: React.FC = () => {
   const handleCloseCriteriaModal = () => setIsCriteriaModalVisible(false);
 
   const handleMutationSuccess = () => {
-    updateInspectionStatus(
-      {
-        url: `https://api.outfit4rent.online/api/inspecting-forms/${id}/status`,
-        method: "patch",
-        values: { status: "Pending" },
-      },
-      {
-        onSuccess: () => {
-          message.success("Đã gửi kết quả kiểm nghiệm chờ duyệt");
-          formQueryResult.refetch();
-          resultQueryResult.refetch();
-        },
-        onError: (error) => {
-          message.error("Cập nhật trạng thái thất bại");
-          console.error(error);
-        },
-      }
-    );
+    message.success("Đã lưu kết quả kiểm nghiệm");
+    formQueryResult.refetch();
+    resultQueryResult.refetch();
   };
 
   const getStatusIcon = (status: string) => {
@@ -417,9 +205,10 @@ export const InspectionsShow: React.FC = () => {
   const isAfterEnd = inspection?.end_date
     ? now.isAfter(dayjs(inspection.end_date))
     : false;
-  const kimloaichecked = contaminantBasedVegetableType[plant?.type as keyof typeof contaminantBasedVegetableType];
-  console.log("kimloaichecked", kimloaichecked);
-  console
+  const kimloaichecked =
+    contaminantBasedVegetableType[
+      plant?.type as keyof typeof contaminantBasedVegetableType
+    ];
   return (
     <div
       style={{
@@ -486,7 +275,7 @@ export const InspectionsShow: React.FC = () => {
                       objectFit: "cover",
                     }}
                     src={plant?.image_url}
-                    fallback="https://via.placeholder.com/300x300?text=No+Image"
+                    fallback="https://placehold.co/300x300?text=No+Image"
                   />
                 </Col>
                 <Col xs={24} md={16}>
@@ -589,7 +378,6 @@ export const InspectionsShow: React.FC = () => {
                     onClick={handleOpenModal}
                     style={{
                       borderRadius: token.borderRadiusSM,
-
                     }}
                   >
                     Xem chi tiết
@@ -601,11 +389,11 @@ export const InspectionsShow: React.FC = () => {
                       type="primary"
                       icon={<EditOutlined />}
                       onClick={handleCreate}
-                      disabled={
-                        isBeforeStart ||
-                        isAfterEnd ||
-                        inspection?.status === "Incomplete"
-                      }
+                      // disabled={
+                      //   isBeforeStart ||
+                      //   isAfterEnd ||
+                      //   inspection?.status === "Incomplete"
+                      // }
                       style={{
                         borderRadius: token.borderRadiusSM,
                         backgroundColor: token.colorPrimary,
@@ -992,7 +780,8 @@ export const InspectionsShow: React.FC = () => {
                   color: token.colorError,
                 }}
               >
-                (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+                (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn
+                (bắt buộc bằng 0).
               </Typography.Text>
             </div>
           </Flex>
@@ -1046,25 +835,23 @@ export const InspectionsShow: React.FC = () => {
                 children: (
                   <Table
                     rowKey="key"
-                    dataSource={chemicalData.filter((item) =>{
-                     if(group?.title === "Kim loại nặng")
-                     {
-                      const key = item.key;
-                      return kimloaichecked?.includes(key);
-                     }
-                    else
-                    {
-                    return group.keys.includes(item.key);
-                    }
-                  }
-                    )}
+                    dataSource={chemicalData.filter((item) => {
+                      if (group?.title === "Kim loại nặng") {
+                        const key = item.key;
+                        return kimloaichecked?.includes(key);
+                      } else {
+                        return group.keys.includes(item.key);
+                      }
+                    })}
                     columns={[
                       {
                         title: "Tên chất",
                         dataIndex: "name",
                         key: "name",
                         render: (text, record) => {
-                          const mustBeZero = mustBeZeroKeys.includes(record.key);
+                          const mustBeZero = mustBeZeroKeys.includes(
+                            record.key
+                          );
                           return (
                             <Flex align="center" gap={8}>
                               <Typography.Text strong>
@@ -1080,13 +867,15 @@ export const InspectionsShow: React.FC = () => {
                                 )}
                               </Typography.Text>
                               <Tooltip
-                                title={`Giới hạn an toàn: ${LIMITS[record.key]
-                                  ? mustBeZero
-                                    ? "Bắt buộc = 0"
-                                    : `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
-                                    }`
-                                  : "Không có dữ liệu"
-                                  }`}
+                                title={`Giới hạn an toàn: ${
+                                  LIMITS[record.key]
+                                    ? mustBeZero
+                                      ? "Bắt buộc = 0"
+                                      : `≤ ${LIMITS[record.key]} ${
+                                          UNITS[record.key] || ""
+                                        }`
+                                    : "Không có dữ liệu"
+                                }`}
                               >
                                 <InfoCircleOutlined
                                   style={{
@@ -1107,9 +896,13 @@ export const InspectionsShow: React.FC = () => {
                         key: "value",
                         render: (value, record) => {
                           const limit = LIMITS[record.key];
-                          const mustBeZero = mustBeZeroKeys.includes(record.key);
+                          const mustBeZero = mustBeZeroKeys.includes(
+                            record.key
+                          );
                           const numericValue =
-                            typeof value === "string" ? parseFloat(value) : value;
+                            typeof value === "string"
+                              ? parseFloat(value)
+                              : value;
                           const isPassed = mustBeZero
                             ? numericValue === 0
                             : limit
@@ -1144,23 +937,28 @@ export const InspectionsShow: React.FC = () => {
                         title: "Tiêu chuẩn",
                         key: "standard",
                         render: (_, record) => {
-                          const mustBeZero = mustBeZeroKeys.includes(record.key);
+                          const mustBeZero = mustBeZeroKeys.includes(
+                            record.key
+                          );
                           return (
                             <Flex align="center" gap={8}>
                               <Typography.Text strong>
                                 {mustBeZero
                                   ? "Bắt buộc = 0"
-                                  : `≤ ${LIMITS[record.key] || "N/A"} ${UNITS[record.key] || ""
-                                  }`}
+                                  : `≤ ${LIMITS[record.key] || "N/A"} ${
+                                      UNITS[record.key] || ""
+                                    }`}
                               </Typography.Text>
                               <Tooltip
-                                title={`Giới hạn an toàn cho ${record.name}: ${mustBeZero
-                                  ? "Bắt buộc = 0"
-                                  : LIMITS[record.key]
-                                    ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""
-                                    }`
-                                    : "Không có dữ liệu"
-                                  }`}
+                                title={`Giới hạn an toàn cho ${record.name}: ${
+                                  mustBeZero
+                                    ? "Bắt buộc = 0"
+                                    : LIMITS[record.key]
+                                      ? `≤ ${LIMITS[record.key]} ${
+                                          UNITS[record.key] || ""
+                                        }`
+                                      : "Không có dữ liệu"
+                                }`}
                               >
                                 <InfoCircleOutlined
                                   style={{

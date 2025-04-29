@@ -33,7 +33,12 @@ import {
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import dayjs from "dayjs";
-import { chemicalGroups, UNITS, LIMITS, mustBeZeroKeys } from "../chemical/ChemicalConstants";
+import {
+  chemicalGroups,
+  UNITS,
+  LIMITS,
+  mustBeZeroKeys,
+} from "../chemical/ChemicalConstants";
 import { getContaminantLimitsByVegetableType } from "@/utils/inspectingKind";
 
 type Props = {
@@ -92,6 +97,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     setFormLoading(true);
     const payload = { ...values, inspect_images: imageList };
 
+    // Kiểm tra các giá trị vượt ngưỡng
     const exceedingLimits = Object.keys(values).filter((key) => {
       if (key === "result_content") return false;
       const value = parseFloat(values[key]);
@@ -99,12 +105,14 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       return limit !== undefined && !isNaN(value) && value > limit;
     });
 
+    // Cảnh báo nếu vượt ngưỡng
     if (exceedingLimits.length > 0) {
       message.warning(
         `Cảnh báo: Các chất (${exceedingLimits.join(", ")}) có giá trị vượt quá giới hạn cho phép. Bạn vẫn có thể lưu kết quả.`
       );
     }
 
+    // Thực hiện lưu kết quả
     mutate(
       {
         url: `https://api.outfit4rent.online/api/inspecting-results/${props.id}/result-report`,
@@ -138,16 +146,16 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       if (x?.title === "Kim loại nặng") {
         const types = props?.type
           ? getContaminantLimitsByVegetableType(
-            props.type as
-            | "Rau họ thập tự"
-            | "Hành"
-            | "Rau ăn lá"
-            | "Rau ăn quả"
-            | "Rau ăn củ"
-            | "Nấm"
-            | "Rau củ quả"
-            | "Rau khô"
-          )
+              props.type as
+                | "Rau họ thập tự"
+                | "Hành"
+                | "Rau ăn lá"
+                | "Rau ăn quả"
+                | "Rau ăn củ"
+                | "Nấm"
+                | "Rau củ quả"
+                | "Rau khô"
+            )
           : [];
         return {
           title: x?.title,
@@ -202,7 +210,8 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                 color: token.colorError,
               }}
             >
-              (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+              (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt
+              buộc bằng 0).
             </Typography.Text>
           </div>
         </Flex>
@@ -248,7 +257,9 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                           key: "label",
                           width: "40%",
                           render: (text: string, record: any) => {
-                            const mustBeZero = mustBeZeroKeys.includes(record.key);
+                            const mustBeZero = mustBeZeroKeys.includes(
+                              record.key
+                            );
                             return (
                               <Flex align="center" gap={8}>
                                 <Typography.Text
@@ -267,12 +278,13 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                                   )}
                                 </Typography.Text>
                                 <Tooltip
-                                  title={`Giới hạn an toàn: ${mustBeZero
+                                  title={`Giới hạn an toàn: ${
+                                    mustBeZero
                                       ? "Bắt buộc = 0"
                                       : LIMITS[record.key]
                                         ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""}`
                                         : "Không có dữ liệu"
-                                    }`}
+                                  }`}
                                 >
                                   <InfoCircleOutlined
                                     style={{
@@ -298,19 +310,35 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                               validateTrigger={["onChange"]}
                               rules={[
                                 {
+                                  required: true, // Đảm bảo không bỏ trống
+                                  message: `Vui lòng nhập giá trị cho ${record.label}`,
+                                },
+                                {
                                   validator: async (_, value) => {
-                                    if (value === undefined || value === null)
-                                      return;
-                                    const mustBeZero = mustBeZeroKeys.includes(record.key);
-                                    const limit = mustBeZero ? 0 : LIMITS[record.key];
-                                    if (limit !== undefined && value > limit) {
+                                    if (
+                                      value === undefined ||
+                                      value === null ||
+                                      value === ""
+                                    ) {
                                       return Promise.reject(
-                                        <Tag
-                                          color="red"
-                                          icon={<WarningOutlined />}
-                                        >
-                                          Vượt quá giới hạn: {mustBeZero ? "Bắt buộc = 0" : `≤ ${limit} ${UNITS[record.key] || ""}`}
-                                        </Tag>
+                                        "Không được để trống!"
+                                      );
+                                    }
+
+                                    const mustBeZero = mustBeZeroKeys.includes(
+                                      record.key
+                                    );
+                                    const limit = mustBeZero
+                                      ? 0
+                                      : LIMITS[record.key];
+
+                                    if (limit !== undefined && value > limit) {
+                                      message.warning(
+                                        `Cảnh báo: Giá trị của ${record.label} vượt quá giới hạn an toàn: ${
+                                          mustBeZero
+                                            ? "Bắt buộc = 0"
+                                            : `≤ ${limit} ${UNITS[record.key] || ""}`
+                                        }`
                                       );
                                     }
                                     return Promise.resolve();
@@ -367,6 +395,12 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                           </Typography.Text>
                         }
                         name="result_content"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Nội dung không được để trống",
+                          },
+                        ]}
                       >
                         <Input.TextArea rows={4} />
                       </Form.Item>

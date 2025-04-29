@@ -2,21 +2,21 @@
 import React from "react";
 import {
   Card,
+  Flex,
   Typography,
+  Space,
   Table,
   Tag,
   Tooltip,
-  Space,
-  Flex,
   theme,
 } from "antd";
 import { ExperimentOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import {
   chemicalGroups,
-  Contaminant,
   LIMITS,
   UNITS,
   getMustBeZeroKeys,
+  Contaminant,
 } from "../chemical/ChemicalConstants";
 
 interface ContaminantCheckCardProps {
@@ -25,16 +25,16 @@ interface ContaminantCheckCardProps {
   contaminants: Contaminant[];
 }
 
-const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
+export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
   style,
   contaminants,
 }) => {
   const { token } = theme.useToken();
-  const mustBeZeroKeys = getMustBeZeroKeys(); // Sử dụng hàm từ ChemicalConstants
+  const mustBeZeroKeys = getMustBeZeroKeys();
 
   return (
     <Card
-      variant="outlined"
+      variant="borderless"
       style={{
         borderRadius: token.borderRadiusLG,
         boxShadow: token.boxShadow,
@@ -53,13 +53,19 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
           Tiêu chí kiểm định
         </Typography.Title>
       </Flex>
+
       <Typography.Text
         type="secondary"
         italic
-        style={{ marginBottom: 16, display: "block" }}
+        style={{
+          fontSize: 14,
+          display: "block",
+          marginTop: 4,
+          color: token.colorError,
+        }}
       >
-        Các chất hóa học được nhóm theo loại để dễ dàng theo dõi và đánh giá. (*)
-        Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+        (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc
+        bằng 0).
       </Typography.Text>
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -96,7 +102,9 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                   padding: "12px 16px",
                   backgroundColor: token.colorBgElevated,
                 },
-                body: { padding: 16 },
+                body: {
+                  padding: "16px",
+                },
               }}
               style={{
                 borderRadius: token.borderRadiusLG,
@@ -112,11 +120,11 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                     title: "Tên chất",
                     dataIndex: "name",
                     key: "name",
-                    render: (text: string, record: Contaminant) => {
+                    render: (text, record) => {
                       const mustBeZero = mustBeZeroKeys.includes(record.key);
                       return (
                         <Flex align="center" gap={8}>
-                          <Typography.Text strong style={{ fontSize: 16 }}>
+                          <Typography.Text strong>
                             {text}
                             {mustBeZero && (
                               <Typography.Text
@@ -133,9 +141,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                               LIMITS[record.key]
                                 ? mustBeZero
                                   ? "Bắt buộc = 0"
-                                  : `≤ ${LIMITS[record.key]} ${
-                                      UNITS[record.key] || ""
-                                    }`
+                                  : `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""}`
                                 : "Không có dữ liệu"
                             }`}
                           >
@@ -150,7 +156,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                         </Flex>
                       );
                     },
-                    width: "50%",
+                    width: "40%",
                   },
                   {
                     title: "Giới hạn",
@@ -170,19 +176,15 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                           >
                             {mustBeZero
                               ? "Bắt buộc = 0"
-                              : `≤ ${LIMITS[record.key] || "N/A"} ${
-                                  UNITS[record.key] || ""
-                                }`}
+                              : `≤ ${LIMITS[record.key] || "N/A"} ${UNITS[record.key] || ""}`}
                           </Tag>
                           <Tooltip
                             title={`Giới hạn an toàn cho ${record.name}: ${
                               mustBeZero
                                 ? "Bắt buộc = 0"
                                 : LIMITS[record.key]
-                                ? `≤ ${LIMITS[record.key]} ${
-                                    UNITS[record.key] || ""
-                                  }`
-                                : "Không có dữ liệu"
+                                  ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""}`
+                                  : "Không có dữ liệu"
                             }`}
                           >
                             <InfoCircleOutlined
@@ -216,5 +218,3 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
     </Card>
   );
 };
-
-export default ContaminantCheckCard;
