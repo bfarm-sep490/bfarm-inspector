@@ -53,7 +53,7 @@ import {
 import { InspectionResultTag } from "../result";
 import { PageHeader } from "@refinedev/antd";
 import { contaminantBasedVegetableType } from "@/utils/inspectingKind";
-import { ContaminantCheckCard } from "../contaminantCheckCard";
+import { ContaminantCheckCard } from "../ContaminantCheckCard";
 
 export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);

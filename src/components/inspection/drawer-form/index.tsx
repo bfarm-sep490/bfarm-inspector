@@ -14,13 +14,11 @@ import {
   Button,
   Flex,
   message,
-  Upload,
   Input,
   Table,
   Tabs,
   Typography,
   Tooltip,
-  Tag,
   theme,
   Space,
 } from "antd";
@@ -28,7 +26,6 @@ import {
   UploadOutlined,
   CloseOutlined,
   InfoCircleOutlined,
-  WarningOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
