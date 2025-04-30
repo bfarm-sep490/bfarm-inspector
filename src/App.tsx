@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import { DashboardOutlined, ScheduleOutlined } from "@ant-design/icons";
+import { ScheduleOutlined } from "@ant-design/icons";
 import "dayjs/locale/vi";
 
 import { useNotificationProvider, ThemedLayoutV2 } from "@refinedev/antd";
@@ -12,7 +11,7 @@ import routerProvider, {
   UnsavedChangesNotifier,
   DocumentTitleHandler,
 } from "@refinedev/react-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router";
 
@@ -28,7 +27,6 @@ import { dataProvider } from "./rest-data-provider";
 import { InspectionEdit, InspectionShow, InspectionsList } from "./pages/inspections";
 import { liveProvider } from "@refinedev/ably";
 import { ablyClient } from "./utils/ablyClient";
-import { fetchToken, onMessageListener } from "./utils/firebase";
 
 interface TitleHandlerOptions {
   resource?: IResourceItem;
@@ -140,15 +138,7 @@ const App: React.FC = () => {
                     </Authenticated>
                   }
                 >
-                  <Route
-                    path="/login"
-                    element={
-                      <AuthPage
-                        type="login"
-                      
-                      />
-                    }
-                  />
+                  <Route path="/login" element={<AuthPage type="login" />} />
 
                   <Route
                     path="/register"

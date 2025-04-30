@@ -1,8 +1,4 @@
-/* eslint-disable prettier/prettier */
-import {
-  InspectionListCard,
-  InspectionListTable,
-} from "@/components/inspection";
+import { InspectionListCard, InspectionListTable } from "@/components/inspection";
 import { AppstoreOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { List } from "@refinedev/antd";
 import { useNavigation, useTranslate } from "@refinedev/core";
@@ -17,7 +13,7 @@ export const InspectionsList = ({ children }: PropsWithChildren) => {
   const { pathname } = useLocation();
 
   const [view, setView] = useState<View>(
-    (localStorage.getItem("inspector-view") as View) || "table"
+    (localStorage.getItem("inspector-view") as View) || "table",
   );
 
   const handleViewChange = (value: View) => {

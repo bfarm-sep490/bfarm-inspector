@@ -1,15 +1,5 @@
-/* eslint-disable prettier/prettier */
 import React from "react";
-import {
-  Card,
-  Typography,
-  Table,
-  Tag,
-  Tooltip,
-  Space,
-  Flex,
-  theme,
-} from "antd";
+import { Card, Typography, Table, Tag, Tooltip, Space, Flex, theme } from "antd";
 import { ExperimentOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import {
   chemicalGroups,
@@ -25,10 +15,7 @@ interface ContaminantCheckCardProps {
   contaminants: Contaminant[];
 }
 
-const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
-  style,
-  contaminants,
-}) => {
+const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({ style, contaminants }) => {
   const { token } = theme.useToken();
   const mustBeZeroKeys = getMustBeZeroKeys(); // Sử dụng hàm từ ChemicalConstants
 
@@ -43,30 +30,19 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
       }}
     >
       <Flex align="center" gap={8} style={{ marginBottom: 16 }}>
-        <ExperimentOutlined
-          style={{ color: token.colorPrimary, fontSize: 24 }}
-        />
-        <Typography.Title
-          level={3}
-          style={{ margin: 0, color: token.colorPrimary }}
-        >
+        <ExperimentOutlined style={{ color: token.colorPrimary, fontSize: 24 }} />
+        <Typography.Title level={3} style={{ margin: 0, color: token.colorPrimary }}>
           Tiêu chí kiểm định
         </Typography.Title>
       </Flex>
-      <Typography.Text
-        type="secondary"
-        italic
-        style={{ marginBottom: 16, display: "block" }}
-      >
-        Các chất hóa học được nhóm theo loại để dễ dàng theo dõi và đánh giá. (*)
-        Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
+      <Typography.Text type="secondary" italic style={{ marginBottom: 16, display: "block" }}>
+        Các chất hóa học được nhóm theo loại để dễ dàng theo dõi và đánh giá. (*) Các chất có dấu
+        sao bắt buộc không được vượt mức an toàn (bắt buộc bằng 0).
       </Typography.Text>
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         {chemicalGroups.map((group) => {
-          const groupContaminants = contaminants.filter((item) =>
-            group.keys.includes(item.key)
-          );
+          const groupContaminants = contaminants.filter((item) => group.keys.includes(item.key));
           if (groupContaminants.length === 0) return null;
 
           return (
@@ -119,11 +95,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                           <Typography.Text strong style={{ fontSize: 16 }}>
                             {text}
                             {mustBeZero && (
-                              <Typography.Text
-                                type="danger"
-                                strong
-                                style={{ marginLeft: 4 }}
-                              >
+                              <Typography.Text type="danger" strong style={{ marginLeft: 4 }}>
                                 (*)
                               </Typography.Text>
                             )}
@@ -133,9 +105,7 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                               LIMITS[record.key]
                                 ? mustBeZero
                                   ? "Bắt buộc = 0"
-                                  : `≤ ${LIMITS[record.key]} ${
-                                      UNITS[record.key] || ""
-                                    }`
+                                  : `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""}`
                                 : "Không có dữ liệu"
                             }`}
                           >
@@ -170,19 +140,15 @@ const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                           >
                             {mustBeZero
                               ? "Bắt buộc = 0"
-                              : `≤ ${LIMITS[record.key] || "N/A"} ${
-                                  UNITS[record.key] || ""
-                                }`}
+                              : `≤ ${LIMITS[record.key] || "N/A"} ${UNITS[record.key] || ""}`}
                           </Tag>
                           <Tooltip
                             title={`Giới hạn an toàn cho ${record.name}: ${
                               mustBeZero
                                 ? "Bắt buộc = 0"
                                 : LIMITS[record.key]
-                                ? `≤ ${LIMITS[record.key]} ${
-                                    UNITS[record.key] || ""
-                                  }`
-                                : "Không có dữ liệu"
+                                  ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""}`
+                                  : "Không có dữ liệu"
                             }`}
                           >
                             <InfoCircleOutlined

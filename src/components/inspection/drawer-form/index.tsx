@@ -1,11 +1,5 @@
-/* eslint-disable prettier/prettier */
 import { SaveButton } from "@refinedev/antd";
-import {
-  BaseKey,
-  useCustomMutation,
-  useGetToPath,
-  useGo,
-} from "@refinedev/core";
+import { BaseKey, useCustomMutation, useGetToPath, useGo } from "@refinedev/core";
 import {
   Form,
   InputNumber,
@@ -62,12 +56,8 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     if (props.open && props.initialValues) {
       const formattedData = {
         ...props.initialValues,
-        start_date: props.initialValues.start_date
-          ? dayjs(props.initialValues.start_date)
-          : null,
-        end_date: props.initialValues.end_date
-          ? dayjs(props.initialValues.end_date)
-          : null,
+        start_date: props.initialValues.start_date ? dayjs(props.initialValues.start_date) : null,
+        end_date: props.initialValues.end_date ? dayjs(props.initialValues.end_date) : null,
       };
       form.setFieldsValue(formattedData);
     }
@@ -101,7 +91,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
 
     if (exceedingLimits.length > 0) {
       message.warning(
-        `Cảnh báo: Các chất (${exceedingLimits.join(", ")}) có giá trị vượt quá giới hạn cho phép. Bạn vẫn có thể lưu kết quả.`
+        `Cảnh báo: Các chất (${exceedingLimits.join(", ")}) có giá trị vượt quá giới hạn cho phép. Bạn vẫn có thể lưu kết quả.`,
       );
     }
 
@@ -123,7 +113,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
           message.error("Tạo thất bại, vui lòng thử lại");
           setFormLoading(false);
         },
-      }
+      },
     );
   };
 
@@ -138,16 +128,16 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       if (x?.title === "Kim loại nặng") {
         const types = props?.type
           ? getContaminantLimitsByVegetableType(
-            props.type as
-            | "Rau họ thập tự"
-            | "Hành"
-            | "Rau ăn lá"
-            | "Rau ăn quả"
-            | "Rau ăn củ"
-            | "Nấm"
-            | "Rau củ quả"
-            | "Rau khô"
-          )
+              props.type as
+                | "Rau họ thập tự"
+                | "Hành"
+                | "Rau ăn lá"
+                | "Rau ăn quả"
+                | "Rau ăn củ"
+                | "Nấm"
+                | "Rau củ quả"
+                | "Rau khô",
+            )
           : [];
         return {
           title: x?.title,
@@ -251,28 +241,22 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                             const mustBeZero = mustBeZeroKeys.includes(record.key);
                             return (
                               <Flex align="center" gap={8}>
-                                <Typography.Text
-                                  strong
-                                  style={{ textTransform: "capitalize" }}
-                                >
+                                <Typography.Text strong style={{ textTransform: "capitalize" }}>
                                   {text.split(" (")[0]}
                                   {mustBeZero && (
-                                    <Typography.Text
-                                      type="danger"
-                                      strong
-                                      style={{ marginLeft: 4 }}
-                                    >
+                                    <Typography.Text type="danger" strong style={{ marginLeft: 4 }}>
                                       (*)
                                     </Typography.Text>
                                   )}
                                 </Typography.Text>
                                 <Tooltip
-                                  title={`Giới hạn an toàn: ${mustBeZero
+                                  title={`Giới hạn an toàn: ${
+                                    mustBeZero
                                       ? "Bắt buộc = 0"
                                       : LIMITS[record.key]
                                         ? `≤ ${LIMITS[record.key]} ${UNITS[record.key] || ""}`
                                         : "Không có dữ liệu"
-                                    }`}
+                                  }`}
                                 >
                                   <InfoCircleOutlined
                                     style={{
@@ -299,18 +283,17 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                               rules={[
                                 {
                                   validator: async (_, value) => {
-                                    if (value === undefined || value === null)
-                                      return;
+                                    if (value === undefined || value === null) return;
                                     const mustBeZero = mustBeZeroKeys.includes(record.key);
                                     const limit = mustBeZero ? 0 : LIMITS[record.key];
                                     if (limit !== undefined && value > limit) {
                                       return Promise.reject(
-                                        <Tag
-                                          color="red"
-                                          icon={<WarningOutlined />}
-                                        >
-                                          Vượt quá giới hạn: {mustBeZero ? "Bắt buộc = 0" : `≤ ${limit} ${UNITS[record.key] || ""}`}
-                                        </Tag>
+                                        <Tag color="red" icon={<WarningOutlined />}>
+                                          Vượt quá giới hạn:{" "}
+                                          {mustBeZero
+                                            ? "Bắt buộc = 0"
+                                            : `≤ ${limit} ${UNITS[record.key] || ""}`}
+                                        </Tag>,
                                       );
                                     }
                                     return Promise.resolve();
@@ -361,11 +344,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                       style={{ width: "100%", padding: 16 }}
                     >
                       <Form.Item
-                        label={
-                          <Typography.Text strong>
-                            Nội dung kết quả
-                          </Typography.Text>
-                        }
+                        label={<Typography.Text strong>Nội dung kết quả</Typography.Text>}
                         name="result_content"
                       >
                         <Input.TextArea rows={4} />

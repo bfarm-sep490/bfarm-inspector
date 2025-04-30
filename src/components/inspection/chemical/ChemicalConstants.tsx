@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IInspectingResult } from "@/interfaces";
 import { Typography, Tag, Space, Divider, Flex, Table } from "antd";
 
@@ -10,28 +9,24 @@ interface ChemicalData {
   value: number;
   limit: number;
 }
-export const mustBeZeroKeys = [
-  "methyl_bromide",
-  "hydrogen_phosphide",
-  "salmonella",
-];
+export const mustBeZeroKeys = ["methyl_bromide", "hydrogen_phosphide", "salmonella"];
 
 export const getMustBeZeroKeys = (): string[] => mustBeZeroKeys;
 export const LIMITS: Record<string, number> = {
-  arsen: 1, 
-  plumbum: 0.3, 
-  cadmi: 0.05, 
-  hydrargyrum: 0.03, 
-  glyphosate_glufosinate: 0.01, 
+  arsen: 1,
+  plumbum: 0.3,
+  cadmi: 0.05,
+  hydrargyrum: 0.03,
+  glyphosate_glufosinate: 0.01,
   sulfur_dioxide: 10,
-  methyl_bromide: 0, 
+  methyl_bromide: 0,
   hydrogen_phosphide: 0,
   dithiocarbamate: 2.0,
-  nitrat: 9, 
-  nano3_kno3: 15, 
+  nitrat: 9,
+  nano3_kno3: 15,
   chlorate: 0.01,
-  perchlorate: 0.01, 
-  salmonella: 0, 
+  perchlorate: 0.01,
+  salmonella: 0,
   ecoli: 100,
   coliforms: 100,
 };
@@ -65,7 +60,7 @@ export interface Contaminant {
   name: string;
   value: string;
   standard?: string;
-};
+}
 
 export const initialContaminants: Contaminant[] = [
   { key: "arsen", name: "Arsen", value: "< 0.5 mg/kg", standard: "Max" },
@@ -156,7 +151,7 @@ export const getChemicalData = (inspectionResult?: IInspectingResult) => {
       key: "arsen",
       label: `Arsen`,
       unit: UNITS["arsen"],
-      value: inspectionResult.arsen ?? 0, 
+      value: inspectionResult.arsen ?? 0,
       limit: LIMITS["arsen"],
     },
     {
@@ -276,10 +271,13 @@ export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResul
   const chemicalData = getChemicalData(inspectionResult);
 
   // Tạo một object để dễ tra cứu giá trị của từng chất
-  const chemicalDataMap = chemicalData.reduce((map, item) => {
-    map[item.key] = item;
-    return map;
-  }, {} as Record<string, ChemicalData>);
+  const chemicalDataMap = chemicalData.reduce(
+    (map, item) => {
+      map[item.key] = item;
+      return map;
+    },
+    {} as Record<string, ChemicalData>,
+  );
 
   return (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
@@ -290,9 +288,7 @@ export const ChemicalDataDisplay: React.FC<{ inspectionResult?: IInspectingResul
           return (
             data || {
               key,
-              label: key
-                .replace(/_/g, " ")
-                .replace(/\b\w/g, (char) => char.toUpperCase()), // Tạo label mặc định nếu không có dữ liệu
+              label: key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()), // Tạo label mặc định nếu không có dữ liệu
               unit: UNITS[key] || "",
               value: 0, // Giá trị mặc định nếu không có dữ liệu
               limit: LIMITS[key] || 0,
