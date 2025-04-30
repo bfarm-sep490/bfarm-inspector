@@ -3,6 +3,7 @@ import { axiosInstance, generateSort, generateFilter } from "./utils";
 import { stringify } from "query-string";
 import type { AxiosInstance } from "axios";
 import type { DataProvider } from "@refinedev/core";
+import { TOKEN_KEY } from "@/authProvider";
 
 type MethodTypes = "get" | "delete" | "head" | "options";
 type MethodTypesWithBody = "post" | "put" | "patch";
@@ -49,7 +50,10 @@ export const dataProvider = (
       : url;
 
     const { data, headers } = await httpClient[requestMethod](urlWithQuery, {
-      headers: headersFromMeta,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+        ...headersFromMeta,
+      },
     });
 
     const responseData = data.data !== undefined ? data.data : data;
@@ -75,7 +79,12 @@ export const dataProvider = (
 
     const { data } = await httpClient[requestMethod](
       `${apiUrl}/${resource}?${stringify({ id: ids })}`,
-      { headers }
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+          ...headers,
+        },
+      }
     );
 
     const responseData = data.data !== undefined ? data.data : data;
@@ -92,7 +101,10 @@ export const dataProvider = (
     const requestMethod = (method as MethodTypesWithBody) ?? "post";
 
     const { data } = await httpClient[requestMethod](url, variables, {
-      headers,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+        ...headers,
+      },
     });
 
     const responseData = data.data !== undefined ? data.data : data;
@@ -109,7 +121,10 @@ export const dataProvider = (
     const requestMethod = (method as MethodTypesWithBody) ?? "put";
 
     const { data } = await httpClient[requestMethod](url, variables, {
-      headers,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+        ...headers,
+      },
     });
 
     const responseData = data.data !== undefined ? data.data : data;
@@ -125,7 +140,12 @@ export const dataProvider = (
     const { headers, method } = meta ?? {};
     const requestMethod = (method as MethodTypes) ?? "get";
 
-    const { data } = await httpClient[requestMethod](url, { headers });
+    const { data } = await httpClient[requestMethod](url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+        ...headers,
+      },
+    });
 
     const responseData = data.data !== undefined ? data.data : data;
 
@@ -142,7 +162,10 @@ export const dataProvider = (
 
     const { data } = await httpClient[requestMethod](url, {
       data: variables,
-      headers,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+        ...headers,
+      },
     });
 
     const responseData = data.data !== undefined ? data.data : data;
@@ -194,18 +217,27 @@ export const dataProvider = (
       case "post":
       case "put":
         axiosResponse = await httpClient[method](url, payload, {
-          headers,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+            ...headers,
+          },
         });
         break;
       case "delete":
         axiosResponse = await httpClient.delete(url, {
           data: payload,
-          headers,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+            ...headers,
+          },
         });
         break;
       default:
         axiosResponse = await httpClient.get(requestUrl, {
-          headers,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`,
+            ...headers,
+          },
         });
         break;
     }
