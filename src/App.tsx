@@ -1,16 +1,8 @@
 /* eslint-disable prettier/prettier */
-import {
-  DashboardOutlined,
-  ExperimentOutlined,
-  ScheduleOutlined,
-} from "@ant-design/icons";
+import { DashboardOutlined, ScheduleOutlined } from "@ant-design/icons";
 import "dayjs/locale/vi";
 
-import {
-  useNotificationProvider,
-  ThemedLayoutV2,
-  ErrorComponent,
-} from "@refinedev/antd";
+import { useNotificationProvider, ThemedLayoutV2 } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
 import { Authenticated, IResourceItem, Refine } from "@refinedev/core";
 import { RefineKbarProvider, RefineKbar } from "@refinedev/kbar";
@@ -33,14 +25,9 @@ import { App as AntdApp } from "antd";
 import { AuthPage } from "./pages/auth";
 import { DashboardPage } from "./pages/dashboard";
 import { dataProvider } from "./rest-data-provider";
-import {
-  InspectionEdit,
-  InspectionShow,
-  InspectionsList,
-} from "./pages/inspections";
+import { InspectionEdit, InspectionShow, InspectionsList } from "./pages/inspections";
 import { liveProvider } from "@refinedev/ably";
 import { ablyClient } from "./utils/ablyClient";
-import { InspectionsShow } from "./components/inspection";
 import { fetchToken, onMessageListener } from "./utils/firebase";
 
 interface TitleHandlerOptions {
@@ -59,34 +46,7 @@ const App: React.FC = () => {
   // This hook is used to automatically login the user.
   // const { loading } = useAutoLoginForDemo();
 
-  const [show, setShow] = useState(false);
-  const [notification, setNotification] = useState({ title: "", body: "" });
-  const [isTokenFound, setTokenFound] = useState(false);
-
-  useEffect(() => {
-    fetchToken(setTokenFound);
-  }, []);
-
-  onMessageListener()
-    .then((payload: any) => {
-      setNotification({
-        title: payload?.notification?.title,
-        body: payload?.notification?.body,
-      });
-      setShow(true);
-      console.log(payload);
-    })
-    .catch((err) => console.log("failed: ", err));
-
-  const onShowNotificationClicked = () => {
-    setNotification({
-      title: "Notification",
-      body: "This is a test notification",
-    });
-    setShow(true);
-  };
-  const API_URL =
-    import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
+  const API_URL = import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
 
   const appDataProvider = dataProvider(API_URL);
 
@@ -120,15 +80,17 @@ const App: React.FC = () => {
                 warnWhenUnsavedChanges: true,
                 liveMode: "auto",
               }}
+              notificationProvider={useNotificationProvider}
+              liveProvider={liveProvider(ablyClient)}
               resources={[
-                {
-                  name: "dashboard",
-                  list: "/",
-                  meta: {
-                    label: "Dashboard",
-                    icon: <DashboardOutlined />,
-                  },
-                },
+                // {
+                //   name: "dashboard",
+                //   list: "/",
+                //   meta: {
+                //     label: "Dashboard",
+                //     icon: <DashboardOutlined />,
+                //   },
+                // },
                 {
                   name: "inspection-forms",
                   list: "/inspection-forms",
@@ -183,15 +145,11 @@ const App: React.FC = () => {
                     element={
                       <AuthPage
                         type="login"
-                        formProps={{
-                          initialValues: {
-                            email: "inspector@gmail.com",
-                            password: "1@",
-                          },
-                        }}
+                      
                       />
                     }
                   />
+
                   <Route
                     path="/register"
                     element={
@@ -199,21 +157,15 @@ const App: React.FC = () => {
                         type="register"
                         formProps={{
                           initialValues: {
-                            email: "expert@gmail.com",
-                            password: "1@",
+                            email: "",
+                            password: "",
                           },
                         }}
                       />
                     }
                   />
-                  <Route
-                    path="/forgot-password"
-                    element={<AuthPage type="forgotPassword" />}
-                  />
-                  <Route
-                    path="/update-password"
-                    element={<AuthPage type="updatePassword" />}
-                  />
+                  <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
+                  <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
                 </Route>
               </Routes>
 

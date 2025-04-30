@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useState, useEffect } from "react";
 import { Card, Divider, Select, Typography, Space, Tag, Row, Col } from "antd";
 import {
@@ -19,7 +20,7 @@ type VegetableContaminantLimits = {
   [vegetableType: string]: ContaminantLimit;
 };
 
-const contaminantBasedVegetableType = {
+export const contaminantBasedVegetableType = {
   "Rau họ thập tự": ["cadmi"],
   Hành: ["cadmi"],
   "Rau ăn lá": ["cadmi", "plumbum"],
@@ -31,18 +32,18 @@ const contaminantBasedVegetableType = {
 };
 
 export const getContaminantLimitsByVegetableType = (
-  type: keyof typeof contaminantBasedVegetableType,
+  type: keyof typeof contaminantBasedVegetableType
 ) => {
   return contaminantBasedVegetableType[type] || [];
 };
 
 const contaminantLimits: VegetableContaminantLimits = {
   "Rau họ thập tự": { Cadmi: 0.05 },
-  Hành: { Cadmi: 0.05 },
+  "Hành": { Cadmi: 0.05 },
   "Rau ăn lá": { Cadmi: 0.2, Plumbum: 0.3 },
   "Rau ăn quả": { Cadmi: 0.05, Plumbum: 0.1 },
   "Rau ăn củ": { Cadmi: 0.1, Plumbum: 0.1 },
-  Nấm: { Cadmi: 0.2 },
+  "Nấm": { Cadmi: 0.2 },
   "Rau củ quả": { Hydrargyrum: 0.02 },
   "Rau khô": { Arsen: 1.0 },
 };
@@ -100,9 +101,11 @@ function getContaminantLimits(vegetableType: string): ContaminantLimit {
   const result: ContaminantLimit = { ...globalLimits };
 
   if (contaminantLimits[vegetableType]) {
-    Object.entries(contaminantLimits[vegetableType]).forEach(([contaminant, limit]) => {
-      result[contaminant] = limit;
-    });
+    Object.entries(contaminantLimits[vegetableType]).forEach(
+      ([contaminant, limit]) => {
+        result[contaminant] = limit;
+      }
+    );
   }
 
   return result;
@@ -159,7 +162,13 @@ interface ContaminantGroupProps {
   icon: React.ReactNode;
 }
 
-const ContaminantGroup = ({ title, contaminants, unit, color, icon }: ContaminantGroupProps) => {
+const ContaminantGroup = ({
+  title,
+  contaminants,
+  unit,
+  color,
+  icon,
+}: ContaminantGroupProps) => {
   if (contaminants.length === 0) {
     return null;
   }
@@ -177,10 +186,16 @@ const ContaminantGroup = ({ title, contaminants, unit, color, icon }: Contaminan
           color: "white",
         }}
       >
-        {icon} <span style={{ marginLeft: "8px", fontWeight: "bold" }}>{title}</span>
+        {icon}{" "}
+        <span style={{ marginLeft: "8px", fontWeight: "bold" }}>{title}</span>
       </div>
       {contaminants.map((item, index) => (
-        <ContaminantItem key={index} name={item.name} value={item.value} unit={unit} />
+        <ContaminantItem
+          key={index}
+          name={item.name}
+          value={item.value}
+          unit={unit}
+        />
       ))}
       <Divider style={{ margin: "12px 0" }} />
     </div>
@@ -212,7 +227,9 @@ const ContaminantCheckCard = ({
     setVegetableType(type);
   }, [type]);
 
-  const getContaminantsByGroup = (groupName: keyof typeof contaminantGroups) => {
+  const getContaminantsByGroup = (
+    groupName: keyof typeof contaminantGroups
+  ) => {
     return contaminantGroups[groupName]
       .filter((name) => limits[name] !== undefined)
       .map((name) => ({ name, value: limits[name] }));
@@ -240,7 +257,12 @@ const ContaminantCheckCard = ({
   );
 
   return (
-    <Card style={style} title={cardTitle} bordered={true} className="contaminant-check-card">
+    <Card
+      style={style}
+      title={cardTitle}
+      variant="outlined"
+      className="contaminant-check-card"
+    >
       <ContaminantGroup
         title="Kiểm định kim loại nặng"
         contaminants={getSpecificMetals()}

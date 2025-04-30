@@ -382,5 +382,15 @@
     "suggestErrorDescription": "An error occurred while retrieving suggestions. Please try again later.",
     "type": "Type",
     "unavailable": "Unavailable"
+  },
+  "inspections": {
+    "search_id": "Search ID",
+    "name": "Inspection form",
+    "plan_name": "Inspection Plan",
+    "task_name": "Inspection Task",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "actions": "Actions",
+    "status": "Status"
   }
 }

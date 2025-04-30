@@ -3,8 +3,8 @@ import { disableAutoLogin } from "./hooks";
 import type { AuthProvider } from "@refinedev/core";
 import axios from "axios";
 
-export const TOKEN_KEY = "bfarmx-auth";
-export const USER_KEY = "bfarmx-user";
+export const TOKEN_KEY = "bfarmx-inspec-auth";
+export const USER_KEY = "bfarmx-inspec-user";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
 const authApiClient = axios.create({

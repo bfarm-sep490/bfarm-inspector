@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useGo, useNavigation, useList } from "@refinedev/core";
 import { Button, Card, Divider, List, Tag, Typography, theme } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
@@ -67,7 +68,9 @@ export const InspectionListCard = () => {
       <List
         dataSource={combinedData}
         pagination={{
-          showTotal: (total) => <PaginationTotal total={total} entityName="inspector" />,
+          showTotal: (total) => (
+            <PaginationTotal total={total} entityName="inspector" />
+          ),
         }}
         grid={{
           gutter: [16, 16],
@@ -75,7 +78,7 @@ export const InspectionListCard = () => {
         }}
         renderItem={(inspector) => (
           <List.Item>
-            <Card hoverable bordered={false}>
+            <Card hoverable variant="borderless">
               <Tag color={getStatusColor(inspector.task?.status)}>
                 {inspector.task?.status?.toUpperCase()}
               </Tag>
