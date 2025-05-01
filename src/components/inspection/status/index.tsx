@@ -1,45 +1,32 @@
+/* eslint-disable prettier/prettier */
 import React from "react";
 import { Tag } from "antd";
+import { useTranslate } from "@refinedev/core";
 
 interface InspectionStatusTagProps {
   value?: string;
 }
 
-export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({ value }) => {
+export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({
+  value,
+}) => {
+  const t = useTranslate();
+
   const normalizedValue = value === "Complete" ? "Completed" : value;
 
-  let color = "default";
-  let text = normalizedValue || "Unknown";
+  const statusKey = normalizedValue?.toLowerCase() || "unknown";
 
-  switch (normalizedValue) {
-    case "Draft":
-      text = "Nháp";
-      color = "gray";
-      break;
-    case "Pending":
-      text = "Chờ duyệt";
-      color = "orange";
-      break;
-    case "Incomplete":
-      text = "Chưa hoàn thành";
-      color = "yellow";
-      break;
-    case "Ongoing":
-      text = "Đang thực hiện";
-      color = "blue";
-      break;
-    case "Completed":
-      text = "Hoàn thành";
-      color = "green";
-      break;
-    case "Cancel":
-      text = "Đã hủy";
-      color = "red";
-      break;
-    default:
-      color = "gray";
-      text = "Không xác định";
-  }
+  const statusMap: Record<string, { textKey: string; color: string }> = {
+    draft: { textKey: "status.draft", color: "gray" },
+    pending: { textKey: "status.pending", color: "orange" },
+    incomplete: { textKey: "status.incomplete", color: "yellow" },
+    ongoing: { textKey: "status.ongoing", color: "blue" },
+    completed: { textKey: "status.completed", color: "green" },
+    cancel: { textKey: "status.cancel", color: "red" },
+    unknown: { textKey: "status.unknown", color: "gray" },
+  };
 
-  return <Tag color={color}>{text}</Tag>;
+  const { textKey, color } = statusMap[statusKey] || statusMap["unknown"];
+
+  return <Tag color={color}>{t(textKey)}</Tag>;
 };

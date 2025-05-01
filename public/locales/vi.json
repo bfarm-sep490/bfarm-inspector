@@ -275,7 +275,14 @@
   },
   "status": {
     "disable": "Vô hiệu hóa",
-    "enable": "Kích hoạt"
+    "enable": "Kích hoạt",
+    "draft": "Nháp",
+    "pending": "Chờ duyệt",
+    "incomplete": "Chưa hoàn thành",
+    "ongoing": "Đang thực hiện",
+    "completed": "Hoàn thành",
+    "cancel": "Đã hủy",
+    "unknown": "Không xác định"
   },
   "table": {
     "actions": "Hành động",
@@ -391,6 +398,50 @@
     "start_date": "Ngày bắt đầu",
     "end_date": "Ngày kết thúc",
     "actions": "Hành động",
-    "status": "Trạng thái"
+    "status": "Trạng thái",
+    "title": "Phiếu kiểm định"
+  },
+  "inspection": {
+    "title": "Thông tin giống cây kiểm nghiệm",
+    "result": "Kết quả",
+    "viewDetail": "Xem chi tiết",
+    "complete": "Hoàn Thành",
+    "beforeStart": "Chưa đến ngày kiểm nghiệm",
+    "noResult": "Chưa có kết quả kiểm nghiệm. Nhấn 'Hoàn Thành' để nhập kết quả.",
+    "late": "Đã quá hạn kiểm nghiệm",
+    "invalid": "Không thể tạo kết quả trong trạng thái hiện tại",
+    "cropName": "Tên cây trồng",
+    "cropType": "Loại cây trồng",
+    "description": "Mô tả",
+    "jobTitle": "Thông tin công việc",
+    "planName": "Tên kế hoạch",
+    "center": "Trung tâm kiểm định",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "status": "Trạng thái",
+    "criteria": "Xem tiêu chí kiểm định",
+    "time": "Thời gian",
+    "completedAt": "Hoàn thành",
+    "createdAt": "Tạo lúc",
+    "createdBy": "Tạo bởi",
+    "evaluation": "Đánh giá",
+    "resultContent": "Nội dung",
+    "menu": "Phiếu kiểm định"
+  },
+  "common": {
+    "at": "lúc"
+  },
+  "notification": {
+    "title": "Thông báo",
+    "markAll": "Đánh dấu đã đọc tất cả",
+    "seeMore": "Xem thêm",
+    "tabs": {
+      "all": "Tất cả",
+      "unread": "Chưa đọc"
+    },
+    "empty": {
+      "all": "Không có thông báo nào 🤐",
+      "unread": "Không có thông báo mới 🤐"
+    }
   }
 }

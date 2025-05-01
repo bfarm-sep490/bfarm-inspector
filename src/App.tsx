@@ -1,4 +1,4 @@
-
+/* eslint-disable prettier/prettier */
 import { ScheduleOutlined } from "@ant-design/icons";
 import "dayjs/locale/vi";
 
@@ -131,7 +131,10 @@ const App: React.FC = () => {
                     </Authenticated>
                   }
                 >
-                  <Route index element={<DashboardPage />} />
+                  <Route
+                    index
+                    element={<NavigateToResource resource="inspection-forms" />}
+                  />
                   <Route
                     path="/inspection-forms"
                     element={<InspectionsList />}

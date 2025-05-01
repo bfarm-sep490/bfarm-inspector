@@ -1,5 +1,4 @@
 /* eslint-disable prettier/prettier */
-import { SaveButton } from "@refinedev/antd";
 import { BaseKey, useCustomMutation } from "@refinedev/core";
 import {
   Form,
@@ -10,7 +9,6 @@ import {
   Flex,
   message,
   Input,
-  Table,
   Tabs,
   Typography,
   theme,
@@ -21,6 +19,8 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { chemicalGroups } from "../chemical/ChemicalConstants";
 import { getContaminantsByType } from "../getContaminantsByType";
+
+const { TabPane } = Tabs;
 
 type Props = {
   type?: string;
@@ -39,6 +39,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
   const [imageList, setImageList] = useState<string[]>([]);
   const { token } = theme.useToken();
   const { mutate, isLoading } = useCustomMutation();
+  const [missingMessage, setMissingMessage] = useState<string | null>(null);
 
   const thresholds = getContaminantsByType(props.type);
   const thresholdMap = Object.fromEntries(
@@ -52,22 +53,12 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     const threshold = thresholdMap[key];
     if (!threshold || value === null || value === undefined || isNaN(value))
       return "ok";
-
     const warning = parseFloat(threshold.warning);
     const danger = parseFloat(threshold.danger);
-
     if (!isNaN(danger) && value >= danger) return "danger";
     if (!isNaN(warning) && value >= warning && value < danger) return "warning";
     if (!isNaN(warning) && value < warning) return "ok";
-
     return "ok";
-  };
-
-  const getValidateStatus = (status: "ok" | "warning" | "danger") => {
-    if (status === "danger") return "error";
-    if (status === "warning") return "warning";
-    if (status === "ok") return "success";
-    return undefined;
   };
 
   const [fieldWarnings, setFieldWarnings] = useState<
@@ -92,10 +83,13 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
   const onModalClose = () => {
     form.resetFields();
     setImageList([]);
+    setMissingMessage(null);
     props?.onClose?.();
   };
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (
+    values: Record<string, number | string | undefined>
+  ) => {
     setFormLoading(true);
     const payload = { ...values, inspect_images: imageList };
 
@@ -124,6 +118,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
         url: `https://api.outfit4rent.online/api/inspecting-results/${props.id}/result-report`,
         method: "post",
         values: payload,
+        meta: {},
       },
       {
         onSuccess: () => {
@@ -133,9 +128,9 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
           onModalClose();
           props.onMutationSuccess?.();
         },
-        onError: () => {
-          message.error("Tạo thất bại, vui lòng thử lại");
-          setFormLoading(false);
+        onError: (error: unknown) => {
+          const err = error as { message?: string };
+          message.error(err?.message || "Tạo thất bại, vui lòng thử lại");
         },
       }
     );
@@ -143,15 +138,16 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
 
   const handleSubmit = async () => {
     try {
-      const allKeys = Object.keys(form.getFieldsValue(true));
-      const values = await form.validateFields(allKeys);
+      const values = await form.validateFields();
+      setMissingMessage(null);
       await onFinish(values);
-    } catch (error) {
-      const errorInfo = error as any;
-      const errorFields = errorInfo?.errorFields || [];
-
-      if (errorFields.length > 0) {
-        message.error("Vui lòng hoàn thành tất cả trường bắt buộc ở các tab.");
+    } catch (errorInfo: unknown) {
+      if (
+        typeof errorInfo === "object" &&
+        errorInfo !== null &&
+        "errorFields" in errorInfo
+      ) {
+        setMissingMessage("Vui lòng nhập đầy đủ các trường bắt buộc.");
       }
     }
   };
@@ -174,12 +170,12 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       <Spin spinning={formLoading || isLoading}>
         <Form form={form} layout="vertical">
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
-            <Tabs
-              type="card"
-              items={[
-                ...chemicalGroups.map((group) => ({
-                  key: group.title,
-                  label: (
+            <Tabs type="card" destroyInactiveTabPane={false}>
+              {chemicalGroups.map((group) => (
+                <TabPane
+                  forceRender
+                  key={group.title}
+                  tab={
                     <Flex align="center" gap={8}>
                       <div
                         style={{
@@ -191,134 +187,145 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                       />
                       <span>{group.title}</span>
                     </Flex>
-                  ),
-                  children: (
-                    <Table
-                      rowKey="key"
-                      dataSource={group.keys.map((key) => ({
-                        key,
-                        label: `${thresholdMap[key]?.name || key} (${thresholdMap[key]?.unit || ""})`,
-                      }))}
-                      columns={[
-                        {
-                          title: "Tên chất",
-                          dataIndex: "label",
-                          render: (text) => (
-                            <Typography.Text strong>{text}</Typography.Text>
-                          ),
-                        },
-                        {
-                          title: "Giá trị",
-                          dataIndex: "value",
-                          render: (_, record) => (
-                            <Form.Item
-                              name={record.key}
-                              help={fieldWarnings[record.key]}
-                              validateStatus={getValidateStatus(
-                                checkThresholdStatus(
-                                  record.key,
-                                  form.getFieldValue(record.key)
-                                )
-                              )}
-                              rules={[
-                                {
-                                  required: true,
-                                  message: `Vui lòng nhập giá trị cho ${record.label}`,
-                                },
-                              ]}
-                            >
-                              <InputNumber
-                                style={{ width: "100%" }}
-                                addonAfter={
-                                  thresholdMap[record.key]?.unit || ""
-                                }
-                                onChange={(value) => {
-                                  const threshold = thresholdMap[record.key];
-                                  if (!threshold) return;
+                  }
+                >
+                  <Flex vertical gap={16}>
+                    {group.keys.map((key) => {
+                      const label = `${thresholdMap[key]?.name || key} (${thresholdMap[key]?.unit || ""})`;
+                      const value = form.getFieldValue(key);
+                      const status = checkThresholdStatus(key, value);
+                      const hasValue =
+                        value !== null &&
+                        value !== undefined &&
+                        value !== "" &&
+                        !isNaN(value);
 
-                                  if (
-                                    value === null ||
-                                    value === undefined ||
-                                    isNaN(Number(value))
-                                  )
-                                    return;
+                      return (
+                        <Form.Item
+                          key={key}
+                          name={key}
+                          label={
+                            <Typography.Text strong>{label}</Typography.Text>
+                          }
+                          help={
+                            status === "ok" ? undefined : fieldWarnings[key]
+                          }
+                          validateStatus={
+                            hasValue
+                              ? status === "danger"
+                                ? "error"
+                                : status === "warning"
+                                  ? "warning"
+                                  : undefined
+                              : undefined
+                          }
+                          rules={[
+                            {
+                              required: true,
+                              message: `Vui lòng nhập giá trị cho ${label}`,
+                            },
+                          ]}
+                        >
+                          <InputNumber
+                            style={{
+                              width: "100%",
+                              borderColor:
+                                hasValue && status === "ok"
+                                  ? "#52c41a"
+                                  : undefined,
+                              boxShadow:
+                                hasValue && status === "ok"
+                                  ? "0 0 0 2px rgba(82, 196, 26, 0.2)"
+                                  : undefined,
+                              borderRadius: 6,
+                              borderWidth:
+                                hasValue && status === "ok" ? 1 : undefined,
+                              borderStyle:
+                                hasValue && status === "ok"
+                                  ? "solid"
+                                  : undefined,
+                            }}
+                            addonAfter={thresholdMap[key]?.unit || ""}
+                            onChange={(value) => {
+                              const threshold = thresholdMap[key];
+                              if (!threshold) return;
+                              if (
+                                value === null ||
+                                value === undefined ||
+                                isNaN(Number(value))
+                              )
+                                return;
 
-                                  const status = checkThresholdStatus(
-                                    record.key,
-                                    Number(value)
-                                  );
-                                  const warningMessage =
-                                    status === "danger"
-                                      ? `🚨 NGUY HIỂM: ${threshold.name} vượt quá ngưỡng nguy hiểm`
-                                      : status === "warning"
-                                        ? `⚠️ CẢNH BÁO: ${threshold.name} vượt quá ngưỡng cảnh báo`
-                                        : `✅ OK: ${threshold.name} nằm trong giới hạn an toàn`;
+                              const status = checkThresholdStatus(
+                                key,
+                                Number(value)
+                              );
+                              const warningMessage =
+                                status === "danger"
+                                  ? `🚨 NGUY HIỂM: ${threshold.name} vượt quá ngưỡng nguy hiểm`
+                                  : status === "warning"
+                                    ? `⚠️ CẢNH BÁO: ${threshold.name} vượt quá ngưỡng cảnh báo`
+                                    : undefined;
 
-                                  setFieldWarnings((prev) => ({
-                                    ...prev,
-                                    [record.key]: warningMessage,
-                                  }));
-                                }}
-                                onBlur={() => {
-                                  form
-                                    .validateFields([record.key])
-                                    .catch(() => {});
-                                }}
-                              />
-                            </Form.Item>
-                          ),
-                        },
-                      ]}
-                      pagination={false}
+                              setFieldWarnings((prev) => ({
+                                ...prev,
+                                [key]: warningMessage,
+                              }));
+                            }}
+                          />
+                        </Form.Item>
+                      );
+                    })}
+                  </Flex>
+                </TabPane>
+              ))}
+              <TabPane
+                forceRender
+                key={overviewTab.key}
+                tab={
+                  <Flex align="center" gap={8}>
+                    <div
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        backgroundColor: overviewTab.color,
+                      }}
                     />
-                  ),
-                })),
-                {
-                  key: overviewTab.key,
-                  label: (
-                    <Flex align="center" gap={8}>
-                      <div
-                        style={{
-                          width: 12,
-                          height: 12,
-                          borderRadius: "50%",
-                          backgroundColor: overviewTab.color,
-                        }}
-                      />
-                      <span>{overviewTab.title}</span>
-                    </Flex>
-                  ),
-                  children: (
-                    <Form.Item
-                      label={
-                        <Typography.Text strong>
-                          Nội dung kết quả
-                        </Typography.Text>
-                      }
-                      name="result_content"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Nội dung không được để trống",
-                        },
-                      ]}
-                    >
-                      <Input.TextArea rows={4} />
-                    </Form.Item>
-                  ),
-                },
-              ]}
-            />
-
-            <Flex justify="space-between">
-              <Button onClick={onModalClose}>Hủy</Button>
-              <SaveButton
-                onClick={handleSubmit}
-                loading={formLoading}
-                type="primary"
+                    <span>{overviewTab.title}</span>
+                  </Flex>
+                }
               >
-                Xác nhận
-              </SaveButton>
+                <Form.Item
+                  label={
+                    <Typography.Text strong>Nội dung kết quả</Typography.Text>
+                  }
+                  name="result_content"
+                  rules={[
+                    { required: true, message: "Nội dung không được để trống" },
+                  ]}
+                >
+                  <Input.TextArea rows={4} />
+                </Form.Item>
+              </TabPane>
+            </Tabs>
+
+            <Flex justify="space-between" align="center" vertical>
+              <Flex style={{ width: "100%" }} justify="space-between">
+                <Button onClick={onModalClose}>Hủy</Button>
+                <Button
+                  onClick={handleSubmit}
+                  loading={formLoading}
+                  type="primary"
+                >
+                  Xác nhận
+                </Button>
+              </Flex>
+              {missingMessage && (
+                <Typography.Text type="danger" style={{ marginTop: 8 }}>
+                  {missingMessage}
+                </Typography.Text>
+              )}
             </Flex>
           </Space>
         </Form>

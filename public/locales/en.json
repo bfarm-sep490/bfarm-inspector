@@ -275,7 +275,14 @@
   },
   "status": {
     "disable": "Disable",
-    "enable": "Enable"
+    "enable": "Enable",
+    "draft": "Draft",
+    "pending": "Pending",
+    "incomplete": "Incomplete",
+    "ongoing": "Ongoing",
+    "completed": "Completed",
+    "cancel": "Cancelled",
+    "unknown": "Unknown"
   },
   "table": {
     "actions": "Actions",
@@ -391,6 +398,51 @@
     "start_date": "Start Date",
     "end_date": "End Date",
     "actions": "Actions",
-    "status": "Status"
+    "status": "Status",
+    "title": "Inspection Forms"
+  },
+  "inspection": {
+    "title": "Inspection Information",
+    "result": "Result",
+    "viewDetail": "View Details",
+    "complete": "Complete",
+    "beforeStart": "Not yet the inspection date",
+    "noResult": "No result yet. Click 'Complete' to add result.",
+    "late": "Inspection overdue",
+    "invalid": "Cannot create result in current status",
+    "cropName": "Plant Name",
+    "cropType": "Plant Type",
+    "description": "Description",
+    "jobTitle": "Job Information",
+    "planName": "Plan Name",
+    "center": "Inspection Center",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "status": "Status",
+    "criteria": "View Inspection Criteria",
+    "time": "Time",
+    "completedAt": "Completed At",
+    "createdAt": "Created At",
+    "createdBy": "Created By",
+    "evaluation": "Evaluation",
+    "resultContent": "Content",
+    "menu": "Inspecting Forms",
+    "inspection": "Inspection"
+  },
+  "common": {
+    "at": "at"
+  },
+  "notification": {
+    "title": "Notifications",
+    "markAll": "Mark all as read",
+    "seeMore": "See more",
+    "tabs": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "empty": {
+      "all": "No notifications 🤐",
+      "unread": "No new notifications 🤐"
+    }
   }
 }

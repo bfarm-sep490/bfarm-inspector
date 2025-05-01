@@ -35,6 +35,7 @@ import { InspectionResultTag } from "../result";
 import { PageHeader } from "@refinedev/antd";
 import { contaminantBasedVegetableType } from "@/utils/inspectingKind";
 import { InspectionModals } from "../inspectionModals";
+import { useTranslation } from "react-i18next";
 
 export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -46,7 +47,6 @@ export const InspectionsShow: React.FC = () => {
   const { token } = theme.useToken();
   const { id } = useParams();
   const navigate = useNavigate();
-  const t = useTranslate();
 
   const { queryResult: formQueryResult } = useShow<
     { data: IInspectingForm[] },
@@ -187,6 +187,8 @@ export const InspectionsShow: React.FC = () => {
     contaminantBasedVegetableType[
       plant?.type as keyof typeof contaminantBasedVegetableType
     ];
+  const { t } = useTranslation();
+
   return (
     <div
       style={{
@@ -211,7 +213,6 @@ export const InspectionsShow: React.FC = () => {
       <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
         <Col xs={24} md={16}>
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
-            {/* Plant Information Card */}
             <Card
               title={
                 <Flex align="center" gap={12}>
@@ -222,7 +223,7 @@ export const InspectionsShow: React.FC = () => {
                     level={4}
                     style={{ margin: 0, color: token.colorTextHeading }}
                   >
-                    Thông tin giống cây kiểm nghiệm
+                    {t("inspection.title")}
                   </Typography.Title>
                 </Flex>
               }
@@ -265,12 +266,9 @@ export const InspectionsShow: React.FC = () => {
                     <Flex justify="space-between" align="center">
                       <Typography.Text
                         strong
-                        style={{
-                          fontSize: 16,
-                          color: token.colorTextHeading,
-                        }}
+                        style={{ fontSize: 16, color: token.colorTextHeading }}
                       >
-                        Tên cây trồng
+                        {t("inspection.cropName")}
                       </Typography.Text>
                       <Typography.Text style={{ fontSize: 16 }}>
                         {plant?.plant_name || "N/A"}
@@ -279,12 +277,9 @@ export const InspectionsShow: React.FC = () => {
                     <Flex justify="space-between" align="center">
                       <Typography.Text
                         strong
-                        style={{
-                          fontSize: 16,
-                          color: token.colorTextHeading,
-                        }}
+                        style={{ fontSize: 16, color: token.colorTextHeading }}
                       >
-                        Loại cây trồng
+                        {t("inspection.cropType")}
                       </Typography.Text>
                       <Typography.Text style={{ fontSize: 16 }}>
                         {plant?.type || "N/A"}
@@ -299,7 +294,7 @@ export const InspectionsShow: React.FC = () => {
                             color: token.colorTextHeading,
                           }}
                         >
-                          Mô tả
+                          {t("inspection.description")}
                         </Typography.Text>
                         <Typography.Paragraph
                           ellipsis={{ rows: 3, expandable: true }}
@@ -317,8 +312,6 @@ export const InspectionsShow: React.FC = () => {
                 </Col>
               </Row>
             </Card>
-
-            {/* Results Card */}
             <Card
               title={
                 <Flex align="center" gap={12}>
@@ -329,7 +322,7 @@ export const InspectionsShow: React.FC = () => {
                     level={4}
                     style={{ margin: 0, color: token.colorTextHeading }}
                   >
-                    Kết quả
+                    {t("inspection.result")}
                   </Typography.Title>
                 </Flex>
               }
@@ -354,11 +347,9 @@ export const InspectionsShow: React.FC = () => {
                     type="primary"
                     icon={<EyeOutlined />}
                     onClick={handleOpenModal}
-                    style={{
-                      borderRadius: token.borderRadiusSM,
-                    }}
+                    style={{ borderRadius: token.borderRadiusSM }}
                   >
-                    Xem chi tiết
+                    {t("inspection.viewDetail")}
                   </Button>
                 ) : (
                   (inspection?.status === "Ongoing" ||
@@ -378,7 +369,7 @@ export const InspectionsShow: React.FC = () => {
                         borderColor: token.colorPrimary,
                       }}
                     >
-                      Hoàn Thành
+                      {t("inspection.complete")}
                     </Button>
                   )
                 )
@@ -392,7 +383,7 @@ export const InspectionsShow: React.FC = () => {
                 >
                   <Flex justify="space-between">
                     <Typography.Text strong style={{ fontSize: 16 }}>
-                      Đánh giá
+                      {t("inspection.evaluation")}
                     </Typography.Text>
                     <InspectionResultTag
                       value={inspectionResult.evaluated_result}
@@ -400,7 +391,7 @@ export const InspectionsShow: React.FC = () => {
                   </Flex>
                   <Flex justify="space-between">
                     <Typography.Text strong style={{ fontSize: 16 }}>
-                      Nội dung
+                      {t("inspection.resultContent")}
                     </Typography.Text>
                     <Typography.Text>
                       {inspectionResult.result_content}
@@ -411,26 +402,27 @@ export const InspectionsShow: React.FC = () => {
                 isBeforeStart ? (
                   <Alert
                     type="warning"
-                    message="Chưa đến ngày kiểm nghiệm"
+                    message={t("inspection.beforeStart")}
                     showIcon
                   />
                 ) : (
                   <Alert
                     type="info"
-                    message="Chưa có kết quả kiểm nghiệm. Nhấn 'Hoàn Thành' để nhập kết quả."
+                    message={t("inspection.noResult")}
                     showIcon
                   />
                 )
               ) : inspection?.status === "Incomplete" ? (
-                <Alert type="error" message="Đã quá hạn kiểm nghiệm" showIcon />
+                <Alert type="error" message={t("inspection.late")} showIcon />
               ) : (
                 <Alert
                   type="warning"
-                  message="Không thể tạo kết quả trong trạng thái hiện tại"
+                  message={t("inspection.invalid")}
                   showIcon
                 />
               )}
             </Card>
+
             <Card
               title={
                 <Flex align="center" gap={12}>
@@ -441,7 +433,7 @@ export const InspectionsShow: React.FC = () => {
                     level={4}
                     style={{ margin: 0, color: token.colorTextHeading }}
                   >
-                    Thông tin công việc
+                    {t("inspection.jobTitle")}
                   </Typography.Title>
                 </Flex>
               }
@@ -467,12 +459,9 @@ export const InspectionsShow: React.FC = () => {
                     <Flex justify="space-between" align="center">
                       <Typography.Text
                         strong
-                        style={{
-                          fontSize: 16,
-                          color: token.colorTextHeading,
-                        }}
+                        style={{ fontSize: 16, color: token.colorTextHeading }}
                       >
-                        Tên kế hoạch
+                        {t("inspection.planName")}
                       </Typography.Text>
                       <Typography.Text style={{ fontSize: 16 }}>
                         {inspection?.plan_name || "N/A"}
@@ -483,12 +472,9 @@ export const InspectionsShow: React.FC = () => {
                     <Flex justify="space-between" align="center">
                       <Typography.Text
                         strong
-                        style={{
-                          fontSize: 16,
-                          color: token.colorTextHeading,
-                        }}
+                        style={{ fontSize: 16, color: token.colorTextHeading }}
                       >
-                        Trung tâm kiểm định
+                        {t("inspection.center")}
                       </Typography.Text>
                       <Typography.Text style={{ fontSize: 16 }}>
                         {inspection?.inspector_name || "N/A"}
@@ -504,15 +490,13 @@ export const InspectionsShow: React.FC = () => {
                     <Flex justify="space-between" align="center">
                       <Typography.Text
                         strong
-                        style={{
-                          fontSize: 16,
-                          color: token.colorTextHeading,
-                        }}
+                        style={{ fontSize: 16, color: token.colorTextHeading }}
                       >
-                        Ngày bắt đầu
+                        {t("inspection.startDate")}
                       </Typography.Text>
                       <Typography.Text style={{ fontSize: 16 }}>
-                        {dayjs(inspection?.start_date).format("DD/MM/YYYY")} lúc{" "}
+                        {dayjs(inspection?.start_date).format("DD/MM/YYYY")}{" "}
+                        {t("common.at")}{" "}
                         <Tag color="red">
                           {dayjs(inspection?.start_date).format("HH:mm:ss")}
                         </Tag>
@@ -523,15 +507,13 @@ export const InspectionsShow: React.FC = () => {
                     <Flex justify="space-between" align="center">
                       <Typography.Text
                         strong
-                        style={{
-                          fontSize: 16,
-                          color: token.colorTextHeading,
-                        }}
+                        style={{ fontSize: 16, color: token.colorTextHeading }}
                       >
-                        Ngày kết thúc
+                        {t("inspection.endDate")}
                       </Typography.Text>
                       <Typography.Text style={{ fontSize: 16 }}>
-                        {dayjs(inspection?.end_date).format("DD/MM/YYYY")} lúc{" "}
+                        {dayjs(inspection?.end_date).format("DD/MM/YYYY")}{" "}
+                        {t("common.at")}{" "}
                         <Tag color="red">
                           {dayjs(inspection?.end_date).format("HH:mm:ss")}
                         </Tag>
@@ -547,12 +529,9 @@ export const InspectionsShow: React.FC = () => {
                     <Flex justify="space-between" align="center">
                       <Typography.Text
                         strong
-                        style={{
-                          fontSize: 16,
-                          color: token.colorTextHeading,
-                        }}
+                        style={{ fontSize: 16, color: token.colorTextHeading }}
                       >
-                        Trạng thái
+                        {t("inspection.status")}
                       </Typography.Text>
                       <Flex align="center" gap={8}>
                         {getStatusIcon(inspection?.status || "")}
@@ -581,7 +560,7 @@ export const InspectionsShow: React.FC = () => {
                 fontSize: 16,
               }}
             >
-              Xem tiêu chí kiểm định
+              {t("inspection.criteria")}
             </Button>
 
             <Card
@@ -594,7 +573,7 @@ export const InspectionsShow: React.FC = () => {
                     level={4}
                     style={{ margin: 0, color: token.colorTextHeading }}
                   >
-                    Thời gian
+                    {t("inspection.time")}
                   </Typography.Title>
                 </Flex>
               }
@@ -624,13 +603,13 @@ export const InspectionsShow: React.FC = () => {
                     strong
                     style={{ fontSize: 14, color: token.colorTextHeading }}
                   >
-                    Hoàn thành
+                    {t("inspection.completedAt")}
                   </Typography.Text>
                   <Typography.Text style={{ fontSize: 14 }}>
                     {inspection?.complete_date ? (
                       <>
                         {dayjs(inspection?.complete_date).format("DD/MM/YYYY")}{" "}
-                        lúc{" "}
+                        {t("common.at")}{" "}
                         <Tag color="red">
                           {dayjs(inspection?.complete_date).format("HH:mm:ss")}
                         </Tag>
@@ -640,55 +619,34 @@ export const InspectionsShow: React.FC = () => {
                     )}
                   </Typography.Text>
                 </Flex>
+
                 <Flex justify="space-between">
                   <Typography.Text
                     strong
                     style={{ fontSize: 14, color: token.colorTextHeading }}
                   >
-                    Tạo lúc
+                    {t("inspection.createdAt")}
                   </Typography.Text>
                   <Typography.Text style={{ fontSize: 14 }}>
-                    {dayjs(inspection?.created_at).format("DD/MM/YYYY")} lúc{" "}
+                    {dayjs(inspection?.created_at).format("DD/MM/YYYY")}{" "}
+                    {t("common.at")}{" "}
                     <Tag color="red">
                       {dayjs(inspection?.created_at).format("HH:mm:ss")}
                     </Tag>
                   </Typography.Text>
                 </Flex>
+
                 <Flex justify="space-between">
                   <Typography.Text
                     strong
                     style={{ fontSize: 14, color: token.colorTextHeading }}
                   >
-                    Tạo bởi
+                    {t("inspection.createdBy")}
                   </Typography.Text>
                   <Typography.Text style={{ fontSize: 14 }}>
                     {inspection?.created_by || "N/A"}
                   </Typography.Text>
                 </Flex>
-                {/* <Flex justify="space-between">
-                  <Typography.Text
-                    strong
-                    style={{ fontSize: 14, color: token.colorTextHeading }}
-                  >
-                    Cập nhật
-                  </Typography.Text>
-                  <Typography.Text style={{ fontSize: 14 }}>
-                    {inspection?.updated_at
-                      ? dayjs(inspection?.updated_at).format("DD/MM/YYYY")
-                      : "N/A"}
-                  </Typography.Text>
-                </Flex>
-                <Flex justify="space-between">
-                  <Typography.Text
-                    strong
-                    style={{ fontSize: 14, color: token.colorTextHeading }}
-                  >
-                    Cập nhật bởi
-                  </Typography.Text>
-                  <Typography.Text style={{ fontSize: 14 }}>
-                    {inspection?.updated_by || "N/A"}
-                  </Typography.Text>
-                </Flex> */}
               </Space>
             </Card>
           </Space>
