@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 import { ScheduleOutlined } from "@ant-design/icons";
 import "dayjs/locale/vi";
 

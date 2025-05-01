@@ -1,15 +1,7 @@
-/* eslint-disable prettier/prettier */
 import React from "react";
-import {
-  Card,
-  Flex,
-  Typography,
-  Space,
-  Table,
-  Tag,
-  Tooltip,
-  theme,
-} from "antd";
+
+import { Card, Typography, Table, Tag, Tooltip, Space, Flex, theme } from "antd";
+
 import { ExperimentOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import {
   chemicalGroups,
@@ -25,10 +17,12 @@ interface ContaminantCheckCardProps {
   contaminants: Contaminant[];
 }
 
+
 export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
   style,
   contaminants,
 }) => {
+
   const { token } = theme.useToken();
   const mustBeZeroKeys = getMustBeZeroKeys();
 
@@ -43,17 +37,11 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
       }}
     >
       <Flex align="center" gap={8} style={{ marginBottom: 16 }}>
-        <ExperimentOutlined
-          style={{ color: token.colorPrimary, fontSize: 24 }}
-        />
-        <Typography.Title
-          level={3}
-          style={{ margin: 0, color: token.colorPrimary }}
-        >
+        <ExperimentOutlined style={{ color: token.colorPrimary, fontSize: 24 }} />
+        <Typography.Title level={3} style={{ margin: 0, color: token.colorPrimary }}>
           Tiêu chí kiểm định
         </Typography.Title>
       </Flex>
-
       <Typography.Text
         type="secondary"
         italic
@@ -66,13 +54,12 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
       >
         (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc
         bằng 0).
+
       </Typography.Text>
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         {chemicalGroups.map((group) => {
-          const groupContaminants = contaminants.filter((item) =>
-            group.keys.includes(item.key)
-          );
+          const groupContaminants = contaminants.filter((item) => group.keys.includes(item.key));
           if (groupContaminants.length === 0) return null;
 
           return (
@@ -127,11 +114,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                           <Typography.Text strong>
                             {text}
                             {mustBeZero && (
-                              <Typography.Text
-                                type="danger"
-                                strong
-                                style={{ marginLeft: 4 }}
-                              >
+                              <Typography.Text type="danger" strong style={{ marginLeft: 4 }}>
                                 (*)
                               </Typography.Text>
                             )}
@@ -218,3 +201,4 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
     </Card>
   );
 };
+

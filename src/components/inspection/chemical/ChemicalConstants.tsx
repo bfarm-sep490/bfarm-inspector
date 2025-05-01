@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IInspectingResult } from "@/interfaces";
 import { Typography, Tag, Space, Divider, Flex } from "antd";
 
@@ -10,11 +9,7 @@ interface ChemicalData {
   value: number;
   limit: number;
 }
-export const mustBeZeroKeys = [
-  "methyl_bromide",
-  "hydrogen_phosphide",
-  "salmonella",
-];
+export const mustBeZeroKeys = ["methyl_bromide", "hydrogen_phosphide", "salmonella"];
 
 export const getMustBeZeroKeys = (): string[] => mustBeZeroKeys;
 export const LIMITS: Record<string, number> = {
@@ -306,7 +301,8 @@ export const ChemicalDataDisplay: React.FC<{
       map[item.key] = item;
       return map;
     },
-    {} as Record<string, ChemicalData>
+    {} as Record<string, ChemicalData>,
+
   );
 
   return (
@@ -318,9 +314,7 @@ export const ChemicalDataDisplay: React.FC<{
           return (
             data || {
               key,
-              label: key
-                .replace(/_/g, " ")
-                .replace(/\b\w/g, (char) => char.toUpperCase()), // Tạo label mặc định nếu không có dữ liệu
+              label: key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()), // Tạo label mặc định nếu không có dữ liệu
               unit: UNITS[key] || "",
               value: 0, // Giá trị mặc định nếu không có dữ liệu
               limit: LIMITS[key] || 0,

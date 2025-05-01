@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 "use client";
 
 import { Card, Tag, Typography } from "antd";
@@ -25,8 +24,7 @@ export const ContaminantCheckCard = ({ result }: Props) => {
             const item = data.find((d) => d.key === key);
             if (!item) return null;
 
-            const isExceed =
-              LIMITS[key] !== undefined && item.value > LIMITS[key];
+            const isExceed = LIMITS[key] !== undefined && item.value > LIMITS[key];
 
             return (
               <div key={key} className="flex justify-between py-1">

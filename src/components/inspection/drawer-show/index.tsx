@@ -1,12 +1,5 @@
-/* eslint-disable prettier/prettier */
 import React, { useState, useMemo } from "react";
-import {
-  type HttpError,
-  useOne,
-  useShow,
-  useTranslate,
-  useCustomMutation,
-} from "@refinedev/core";
+import { type HttpError, useOne, useShow, useTranslate, useCustomMutation } from "@refinedev/core";
 import {
   Button,
   Typography,
@@ -59,28 +52,20 @@ export const InspectionsShow: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isCriteriaModalVisible, setIsCriteriaModalVisible] = useState(false);
-  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(
-    null
-  );
+  const [selectedResult, setSelectedResult] = useState<IInspectingForm | null>(null);
   const { token } = theme.useToken();
   const breakpoints = Grid.useBreakpoint();
   const { id } = useParams();
   const navigate = useNavigate();
   const t = useTranslate();
 
-  const { queryResult: formQueryResult } = useShow<
-    { data: IInspectingForm[] },
-    HttpError
-  >({
+  const { queryResult: formQueryResult } = useShow<{ data: IInspectingForm[] }, HttpError>({
     resource: "inspecting-forms",
     id,
     queryOptions: { enabled: !!id },
   });
 
-  const { queryResult: resultQueryResult } = useShow<
-    { data: IInspectingResult[] },
-    HttpError
-  >({
+  const { queryResult: resultQueryResult } = useShow<{ data: IInspectingResult[] }, HttpError>({
     resource: "inspecting-results",
     id,
   });
@@ -144,20 +129,12 @@ export const InspectionsShow: React.FC = () => {
   const handleBack = () => navigate("/inspection-forms");
 
   const handleCreate = () => {
-    if (
-      inspection &&
-      inspection.status !== "Completed" &&
-      inspection.status !== "Cancel"
-    ) {
+    if (inspection && inspection.status !== "Completed" && inspection.status !== "Cancel") {
       const { id, ...rest } = inspection;
       const newInspection = {
         ...rest,
-        start_date: inspection.start_date
-          ? dayjs(inspection.start_date).toISOString()
-          : "",
-        end_date: inspection.end_date
-          ? dayjs(inspection.end_date).toISOString()
-          : "",
+        start_date: inspection.start_date ? dayjs(inspection.start_date).toISOString() : "",
+        end_date: inspection.end_date ? dayjs(inspection.end_date).toISOString() : "",
       } as IInspectingForm;
 
       setSelectedResult({ ...newInspection, id });
@@ -221,10 +198,7 @@ export const InspectionsShow: React.FC = () => {
       <PageHeader
         onBack={handleBack}
         title={
-          <Typography.Title
-            level={2}
-            style={{ margin: 0, color: token.colorPrimary }}
-          >
+          <Typography.Title level={2} style={{ margin: 0, color: token.colorPrimary }}>
             #{inspection?.id} - {inspection?.task_name}
           </Typography.Title>
         }
@@ -237,13 +211,8 @@ export const InspectionsShow: React.FC = () => {
             <Card
               title={
                 <Flex align="center" gap={12}>
-                  <InfoCircleOutlined
-                    style={{ color: token.colorPrimary, fontSize: 24 }}
-                  />
-                  <Typography.Title
-                    level={4}
-                    style={{ margin: 0, color: token.colorTextHeading }}
-                  >
+                  <InfoCircleOutlined style={{ color: token.colorPrimary, fontSize: 24 }} />
+                  <Typography.Title level={4} style={{ margin: 0, color: token.colorTextHeading }}>
                     Thông tin giống cây kiểm nghiệm
                   </Typography.Title>
                 </Flex>
@@ -279,11 +248,7 @@ export const InspectionsShow: React.FC = () => {
                   />
                 </Col>
                 <Col xs={24} md={16}>
-                  <Space
-                    direction="vertical"
-                    size={16}
-                    style={{ width: "100%" }}
-                  >
+                  <Space direction="vertical" size={16} style={{ width: "100%" }}>
                     <Flex justify="space-between" align="center">
                       <Typography.Text
                         strong
@@ -344,13 +309,8 @@ export const InspectionsShow: React.FC = () => {
             <Card
               title={
                 <Flex align="center" gap={12}>
-                  <InfoCircleOutlined
-                    style={{ color: token.colorPrimary, fontSize: 24 }}
-                  />
-                  <Typography.Title
-                    level={4}
-                    style={{ margin: 0, color: token.colorTextHeading }}
-                  >
+                  <InfoCircleOutlined style={{ color: token.colorPrimary, fontSize: 24 }} />
+                  <Typography.Title level={4} style={{ margin: 0, color: token.colorTextHeading }}>
                     Kết quả
                   </Typography.Title>
                 </Flex>
@@ -383,17 +343,12 @@ export const InspectionsShow: React.FC = () => {
                     Xem chi tiết
                   </Button>
                 ) : (
-                  (inspection?.status === "Ongoing" ||
-                    inspection?.status === "Incomplete") && (
+                  (inspection?.status === "Ongoing" || inspection?.status === "Incomplete") && (
                     <Button
                       type="primary"
                       icon={<EditOutlined />}
                       onClick={handleCreate}
-                      // disabled={
-                      //   isBeforeStart ||
-                      //   isAfterEnd ||
-                      //   inspection?.status === "Incomplete"
-                      // }
+                      disabled={isBeforeStart || isAfterEnd || inspection?.status === "Incomplete"}
                       style={{
                         borderRadius: token.borderRadiusSM,
                         backgroundColor: token.colorPrimary,
@@ -407,35 +362,23 @@ export const InspectionsShow: React.FC = () => {
               }
             >
               {inspectionResult ? (
-                <Space
-                  direction="vertical"
-                  size="middle"
-                  style={{ width: "100%" }}
-                >
+                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
                   <Flex justify="space-between">
                     <Typography.Text strong style={{ fontSize: 16 }}>
                       Đánh giá
                     </Typography.Text>
-                    <InspectionResultTag
-                      value={inspectionResult.evaluated_result}
-                    />
+                    <InspectionResultTag value={inspectionResult.evaluated_result} />
                   </Flex>
                   <Flex justify="space-between">
                     <Typography.Text strong style={{ fontSize: 16 }}>
                       Nội dung
                     </Typography.Text>
-                    <Typography.Text>
-                      {inspectionResult.result_content}
-                    </Typography.Text>
+                    <Typography.Text>{inspectionResult.result_content}</Typography.Text>
                   </Flex>
                 </Space>
               ) : inspection?.status === "Ongoing" ? (
                 isBeforeStart ? (
-                  <Alert
-                    type="warning"
-                    message="Chưa đến ngày kiểm nghiệm"
-                    showIcon
-                  />
+                  <Alert type="warning" message="Chưa đến ngày kiểm nghiệm" showIcon />
                 ) : (
                   <Alert
                     type="info"
@@ -456,13 +399,8 @@ export const InspectionsShow: React.FC = () => {
             <Card
               title={
                 <Flex align="center" gap={12}>
-                  <InfoCircleOutlined
-                    style={{ color: token.colorPrimary, fontSize: 24 }}
-                  />
-                  <Typography.Title
-                    level={4}
-                    style={{ margin: 0, color: token.colorTextHeading }}
-                  >
+                  <InfoCircleOutlined style={{ color: token.colorPrimary, fontSize: 24 }} />
+                  <Typography.Title level={4} style={{ margin: 0, color: token.colorTextHeading }}>
                     Thông tin công việc
                   </Typography.Title>
                 </Flex>
@@ -535,9 +473,7 @@ export const InspectionsShow: React.FC = () => {
                       </Typography.Text>
                       <Typography.Text style={{ fontSize: 16 }}>
                         {dayjs(inspection?.start_date).format("DD/MM/YYYY")} lúc{" "}
-                        <Tag color="red">
-                          {dayjs(inspection?.start_date).format("HH:mm:ss")}
-                        </Tag>
+                        <Tag color="red">{dayjs(inspection?.start_date).format("HH:mm:ss")}</Tag>
                       </Typography.Text>
                     </Flex>
                   </Col>
@@ -554,9 +490,7 @@ export const InspectionsShow: React.FC = () => {
                       </Typography.Text>
                       <Typography.Text style={{ fontSize: 16 }}>
                         {dayjs(inspection?.end_date).format("DD/MM/YYYY")} lúc{" "}
-                        <Tag color="red">
-                          {dayjs(inspection?.end_date).format("HH:mm:ss")}
-                        </Tag>
+                        <Tag color="red">{dayjs(inspection?.end_date).format("HH:mm:ss")}</Tag>
                       </Typography.Text>
                     </Flex>
                   </Col>
@@ -609,13 +543,8 @@ export const InspectionsShow: React.FC = () => {
             <Card
               title={
                 <Flex align="center" gap={8}>
-                  <InfoCircleOutlined
-                    style={{ color: token.colorPrimary, fontSize: 20 }}
-                  />
-                  <Typography.Title
-                    level={4}
-                    style={{ margin: 0, color: token.colorTextHeading }}
-                  >
+                  <InfoCircleOutlined style={{ color: token.colorPrimary, fontSize: 20 }} />
+                  <Typography.Title level={4} style={{ margin: 0, color: token.colorTextHeading }}>
                     Thời gian
                   </Typography.Title>
                 </Flex>
@@ -636,26 +565,16 @@ export const InspectionsShow: React.FC = () => {
                 backgroundColor: token.colorBgElevated,
               }}
             >
-              <Space
-                direction="vertical"
-                size="small"
-                style={{ width: "100%" }}
-              >
+              <Space direction="vertical" size="small" style={{ width: "100%" }}>
                 <Flex justify="space-between">
-                  <Typography.Text
-                    strong
-                    style={{ fontSize: 14, color: token.colorTextHeading }}
-                  >
+                  <Typography.Text strong style={{ fontSize: 14, color: token.colorTextHeading }}>
                     Hoàn thành
                   </Typography.Text>
                   <Typography.Text style={{ fontSize: 14 }}>
                     {inspection?.complete_date ? (
                       <>
-                        {dayjs(inspection?.complete_date).format("DD/MM/YYYY")}{" "}
-                        lúc{" "}
-                        <Tag color="red">
-                          {dayjs(inspection?.complete_date).format("HH:mm:ss")}
-                        </Tag>
+                        {dayjs(inspection?.complete_date).format("DD/MM/YYYY")} lúc{" "}
+                        <Tag color="red">{dayjs(inspection?.complete_date).format("HH:mm:ss")}</Tag>
                       </>
                     ) : (
                       "N/A"
@@ -663,24 +582,16 @@ export const InspectionsShow: React.FC = () => {
                   </Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
-                  <Typography.Text
-                    strong
-                    style={{ fontSize: 14, color: token.colorTextHeading }}
-                  >
+                  <Typography.Text strong style={{ fontSize: 14, color: token.colorTextHeading }}>
                     Tạo lúc
                   </Typography.Text>
                   <Typography.Text style={{ fontSize: 14 }}>
                     {dayjs(inspection?.created_at).format("DD/MM/YYYY")} lúc{" "}
-                    <Tag color="red">
-                      {dayjs(inspection?.created_at).format("HH:mm:ss")}
-                    </Tag>
+                    <Tag color="red">{dayjs(inspection?.created_at).format("HH:mm:ss")}</Tag>
                   </Typography.Text>
                 </Flex>
                 <Flex justify="space-between">
-                  <Typography.Text
-                    strong
-                    style={{ fontSize: 14, color: token.colorTextHeading }}
-                  >
+                  <Typography.Text strong style={{ fontSize: 14, color: token.colorTextHeading }}>
                     Tạo bởi
                   </Typography.Text>
                   <Typography.Text style={{ fontSize: 14 }}>
@@ -736,14 +647,9 @@ export const InspectionsShow: React.FC = () => {
           top: 20,
         }}
         centered
-        closeIcon={
-          <CloseOutlined style={{ color: token.colorTextSecondary }} />
-        }
+        closeIcon={<CloseOutlined style={{ color: token.colorTextSecondary }} />}
       >
-        <ContaminantCheckCard
-          type={plant?.type}
-          contaminants={initialContaminants}
-        />
+        <ContaminantCheckCard type={plant?.type} contaminants={initialContaminants} />
       </Modal>
 
       <Modal
@@ -763,9 +669,7 @@ export const InspectionsShow: React.FC = () => {
         }}
         title={
           <Flex align="center" gap={12}>
-            <ExperimentOutlined
-              style={{ color: token.colorPrimary, fontSize: 20 }}
-            />
+            <ExperimentOutlined style={{ color: token.colorPrimary, fontSize: 20 }} />
             <div>
               <Typography.Title level={4} style={{ margin: 0 }}>
                 Chi tiết kết quả kiểm nghiệm
@@ -790,9 +694,7 @@ export const InspectionsShow: React.FC = () => {
           top: 20,
         }}
         centered
-        closeIcon={
-          <CloseOutlined style={{ color: token.colorTextSecondary }} />
-        }
+        closeIcon={<CloseOutlined style={{ color: token.colorTextSecondary }} />}
       >
         <Space direction="vertical" size={24} style={{ width: "100%" }}>
           {/* Summary Card */}
@@ -814,9 +716,7 @@ export const InspectionsShow: React.FC = () => {
           <Tabs
             type="card"
             items={chemicalGroups
-              .filter((group) =>
-                chemicalData.some((item) => group.keys?.includes(item.key))
-              )
+              .filter((group) => chemicalData.some((item) => group.keys?.includes(item.key)))
               .map((group) => ({
                 key: group.title,
                 label: (
@@ -857,11 +757,7 @@ export const InspectionsShow: React.FC = () => {
                               <Typography.Text strong>
                                 {text}
                                 {mustBeZero && (
-                                  <Typography.Text
-                                    type="danger"
-                                    strong
-                                    style={{ marginLeft: 4 }}
-                                  >
+                                  <Typography.Text type="danger" strong style={{ marginLeft: 4 }}>
                                     (*)
                                   </Typography.Text>
                                 )}
@@ -912,13 +808,7 @@ export const InspectionsShow: React.FC = () => {
                           return (
                             <Tag
                               color={isPassed ? "green" : "red"}
-                              icon={
-                                isPassed ? (
-                                  <CheckCircleOutlined />
-                                ) : (
-                                  <CloseCircleOutlined />
-                                )
-                              }
+                              icon={isPassed ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
                               style={{
                                 width: 120,
                                 textAlign: "center",
