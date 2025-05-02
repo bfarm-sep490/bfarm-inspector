@@ -9,7 +9,6 @@ interface ChemicalData {
   limit: number;
 }
 export const mustBeZeroKeys = [
-  "methyl_bromide",
   "hydrogen_phosphide",
   "salmonella",
 ];
