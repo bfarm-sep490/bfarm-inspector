@@ -12,7 +12,7 @@ import routerProvider, {
   UnsavedChangesNotifier,
   DocumentTitleHandler,
 } from "@refinedev/react-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router";
 
@@ -23,7 +23,6 @@ import { themeConfig } from "./components/theme";
 import { ConfigProvider } from "./context";
 import { App as AntdApp } from "antd";
 import { AuthPage } from "./pages/auth";
-import { DashboardPage } from "./pages/dashboard";
 import { dataProvider } from "./rest-data-provider";
 import {
   InspectionEdit,
@@ -46,28 +45,35 @@ const customTitleHandler = ({ resource }: TitleHandlerOptions): string => {
 };
 
 const App: React.FC = () => {
-  // This hook is used to automatically login the user.
-  // const { loading } = useAutoLoginForDemo();
-
   const API_URL =
     import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
 
   const appDataProvider = dataProvider(API_URL);
 
   const { t, i18n } = useTranslation();
-  interface TranslationParams {
-    [key: string]: string | number;
-  }
 
   const i18nProvider = {
-    translate: (key: string, params?: TranslationParams) => t(key, params),
+    translate: (key: string, params?: { [key: string]: string | number }) =>
+      t(key, params),
     changeLocale: (lang: string) => i18n.changeLanguage(lang),
     getLocale: () => i18n.language,
   };
 
-  // if (loading) {
-  //   return null;
-  // }
+  const resources: IResourceItem[] = useMemo(
+    () => [
+      {
+        name: "inspection-forms",
+        list: "/inspection-forms",
+        edit: "/inspection-forms/edit/:id",
+        show: "/inspection-forms/show/:id",
+        meta: {
+          label: t("inspection.menu"),
+          icon: <ScheduleOutlined />,
+        },
+      },
+    ],
+    [t]
+  );
 
   return (
     <BrowserRouter>
@@ -79,6 +85,7 @@ const App: React.FC = () => {
               dataProvider={appDataProvider}
               authProvider={authProvider}
               i18nProvider={i18nProvider}
+              resources={resources}
               options={{
                 syncWithLocation: true,
                 warnWhenUnsavedChanges: true,
@@ -86,26 +93,6 @@ const App: React.FC = () => {
               }}
               notificationProvider={useNotificationProvider}
               liveProvider={liveProvider(ablyClient)}
-              resources={[
-                // {
-                //   name: "dashboard",
-                //   list: "/",
-                //   meta: {
-                //     label: "Dashboard",
-                //     icon: <DashboardOutlined />,
-                //   },
-                // },
-                {
-                  name: "inspection-forms",
-                  list: "/inspection-forms",
-                  edit: "/inspection-forms/edit/:id",
-                  show: "/inspection-forms/show/:id",
-                  meta: {
-                    label: "Inspecting Forms",
-                    icon: <ScheduleOutlined />,
-                  },
-                },
-              ]}
             >
               <Routes>
                 <Route
@@ -152,7 +139,7 @@ const App: React.FC = () => {
                 <Route
                   element={
                     <Authenticated key="auth-pages" fallback={<Outlet />}>
-                      <NavigateToResource resource="dashboard" />
+                      <NavigateToResource resource="inspection-forms" />
                     </Authenticated>
                   }
                 >

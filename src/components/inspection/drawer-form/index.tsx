@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { BaseKey, useCustomMutation } from "@refinedev/core";
+import { BaseKey, useCustomMutation, useTranslate } from "@refinedev/core";
 import {
   Form,
   InputNumber,
@@ -40,6 +40,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
   const { token } = theme.useToken();
   const { mutate, isLoading } = useCustomMutation();
   const [missingMessage, setMissingMessage] = useState<string | null>(null);
+  const t = useTranslate();
 
   const thresholds = getContaminantsByType(props.type);
   const thresholdMap = Object.fromEntries(
@@ -105,11 +106,19 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
 
     if (dangerKeys.length || warningKeys.length) {
       message.warning(
-        `Cảnh báo vượt ngưỡng:\n` +
+        t("inspectionForm.warning.title") +
           (dangerKeys.length
-            ? `🚨 Nguy hiểm: ${dangerKeys.join(", ")}\n`
+            ? "\n" +
+              t("inspectionForm.warning.danger", {
+                keys: dangerKeys.join(", "),
+              })
             : "") +
-          (warningKeys.length ? `⚠️ Cảnh báo: ${warningKeys.join(", ")}` : "")
+          (warningKeys.length
+            ? "\n" +
+              t("inspectionForm.warning.warning", {
+                keys: warningKeys.join(", "),
+              })
+            : "")
       );
     }
 
@@ -122,7 +131,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       },
       {
         onSuccess: () => {
-          message.success("Tạo kết quả kiểm nghiệm thành công");
+          message.success(t("inspectionForm.success"));
           setFormLoading(false);
           form.resetFields();
           onModalClose();
@@ -130,7 +139,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
         },
         onError: (error: unknown) => {
           const err = error as { message?: string };
-          message.error(err?.message || "Tạo thất bại, vui lòng thử lại");
+          message.error(err?.message || t("inspectionForm.error"));
         },
       }
     );
@@ -147,13 +156,13 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
         errorInfo !== null &&
         "errorFields" in errorInfo
       ) {
-        setMissingMessage("Vui lòng nhập đầy đủ các trường bắt buộc.");
+        setMissingMessage(t("inspectionForm.missing"));
       }
     }
   };
 
   const overviewTab = {
-    title: "Tổng quan",
+    title: t("inspectionForm.tab.overview"),
     key: "overview",
     color: token.colorPrimary,
   };
@@ -185,7 +194,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                           backgroundColor: group.color,
                         }}
                       />
-                      <span>{group.title}</span>
+                      <span>{t(group.title)}</span>
                     </Flex>
                   }
                 >
@@ -222,7 +231,9 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                           rules={[
                             {
                               required: true,
-                              message: `Vui lòng nhập giá trị cho ${label}`,
+                              message: t("inspectionForm.field.inputRequired", {
+                                label,
+                              }),
                             },
                           ]}
                         >
@@ -262,9 +273,13 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                               );
                               const warningMessage =
                                 status === "danger"
-                                  ? `🚨 NGUY HIỂM: ${threshold.name} vượt quá ngưỡng nguy hiểm`
+                                  ? t("inspectionForm.warning.fieldDanger", {
+                                      name: threshold.name,
+                                    })
                                   : status === "warning"
-                                    ? `⚠️ CẢNH BÁO: ${threshold.name} vượt quá ngưỡng cảnh báo`
+                                    ? t("inspectionForm.warning.fieldWarning", {
+                                        name: threshold.name,
+                                      })
                                     : undefined;
 
                               setFieldWarnings((prev) => ({
@@ -298,11 +313,16 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
               >
                 <Form.Item
                   label={
-                    <Typography.Text strong>Nội dung kết quả</Typography.Text>
+                    <Typography.Text strong>
+                      {t("inspectionForm.field.resultContent")}
+                    </Typography.Text>
                   }
                   name="result_content"
                   rules={[
-                    { required: true, message: "Nội dung không được để trống" },
+                    {
+                      required: true,
+                      message: t("inspectionForm.field.resultRequired"),
+                    },
                   ]}
                 >
                   <Input.TextArea rows={4} />
@@ -312,13 +332,15 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
 
             <Flex justify="space-between" align="center" vertical>
               <Flex style={{ width: "100%" }} justify="space-between">
-                <Button onClick={onModalClose}>Hủy</Button>
+                <Button onClick={onModalClose}>
+                  {t("inspectionForm.button.cancel")}
+                </Button>
                 <Button
                   onClick={handleSubmit}
                   loading={formLoading}
                   type="primary"
                 >
-                  Xác nhận
+                  {t("inspectionForm.button.submit")}
                 </Button>
               </Flex>
               {missingMessage && (

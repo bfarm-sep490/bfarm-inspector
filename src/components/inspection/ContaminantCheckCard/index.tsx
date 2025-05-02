@@ -13,6 +13,7 @@ import {
 import { ExperimentOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { chemicalGroups, mustBeZeroKeys } from "../chemical/ChemicalConstants";
 import { getContaminantsByType } from "../getContaminantsByType";
+import { useTranslate } from "@refinedev/core";
 
 interface ContaminantCheckCardProps {
   type: string | undefined;
@@ -25,8 +26,8 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
 }) => {
   const { token } = theme.useToken();
   const mustBeZero = mustBeZeroKeys;
-
   const contaminants = useMemo(() => getContaminantsByType(type), [type]);
+  const t = useTranslate();
 
   return (
     <Card
@@ -44,7 +45,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
           level={3}
           style={{ margin: 0, color: token.colorPrimary }}
         >
-          Tiêu chí kiểm định
+          {t("contaminant.title")}
         </Typography.Title>
         {type && (
           <Tag
@@ -57,7 +58,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
               width: "fit-content",
             }}
           >
-            Loại cây: {type}
+            {t("contaminant.plantType")}: {type}
           </Tag>
         )}
       </Flex>
@@ -72,8 +73,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
           color: token.colorError,
         }}
       >
-        (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn (bắt buộc
-        bằng 0).
+        {t("contaminant.note")}
       </Typography.Text>
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -100,7 +100,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                     level={4}
                     style={{ margin: 0, color: group.color, fontSize: 18 }}
                   >
-                    {group.title}
+                    {t(group.title)}
                   </Typography.Title>
                 </Flex>
               }
@@ -125,7 +125,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                 dataSource={groupContaminants}
                 columns={[
                   {
-                    title: "Tên chất",
+                    title: t("contaminant.table.chemicalName"),
                     dataIndex: "name",
                     key: "name",
                     render: (text, record) => {
@@ -145,11 +145,14 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                             )}
                           </Typography.Text>
                           <Tooltip
-                            title={`Ngưỡng kiểm định: ${
-                              isZero
-                                ? "Bắt buộc = 0"
-                                : `Nhẹ ≤ ${record.warning}, Nặng ≥ ${record.danger}`
-                            }`}
+                            title={t("contaminant.table.thresholdTooltip", {
+                              value: isZero
+                                ? t("contaminant.table.mustBeZero")
+                                : t("contaminant.table.range", {
+                                    warning: record.warning,
+                                    danger: record.danger,
+                                  }),
+                            })}
                           >
                             <InfoCircleOutlined
                               style={{
@@ -165,7 +168,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                     width: "40%",
                   },
                   {
-                    title: "Ngưỡng nhẹ",
+                    title: t("contaminant.table.warningLimit"),
                     dataIndex: "warning",
                     key: "warning",
                     render: (value: string, record) => (
@@ -185,9 +188,8 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                     ),
                     width: "25%",
                   },
-
                   {
-                    title: "Ngưỡng nặng",
+                    title: t("contaminant.table.dangerLimit"),
                     dataIndex: "danger",
                     key: "danger",
                     render: (value: string, record) => (

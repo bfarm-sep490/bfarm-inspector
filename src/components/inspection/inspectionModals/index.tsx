@@ -28,6 +28,7 @@ import {
 import { IInspectingResult } from "@/interfaces";
 import { contaminantBasedVegetableType } from "@/utils/inspectingKind";
 import { getContaminantsByType } from "../getContaminantsByType";
+import { useTranslate } from "@refinedev/core";
 
 interface InspectionModalsProps {
   isModalVisible: boolean;
@@ -60,6 +61,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
     () => getContaminantsByType(plantType),
     [plantType]
   );
+  const t = useTranslate();
 
   return (
     <>
@@ -100,9 +102,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
             backgroundColor: "rgba(0, 0, 0, 0.45)",
             backdropFilter: "blur(4px)",
           },
-          body: {
-            padding: 24,
-          },
+          body: { padding: 24 },
         }}
         title={
           <Flex align="center" gap={12}>
@@ -111,7 +111,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
             />
             <div>
               <Typography.Title level={4} style={{ margin: 0 }}>
-                Chi tiết kết quả kiểm nghiệm
+                {t("inspection.modal.title")}
               </Typography.Title>
               <Typography.Text
                 type="secondary"
@@ -123,8 +123,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                   color: token.colorError,
                 }}
               >
-                (*) Các chất có dấu sao bắt buộc không được vượt mức an toàn
-                (bắt buộc bằng 0).
+                {t("inspection.modal.note")}
               </Typography.Text>
             </div>
           </Flex>
@@ -140,10 +139,11 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
             }}
           >
             <Typography.Paragraph strong style={{ marginBottom: 8 }}>
-              Kết luận kiểm nghiệm:
+              {t("inspection.modal.conclusion")}
             </Typography.Paragraph>
             <Typography.Text>
-              {inspectionResult?.result_content || "Không có nhận xét"}
+              {inspectionResult?.result_content ||
+                t("inspection.modal.noComment")}
             </Typography.Text>
           </Card>
 
@@ -165,14 +165,14 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                         backgroundColor: group.color,
                       }}
                     />
-                    <span>{group.title}</span>
+                    <span>{t(group.title)}</span>
                   </Flex>
                 ),
                 children: (
                   <Table
                     rowKey="key"
                     dataSource={chemicalData.filter((item) => {
-                      if (group.title === "Kim loại nặng") {
+                      if (group.title === "chemicalGroups.heavyMetals") {
                         return kimloaichecked?.includes(item.key);
                       } else {
                         return group.keys.includes(item.key);
@@ -180,7 +180,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                     })}
                     columns={[
                       {
-                        title: "Tên chất",
+                        title: t("inspection.table.chemicalName"),
                         dataIndex: "name",
                         key: "name",
                         render: (text, record) => {
@@ -202,11 +202,11 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                                 )}
                               </Typography.Text>
                               <Tooltip
-                                title={`Giới hạn an toàn: ${
-                                  mustBeZero
-                                    ? "Bắt buộc = 0"
-                                    : "Dựa trên loại cây trồng"
-                                }`}
+                                title={t("inspection.table.safetyLimit", {
+                                  value: mustBeZero
+                                    ? t("inspection.table.limitZero")
+                                    : t("inspection.table.limitByCrop"),
+                                })}
                               >
                                 <InfoCircleOutlined
                                   style={{
@@ -222,7 +222,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                         width: "40%",
                       },
                       {
-                        title: "Giá trị",
+                        title: t("inspection.table.value"),
                         dataIndex: "value",
                         key: "value",
                         render: (value, record) => {
@@ -270,7 +270,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                         width: "30%",
                       },
                       {
-                        title: "Tiêu chuẩn",
+                        title: t("inspection.table.standard"),
                         key: "standard",
                         render: (_, record) => {
                           const mustBeZero = mustBeZeroKeys.includes(
@@ -284,18 +284,21 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                             <Flex align="center" gap={8}>
                               <Typography.Text strong>
                                 {mustBeZero
-                                  ? "Bắt buộc = 0"
+                                  ? t("inspection.table.limitZero")
                                   : threshold
                                     ? `≤ ${threshold.warning} ${threshold.unit}`
-                                    : "Không có dữ liệu"}
+                                    : t("inspection.table.noData")}
                               </Typography.Text>
                               <Tooltip
                                 title={
                                   mustBeZero
-                                    ? "Bắt buộc = 0"
+                                    ? t("inspection.table.limitZero")
                                     : threshold
-                                      ? `Bình thường: ≤ ${threshold.warning}, Ngưỡng nhẹ: > ${threshold.warning}–${threshold.danger}, Nặng: ≥ ${threshold.danger}`
-                                      : "Không có dữ liệu"
+                                      ? t("inspection.table.tooltipThreshold", {
+                                          warning: threshold.warning,
+                                          danger: threshold.danger,
+                                        })
+                                      : t("inspection.table.noData")
                                 }
                               >
                                 <InfoCircleOutlined

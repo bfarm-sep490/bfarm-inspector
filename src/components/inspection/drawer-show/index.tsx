@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useMemo } from "react";
-import { type HttpError, useOne, useShow, useTranslate } from "@refinedev/core";
+import { type HttpError, useOne, useShow } from "@refinedev/core";
 import {
   Button,
   Typography,
@@ -33,7 +33,6 @@ import dayjs from "dayjs";
 import { getChemicalData } from "../chemical/ChemicalConstants";
 import { InspectionResultTag } from "../result";
 import { PageHeader } from "@refinedev/antd";
-import { contaminantBasedVegetableType } from "@/utils/inspectingKind";
 import { InspectionModals } from "../inspectionModals";
 import { useTranslation } from "react-i18next";
 
@@ -183,10 +182,6 @@ export const InspectionsShow: React.FC = () => {
   const isAfterEnd = inspection?.end_date
     ? now.isAfter(dayjs(inspection.end_date))
     : false;
-  const kimloaichecked =
-    contaminantBasedVegetableType[
-      plant?.type as keyof typeof contaminantBasedVegetableType
-    ];
   const { t } = useTranslation();
 
   return (

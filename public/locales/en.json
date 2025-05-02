@@ -427,7 +427,67 @@
     "evaluation": "Evaluation",
     "resultContent": "Content",
     "menu": "Inspecting Forms",
-    "inspection": "Inspection"
+    "inspection": "Inspection",
+    "modal": {
+      "title": "Inspection Result Details",
+      "note": "(*) Substances marked with an asterisk must not exceed the safety limit (must be zero).",
+      "conclusion": "Inspection Conclusion:",
+      "noComment": "No comment"
+    },
+    "table": {
+      "chemicalName": "Chemical Name",
+      "value": "Value",
+      "standard": "Standard",
+      "limitZero": "Must be zero",
+      "limitByCrop": "Based on crop type",
+      "noData": "No data available",
+      "safetyLimit": "Safety limit: {{value}}",
+      "tooltipThreshold": "Normal: ≤ {{warning}}, Light: > {{warning}}–{{danger}}, Heavy: ≥ {{danger}}"
+    }
+  },
+  "inspectionForm": {
+    "tab": {
+      "overview": "Overview"
+    },
+    "button": {
+      "cancel": "Cancel",
+      "submit": "Submit"
+    },
+    "field": {
+      "inputRequired": "Please enter a value for {{label}}",
+      "resultContent": "Inspection Result Content",
+      "resultRequired": "Result content must not be empty"
+    },
+    "warning": {
+      "title": "Threshold exceeded:\n",
+      "danger": "🚨 Danger: {{keys}}",
+      "warning": "⚠️ Warning: {{keys}}",
+      "fieldDanger": "🚨 DANGER: {{name}} exceeds the danger threshold",
+      "fieldWarning": "⚠️ WARNING: {{name}} exceeds the warning threshold"
+    },
+    "success": "Inspection result created successfully",
+    "error": "Creation failed, please try again",
+    "missing": "Please complete all required fields."
+  },
+  "contaminant": {
+    "title": "Inspection Criteria",
+    "plantType": "Crop Type",
+    "note": "(*) Substances marked with an asterisk must not exceed the safety limit (must be zero).",
+    "table": {
+      "chemicalName": "Substance Name",
+      "warningLimit": "Warning Threshold",
+      "dangerLimit": "Danger Threshold",
+      "mustBeZero": "Must be zero",
+      "thresholdTooltip": "Inspection threshold: {{value}}",
+      "range": "Light ≤ {{warning}}, Heavy ≥ {{danger}}"
+    }
+  },
+  "chemicalGroups": {
+    "heavyMetals": "Heavy Metals",
+    "pathogens": "Pathogenic Microorganisms",
+    "pesticides": "Pesticides & Residues",
+    "fumigants": "Fumigants & Preservatives",
+    "agrochemicals": "Agricultural Chemicals"
   },
   "common": {
     "at": "at"

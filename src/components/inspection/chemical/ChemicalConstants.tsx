@@ -141,17 +141,17 @@ export const initialContaminants: Contaminant[] = [
 
 export const chemicalGroups: ChemicalCategory[] = [
   {
-    title: "Kim loại nặng",
+    title: "chemicalGroups.heavyMetals",
     keys: ["arsen", "plumbum", "cadmi", "hydrargyrum"],
     color: "#722ed1",
   },
   {
-    title: "Vi sinh vật gây bệnh",
+    title: "chemicalGroups.pathogens",
     keys: ["salmonella", "coliforms", "ecoli"],
     color: "#1890ff",
   },
   {
-    title: "Thuốc trừ sâu & tồn dư BVTV",
+    title: "chemicalGroups.pesticides",
     keys: [
       "glyphosate_glufosinate",
       "dithiocarbamate",
@@ -161,16 +161,17 @@ export const chemicalGroups: ChemicalCategory[] = [
     color: "#52c41a",
   },
   {
-    title: "Chất xông hơi & bảo quản",
+    title: "chemicalGroups.fumigants",
     keys: ["sulfur_dioxide", "methyl_bromide", "hydrogen_phosphide"],
     color: "#fa8c16",
   },
   {
-    title: "Hóa chất nông nghiệp",
+    title: "chemicalGroups.agrochemicals",
     keys: ["nitrat", "nano3_kno3"],
     color: "#722ed1",
   },
 ];
+
 export const getChemicalData = (inspectionResult?: IInspectingResult) => {
   if (!inspectionResult) return [];
 
