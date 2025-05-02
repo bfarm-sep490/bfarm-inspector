@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ScheduleOutlined } from "@ant-design/icons";
 import "dayjs/locale/vi";
 
@@ -11,7 +12,7 @@ import routerProvider, {
   UnsavedChangesNotifier,
   DocumentTitleHandler,
 } from "@refinedev/react-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router";
 
@@ -22,9 +23,12 @@ import { themeConfig } from "./components/theme";
 import { ConfigProvider } from "./context";
 import { App as AntdApp } from "antd";
 import { AuthPage } from "./pages/auth";
-import { DashboardPage } from "./pages/dashboard";
 import { dataProvider } from "./rest-data-provider";
-import { InspectionEdit, InspectionShow, InspectionsList } from "./pages/inspections";
+import {
+  InspectionEdit,
+  InspectionShow,
+  InspectionsList,
+} from "./pages/inspections";
 import { liveProvider } from "@refinedev/ably";
 import { ablyClient } from "./utils/ablyClient";
 
@@ -41,27 +45,35 @@ const customTitleHandler = ({ resource }: TitleHandlerOptions): string => {
 };
 
 const App: React.FC = () => {
-  // This hook is used to automatically login the user.
-  // const { loading } = useAutoLoginForDemo();
-
-  const API_URL = import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
+  const API_URL =
+    import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
 
   const appDataProvider = dataProvider(API_URL);
 
   const { t, i18n } = useTranslation();
-  interface TranslationParams {
-    [key: string]: string | number;
-  }
 
   const i18nProvider = {
-    translate: (key: string, params?: TranslationParams) => t(key, params),
+    translate: (key: string, params?: { [key: string]: string | number }) =>
+      t(key, params),
     changeLocale: (lang: string) => i18n.changeLanguage(lang),
     getLocale: () => i18n.language,
   };
 
-  // if (loading) {
-  //   return null;
-  // }
+  const resources: IResourceItem[] = useMemo(
+    () => [
+      {
+        name: "inspection-forms",
+        list: "/inspection-forms",
+        edit: "/inspection-forms/edit/:id",
+        show: "/inspection-forms/show/:id",
+        meta: {
+          label: t("inspection.menu"),
+          icon: <ScheduleOutlined />,
+        },
+      },
+    ],
+    [t]
+  );
 
   return (
     <BrowserRouter>
@@ -73,6 +85,7 @@ const App: React.FC = () => {
               dataProvider={appDataProvider}
               authProvider={authProvider}
               i18nProvider={i18nProvider}
+              resources={resources}
               options={{
                 syncWithLocation: true,
                 warnWhenUnsavedChanges: true,
@@ -80,26 +93,6 @@ const App: React.FC = () => {
               }}
               notificationProvider={useNotificationProvider}
               liveProvider={liveProvider(ablyClient)}
-              resources={[
-                // {
-                //   name: "dashboard",
-                //   list: "/",
-                //   meta: {
-                //     label: "Dashboard",
-                //     icon: <DashboardOutlined />,
-                //   },
-                // },
-                {
-                  name: "inspection-forms",
-                  list: "/inspection-forms",
-                  edit: "/inspection-forms/edit/:id",
-                  show: "/inspection-forms/show/:id",
-                  meta: {
-                    label: "Inspecting Forms",
-                    icon: <ScheduleOutlined />,
-                  },
-                },
-              ]}
             >
               <Routes>
                 <Route
@@ -125,16 +118,28 @@ const App: React.FC = () => {
                     </Authenticated>
                   }
                 >
-                  <Route index element={<DashboardPage />} />
-                  <Route path="/inspection-forms" element={<InspectionsList />} />
-                  <Route path="/inspection-forms/:id" element={<InspectionShow />} />
-                  <Route path="/inspection-forms/edit/:id" element={<InspectionEdit />} />
+                  <Route
+                    index
+                    element={<NavigateToResource resource="inspection-forms" />}
+                  />
+                  <Route
+                    path="/inspection-forms"
+                    element={<InspectionsList />}
+                  />
+                  <Route
+                    path="/inspection-forms/:id"
+                    element={<InspectionShow />}
+                  />
+                  <Route
+                    path="/inspection-forms/edit/:id"
+                    element={<InspectionEdit />}
+                  />
                 </Route>
 
                 <Route
                   element={
                     <Authenticated key="auth-pages" fallback={<Outlet />}>
-                      <NavigateToResource resource="dashboard" />
+                      <NavigateToResource resource="inspection-forms" />
                     </Authenticated>
                   }
                 >
@@ -154,8 +159,14 @@ const App: React.FC = () => {
                       />
                     }
                   />
-                  <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
-                  <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
+                  <Route
+                    path="/forgot-password"
+                    element={<AuthPage type="forgotPassword" />}
+                  />
+                  <Route
+                    path="/update-password"
+                    element={<AuthPage type="updatePassword" />}
+                  />
                 </Route>
               </Routes>
 
