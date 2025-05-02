@@ -1,5 +1,4 @@
 /* eslint-disable prettier/prettier */
-import { BaseKey, useCustomMutation, useTranslate } from "@refinedev/core";
 import {
   Form,
   InputNumber,
@@ -15,10 +14,12 @@ import {
   Space,
 } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
+import { BaseKey, useCustomMutation, useTranslate } from "@refinedev/core";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { chemicalGroups } from "../chemical/ChemicalConstants";
 import { getContaminantsByType } from "../getContaminantsByType";
+import { getContaminantLimitsByVegetableType } from "@/utils/inspectingKind";
 
 const { TabPane } = Tabs;
 
@@ -46,6 +47,30 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
   const thresholdMap = Object.fromEntries(
     thresholds.map((item) => [item.key, item])
   );
+
+  const filteredChemicalGroups = chemicalGroups
+    .map((group: any) => {
+      if (group.title === "Kim loại nặng" && props?.type) {
+        const allowedKeys = getContaminantLimitsByVegetableType(
+          props.type as keyof typeof getContaminantLimitsByVegetableType
+        );
+        return {
+          title: group.title,
+          keys: group.keys.filter((k: string) =>
+            allowedKeys.includes(k.toLowerCase())
+          ),
+          color: group.color,
+        };
+      }
+
+      const validKeys = group.keys.filter((k: string) => thresholdMap[k]);
+      return {
+        title: group.title,
+        keys: validKeys,
+        color: group.color,
+      };
+    })
+    .filter((group) => group.keys.length > 0);
 
   const checkThresholdStatus = (
     key: string,
@@ -180,7 +205,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
         <Form form={form} layout="vertical">
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
             <Tabs type="card" destroyInactiveTabPane={false}>
-              {chemicalGroups.map((group) => (
+              {filteredChemicalGroups.map((group) => (
                 <TabPane
                   forceRender
                   key={group.title}
@@ -199,8 +224,8 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                   }
                 >
                   <Flex vertical gap={16}>
-                    {group.keys.map((key) => {
-                      const label = `${thresholdMap[key]?.name || key} (${thresholdMap[key]?.unit || ""})`;
+                    {group.keys.map((key: string) => {
+                      const label = `${thresholdMap[key]?.name || key} (${(thresholdMap[key]?.unit || "").replace("/", "⁄")})`;
                       const value = form.getFieldValue(key);
                       const status = checkThresholdStatus(key, value);
                       const hasValue =
