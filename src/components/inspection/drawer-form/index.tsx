@@ -107,7 +107,10 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
 
   const onFinish = async (values: Record<string, number | string | undefined>) => {
     setFormLoading(true);
-    const payload = { ...values, inspect_images: imageList };
+    const payload = {
+      ...values,
+      inspect_images: imageList.map((item) => item.url),
+    };
 
     const dangerKeys: string[] = [];
     const warningKeys: string[] = [];
@@ -155,6 +158,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
         onError: (error: unknown) => {
           const err = error as { message?: string };
           message.error(err?.message || t("inspectionForm.error"));
+          setFormLoading(false);
         },
       },
     );
