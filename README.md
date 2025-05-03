@@ -18,17 +18,20 @@
 ## 🚀 Getting Started
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/bfarm-sep490/bfarm-front.git
    cd bfarm-front
    ```
 
 2. **Install dependencies**
+
    ```bash
    bun install
    ```
 
 3. **Start the development server**
+
    ```bash
    bun run dev
    ```
@@ -68,12 +71,15 @@ VITE_GOOGLE_MAPS_API_KEY=google_maps_api_key
 ## 🤝 Contributing
 
 ### Local Development Flow
+
 1. Create a new branch for your feature
+
    ```bash
    git checkout -b feature/amazing-feature
    ```
 
 2. Make your changes and commit frequently
+
    ```bash
    git commit -m 'feat: add new feature component'
    git commit -m 'feat: implement feature logic'
@@ -81,6 +87,7 @@ VITE_GOOGLE_MAPS_API_KEY=google_maps_api_key
    ```
 
 3. Keep your branch up to date by rebasing with main
+
    ```bash
    # Update your local main
    git checkout main
@@ -95,18 +102,21 @@ VITE_GOOGLE_MAPS_API_KEY=google_maps_api_key
    ```
 
 4. Push your branch to GitHub
+
    ```bash
    git push origin feature/amazing-feature
    ```
 
    If you've rebased your branch and get a push rejection, use force-push:
+
    ```bash
    git push --force-with-lease origin feature/amazing-feature
    ```
-   
+
    > ⚠️ **Note**: Use `--force-with-lease` instead of `--force` as it's safer. It will prevent you from overwriting others' work if someone else has pushed to your branch.
 
 ### Pull Request Process
+
 1. Create a Pull Request on GitHub
 2. Ensure the PR title follows the commit convention
 3. Request reviews from team members
@@ -117,6 +127,7 @@ VITE_GOOGLE_MAPS_API_KEY=google_maps_api_key
    - The commit details will include a co-authored-by credit
 
 ### GitHub Repository Settings
+
 - Branch Protection Rules:
   - Require pull request reviews before merging
   - Require branches to be up to date
@@ -142,6 +153,7 @@ This project uses conventional commits specification with custom types. Your com
 - `foo:` - Custom type for specific project needs
 
 Example commit messages:
+
 ```bash
 feat: add user authentication system
 fix: resolve login page redirect issue

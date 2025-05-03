@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IInspectingResult } from "@/interfaces";
 import { Typography, Tag, Space, Divider, Flex } from "antd";
 interface ChemicalData {
@@ -8,10 +7,7 @@ interface ChemicalData {
   value: number;
   limit: number;
 }
-export const mustBeZeroKeys = [
-  "hydrogen_phosphide",
-  "salmonella",
-];
+export const mustBeZeroKeys = ["hydrogen_phosphide", "salmonella", "sulfur_dioxide"];
 
 export const getMustBeZeroKeys = (): string[] => mustBeZeroKeys;
 export const LIMITS: Record<string, number> = {
@@ -151,12 +147,7 @@ export const chemicalGroups: ChemicalCategory[] = [
   },
   {
     title: "chemicalGroups.pesticides",
-    keys: [
-      "glyphosate_glufosinate",
-      "dithiocarbamate",
-      "chlorate",
-      "perchlorate",
-    ],
+    keys: ["glyphosate_glufosinate", "dithiocarbamate", "chlorate", "perchlorate"],
     color: "#52c41a",
   },
   {
@@ -292,35 +283,29 @@ export const getChemicalData = (inspectionResult?: IInspectingResult) => {
   return chemicalData;
 };
 
-// Define the columns for the Table component
 export const ChemicalDataDisplay: React.FC<{
   inspectionResult?: IInspectingResult;
 }> = ({ inspectionResult }) => {
   const chemicalData = getChemicalData(inspectionResult);
-
-  // Tạo một object để dễ tra cứu giá trị của từng chất
   const chemicalDataMap = chemicalData.reduce(
     (map, item) => {
       map[item.key] = item;
       return map;
     },
-    {} as Record<string, ChemicalData>
+    {} as Record<string, ChemicalData>,
   );
 
   return (
     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
       {chemicalGroups.map((group) => {
-        // Lấy tất cả các chất trong nhóm, kể cả khi không có dữ liệu
         const groupData = group.keys.map((key) => {
           const data = chemicalDataMap[key];
           return (
             data || {
               key,
-              label: key
-                .replace(/_/g, " ")
-                .replace(/\b\w/g, (char) => char.toUpperCase()), // Tạo label mặc định nếu không có dữ liệu
+              label: key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()),
               unit: UNITS[key] || "",
-              value: 0, // Giá trị mặc định nếu không có dữ liệu
+              value: 0,
               limit: LIMITS[key] || 0,
             }
           );
@@ -328,16 +313,12 @@ export const ChemicalDataDisplay: React.FC<{
 
         return (
           <div key={group.title}>
-            <Typography.Text
-              strong
-              style={{ color: group.color, fontSize: 16 }}
-            >
+            <Typography.Text strong style={{ color: group.color, fontSize: 16 }}>
               {group.title}
             </Typography.Text>
             <Divider style={{ margin: "8px 0" }} />
             {groupData.map((item) => {
-              const isExceed =
-                item.limit !== undefined && item.value > item.limit;
+              const isExceed = item.limit !== undefined && item.value > item.limit;
               return (
                 <Flex
                   key={item.key}

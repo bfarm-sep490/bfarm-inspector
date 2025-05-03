@@ -455,7 +455,8 @@
     "field": {
       "inputRequired": "Vui lòng nhập giá trị cho {{label}}",
       "resultContent": "Nội dung kết quả",
-      "resultRequired": "Nội dung không được để trống"
+      "resultRequired": "Nội dung không được để trống",
+      "imageProof": "Ảnh minh chứng"
     },
     "warning": {
       "title": "Cảnh báo vượt ngưỡng:\n",

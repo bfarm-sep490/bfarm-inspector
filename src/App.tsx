@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { ScheduleOutlined } from "@ant-design/icons";
 import "dayjs/locale/vi";
 
@@ -24,11 +23,7 @@ import { ConfigProvider } from "./context";
 import { App as AntdApp } from "antd";
 import { AuthPage } from "./pages/auth";
 import { dataProvider } from "./rest-data-provider";
-import {
-  InspectionEdit,
-  InspectionShow,
-  InspectionsList,
-} from "./pages/inspections";
+import { InspectionEdit, InspectionShow, InspectionsList } from "./pages/inspections";
 import { liveProvider } from "@refinedev/ably";
 import { ablyClient } from "./utils/ablyClient";
 
@@ -45,16 +40,14 @@ const customTitleHandler = ({ resource }: TitleHandlerOptions): string => {
 };
 
 const App: React.FC = () => {
-  const API_URL =
-    import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
+  const API_URL = import.meta.env.VITE_API_URL || "https://api.outfit4rent.online/api";
 
   const appDataProvider = dataProvider(API_URL);
 
   const { t, i18n } = useTranslation();
 
   const i18nProvider = {
-    translate: (key: string, params?: { [key: string]: string | number }) =>
-      t(key, params),
+    translate: (key: string, params?: { [key: string]: string | number }) => t(key, params),
     changeLocale: (lang: string) => i18n.changeLanguage(lang),
     getLocale: () => i18n.language,
   };
@@ -72,7 +65,7 @@ const App: React.FC = () => {
         },
       },
     ],
-    [t]
+    [t],
   );
 
   return (
@@ -118,22 +111,10 @@ const App: React.FC = () => {
                     </Authenticated>
                   }
                 >
-                  <Route
-                    index
-                    element={<NavigateToResource resource="inspection-forms" />}
-                  />
-                  <Route
-                    path="/inspection-forms"
-                    element={<InspectionsList />}
-                  />
-                  <Route
-                    path="/inspection-forms/:id"
-                    element={<InspectionShow />}
-                  />
-                  <Route
-                    path="/inspection-forms/edit/:id"
-                    element={<InspectionEdit />}
-                  />
+                  <Route index element={<NavigateToResource resource="inspection-forms" />} />
+                  <Route path="/inspection-forms" element={<InspectionsList />} />
+                  <Route path="/inspection-forms/:id" element={<InspectionShow />} />
+                  <Route path="/inspection-forms/edit/:id" element={<InspectionEdit />} />
                 </Route>
 
                 <Route
@@ -159,14 +140,8 @@ const App: React.FC = () => {
                       />
                     }
                   />
-                  <Route
-                    path="/forgot-password"
-                    element={<AuthPage type="forgotPassword" />}
-                  />
-                  <Route
-                    path="/update-password"
-                    element={<AuthPage type="updatePassword" />}
-                  />
+                  <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
+                  <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
                 </Route>
               </Routes>
 

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { useTranslate } from "@refinedev/core";
 import { Typography, theme } from "antd";
 
@@ -9,10 +8,7 @@ type PaginationTotalProps = {
   entityName: string;
 };
 
-export const PaginationTotal: FC<PaginationTotalProps> = ({
-  total,
-  entityName,
-}) => {
+export const PaginationTotal: FC<PaginationTotalProps> = ({ total, entityName }) => {
   const t = useTranslate();
   const { token } = theme.useToken();
   return (

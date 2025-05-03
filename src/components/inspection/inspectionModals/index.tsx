@@ -1,17 +1,5 @@
-/* eslint-disable prettier/prettier */
 import React, { useMemo } from "react";
-import {
-  Modal,
-  Typography,
-  Flex,
-  Space,
-  Card,
-  Tag,
-  Table,
-  Tooltip,
-  Tabs,
-  theme,
-} from "antd";
+import { Modal, Typography, Flex, Space, Card, Tag, Table, Tooltip, Tabs, theme } from "antd";
 import {
   CloseOutlined,
   ExperimentOutlined,
@@ -20,11 +8,7 @@ import {
   CloseCircleOutlined,
 } from "@ant-design/icons";
 import { ContaminantCheckCard } from "../ContaminantCheckCard";
-import {
-  chemicalGroups,
-  UNITS,
-  mustBeZeroKeys,
-} from "../chemical/ChemicalConstants";
+import { chemicalGroups, UNITS, mustBeZeroKeys } from "../chemical/ChemicalConstants";
 import { IInspectingResult } from "@/interfaces";
 import { contaminantBasedVegetableType } from "@/utils/inspectingKind";
 import { getContaminantsByType } from "../getContaminantsByType";
@@ -36,7 +20,6 @@ interface InspectionModalsProps {
   inspectionResult?: IInspectingResult;
   chemicalData: any[];
   plantType?: string;
-
   isCriteriaModalVisible: boolean;
   onCloseCriteriaModal: () => void;
 }
@@ -53,14 +36,11 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
   const { token } = theme.useToken();
 
   const kimloaichecked =
-    contaminantBasedVegetableType[
-      plantType as keyof typeof contaminantBasedVegetableType
-    ];
+    contaminantBasedVegetableType[plantType as keyof typeof contaminantBasedVegetableType];
 
-  const thresholdList = useMemo(
-    () => getContaminantsByType(plantType),
-    [plantType]
-  );
+  const thresholdList = useMemo(() => getContaminantsByType(plantType), [plantType]);
+  let tooltipText: React.ReactNode;
+
   const t = useTranslate();
 
   return (
@@ -71,9 +51,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
         footer={null}
         width={1000}
         centered
-        closeIcon={
-          <CloseOutlined style={{ color: token.colorTextSecondary }} />
-        }
+        closeIcon={<CloseOutlined style={{ color: token.colorTextSecondary }} />}
         styles={{
           mask: {
             backgroundColor: "rgba(0, 0, 0, 0.45)",
@@ -94,9 +72,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
         footer={null}
         width={1000}
         centered
-        closeIcon={
-          <CloseOutlined style={{ color: token.colorTextSecondary }} />
-        }
+        closeIcon={<CloseOutlined style={{ color: token.colorTextSecondary }} />}
         styles={{
           mask: {
             backgroundColor: "rgba(0, 0, 0, 0.45)",
@@ -106,9 +82,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
         }}
         title={
           <Flex align="center" gap={12}>
-            <ExperimentOutlined
-              style={{ color: token.colorPrimary, fontSize: 20 }}
-            />
+            <ExperimentOutlined style={{ color: token.colorPrimary, fontSize: 20 }} />
             <div>
               <Typography.Title level={4} style={{ margin: 0 }}>
                 {t("inspection.modal.title")}
@@ -142,17 +116,14 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
               {t("inspection.modal.conclusion")}
             </Typography.Paragraph>
             <Typography.Text>
-              {inspectionResult?.result_content ||
-                t("inspection.modal.noComment")}
+              {inspectionResult?.result_content || t("inspection.modal.noComment")}
             </Typography.Text>
           </Card>
 
           <Tabs
             type="card"
             items={chemicalGroups
-              .filter((group) =>
-                chemicalData.some((item) => group.keys?.includes(item.key))
-              )
+              .filter((group) => chemicalData.some((item) => group.keys?.includes(item.key)))
               .map((group) => ({
                 key: group.title,
                 label: (
@@ -184,39 +155,16 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                         dataIndex: "name",
                         key: "name",
                         render: (text, record) => {
-                          const mustBeZero = mustBeZeroKeys.includes(
-                            record.key
-                          );
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
                           return (
-                            <Flex align="center" gap={8}>
-                              <Typography.Text strong>
-                                {text}
-                                {mustBeZero && (
-                                  <Typography.Text
-                                    type="danger"
-                                    strong
-                                    style={{ marginLeft: 4 }}
-                                  >
-                                    (*)
-                                  </Typography.Text>
-                                )}
-                              </Typography.Text>
-                              <Tooltip
-                                title={t("inspection.table.safetyLimit", {
-                                  value: mustBeZero
-                                    ? t("inspection.table.limitZero")
-                                    : t("inspection.table.limitByCrop"),
-                                })}
-                              >
-                                <InfoCircleOutlined
-                                  style={{
-                                    color: token.colorPrimary,
-                                    cursor: "pointer",
-                                    fontSize: 14,
-                                  }}
-                                />
-                              </Tooltip>
-                            </Flex>
+                            <Typography.Text strong>
+                              {text}
+                              {mustBeZero && (
+                                <Typography.Text type="danger" strong style={{ marginLeft: 4 }}>
+                                  (*)
+                                </Typography.Text>
+                              )}
+                            </Typography.Text>
                           );
                         },
                         width: "40%",
@@ -226,85 +174,66 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                         dataIndex: "value",
                         key: "value",
                         render: (value, record) => {
-                          const mustBeZero = mustBeZeroKeys.includes(
-                            record.key
-                          );
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
                           const numericValue =
-                            typeof value === "string"
-                              ? parseFloat(value)
-                              : value;
+                            typeof value === "string" ? parseFloat(value) : value;
 
-                          const threshold = thresholdList.find(
-                            (item) => item.key === record.key
-                          );
+                          const threshold = thresholdList.find((item) => item.key === record.key);
 
-                          const warningLimit = parseFloat(
-                            threshold?.warning || "0"
-                          );
-                          const isPassed = mustBeZero
-                            ? numericValue === 0
-                            : numericValue <= warningLimit;
+                          const warningLimit = parseFloat(threshold?.warning || "0");
+                          const dangerLimit = parseFloat(threshold?.danger || "0");
+                          const unit = UNITS[record.key] || "";
 
-                          return (
-                            <Tag
-                              color={isPassed ? "green" : "red"}
-                              icon={
-                                isPassed ? (
-                                  <CheckCircleOutlined />
-                                ) : (
-                                  <CloseCircleOutlined />
-                                )
-                              }
-                              style={{
-                                width: 120,
-                                textAlign: "center",
-                                display: "inline-flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              {value} {UNITS[record.key] || ""}
-                            </Tag>
-                          );
-                        },
-                        width: "30%",
-                      },
-                      {
-                        title: t("inspection.table.standard"),
-                        key: "standard",
-                        render: (_, record) => {
-                          const mustBeZero = mustBeZeroKeys.includes(
-                            record.key
-                          );
-                          const threshold = thresholdList.find(
-                            (item) => item.key === record.key
-                          );
+                          let tagColor = "green";
+                          let tooltipText: React.ReactNode = "Giá trị an toàn";
+
+                          if (mustBeZero) {
+                            if (numericValue === 0) {
+                              tagColor = "green";
+                              tooltipText = "Giá trị an toàn (bằng 0)";
+                            } else {
+                              tagColor = "red";
+                              tooltipText = "Vượt ngưỡng – phải bằng 0";
+                            }
+                          } else if (numericValue > dangerLimit) {
+                            tagColor = "red";
+                            tooltipText = (
+                              <>
+                                Vượt ngưỡng nguy hiểm <br />({`> ${dangerLimit} ${unit}`})
+                              </>
+                            );
+                          } else if (numericValue > warningLimit) {
+                            tagColor = "gold";
+                            tooltipText = (
+                              <>
+                                Vượt ngưỡng cảnh báo <br />({`> ${warningLimit} ${unit}`})
+                              </>
+                            );
+                          }
+
+                          const isPassed = tagColor === "green";
 
                           return (
-                            <Flex align="center" gap={8}>
-                              <Typography.Text strong>
-                                {mustBeZero
-                                  ? t("inspection.table.limitZero")
-                                  : threshold
-                                    ? `≤ ${threshold.warning} ${threshold.unit}`
-                                    : t("inspection.table.noData")}
-                              </Typography.Text>
-                              <Tooltip
-                                title={
-                                  mustBeZero
-                                    ? t("inspection.table.limitZero")
-                                    : threshold
-                                      ? t("inspection.table.tooltipThreshold", {
-                                          warning: threshold.warning,
-                                          danger: threshold.danger,
-                                        })
-                                      : t("inspection.table.noData")
-                                }
+                            <Flex align="center" gap={6}>
+                              <Tag
+                                color={tagColor}
+                                icon={isPassed ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+                                style={{
+                                  width: 120,
+                                  textAlign: "center",
+                                  display: "inline-flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                }}
                               >
+                                {value} {UNITS[record.key] || ""}
+                              </Tag>
+                              <Tooltip title={tooltipText}>
                                 <InfoCircleOutlined
                                   style={{
+                                    fontSize: 16,
                                     color: token.colorPrimary,
-                                    fontSize: 14,
+                                    cursor: "pointer",
                                   }}
                                 />
                               </Tooltip>

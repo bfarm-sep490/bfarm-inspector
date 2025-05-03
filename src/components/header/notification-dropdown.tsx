@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { BellOutlined } from "@ant-design/icons";
 import {
   Badge,
@@ -80,7 +79,7 @@ export const NotificationDropdown = () => {
             invalidates: ["list"],
           });
         },
-      }
+      },
     );
   };
 
@@ -100,7 +99,7 @@ export const NotificationDropdown = () => {
           });
           setActiveTab("read");
         },
-      }
+      },
     );
   };
 
@@ -137,12 +136,8 @@ export const NotificationDropdown = () => {
               icon={!item.image && <BellOutlined />}
               size={{ xs: 40, sm: 48 }[token.screenXS ? "xs" : "sm"]}
               style={{
-                backgroundColor: !item.is_read
-                  ? token.colorPrimary
-                  : token.colorBgContainer,
-                color: !item.is_read
-                  ? token.colorWhite
-                  : token.colorTextSecondary,
+                backgroundColor: !item.is_read ? token.colorPrimary : token.colorBgContainer,
+                color: !item.is_read ? token.colorWhite : token.colorTextSecondary,
               }}
             />
           </div>
@@ -175,9 +170,7 @@ export const NotificationDropdown = () => {
               }}
               style={{
                 margin: 0,
-                fontSize: { xs: "12px", sm: "13px" }[
-                  token.screenXS ? "xs" : "sm"
-                ],
+                fontSize: { xs: "12px", sm: "13px" }[token.screenXS ? "xs" : "sm"],
                 lineHeight: "1.4",
               }}
             >
@@ -186,9 +179,7 @@ export const NotificationDropdown = () => {
             <Typography.Text
               type="secondary"
               style={{
-                fontSize: { xs: "11px", sm: "12px" }[
-                  token.screenXS ? "xs" : "sm"
-                ],
+                fontSize: { xs: "11px", sm: "12px" }[token.screenXS ? "xs" : "sm"],
                 display: "block",
               }}
             >
@@ -219,11 +210,7 @@ export const NotificationDropdown = () => {
           {t("notification.title")}
         </Typography.Text>
         {unreadNotifications.length > 0 && (
-          <Button
-            type="link"
-            onClick={handleMarkAllAsRead}
-            style={{ padding: "0 8px" }}
-          >
+          <Button type="link" onClick={handleMarkAllAsRead} style={{ padding: "0 8px" }}>
             {t("notification.markAll")}
           </Button>
         )}
@@ -325,12 +312,7 @@ export const NotificationDropdown = () => {
   );
 
   return (
-    <Popover
-      content={content}
-      trigger="click"
-      open={open}
-      onOpenChange={handleOpenChange}
-    >
+    <Popover content={content} trigger="click" open={open} onOpenChange={handleOpenChange}>
       <Badge
         count={unreadNotifications.length}
         offset={[-2, 2]}
@@ -340,11 +322,7 @@ export const NotificationDropdown = () => {
         }}
         className="notification-badge"
       >
-        <Button
-          className={styles.themeSwitch}
-          type="text"
-          icon={<BellOutlined />}
-        />
+        <Button className={styles.themeSwitch} type="text" icon={<BellOutlined />} />
       </Badge>
     </Popover>
   );

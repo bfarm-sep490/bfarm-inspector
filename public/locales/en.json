@@ -456,7 +456,8 @@
     "field": {
       "inputRequired": "Please enter a value for {{label}}",
       "resultContent": "Inspection Result Content",
-      "resultRequired": "Result content must not be empty"
+      "resultRequired": "Result content must not be empty",
+      "imageProof": "Image Evidence"
     },
     "warning": {
       "title": "Threshold exceeded:\n",
