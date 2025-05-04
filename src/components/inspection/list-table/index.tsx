@@ -26,10 +26,10 @@ export const InspectionListTable: React.FC = () => {
   const { tableProps, filters, setFilters } = useTable<IInspectingForm, HttpError>({
     resource: "inspecting-forms",
     filters: {
+      permanent: [{ field: "inspector_id", operator: "eq", value: user?.id }],
       initial: [
         { field: "id", operator: "eq", value: "" },
         { field: "task_type", operator: "contains", value: "" },
-        { field: "inspector_id", operator: "eq", value: user?.id },
       ],
     },
   });

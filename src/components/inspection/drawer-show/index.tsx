@@ -53,6 +53,7 @@ export const InspectionsShow: React.FC = () => {
   const { queryResult: resultQueryResult } = useShow<{ data: IInspectingResult[] }, HttpError>({
     resource: "inspecting-results",
     id,
+    errorNotification: false,
   });
 
   const inspection = useMemo(

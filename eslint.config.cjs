@@ -83,7 +83,7 @@ module.exports = [
           trailingComma: "all",
           jsxSingleQuote: false,
           bracketSpacing: true,
-          endOfLine: "lf",
+          endOfLine: "auto",
         },
       ],
     },
