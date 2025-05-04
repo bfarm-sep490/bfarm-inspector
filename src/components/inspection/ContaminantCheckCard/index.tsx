@@ -64,9 +64,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({ styl
             <span style={{ color: token.colorError, fontWeight: 500 }}>
               MRL (Maximum Residue Level)
             </span>
-            <span style={{ color: token.colorText, marginLeft: 4 }}>
-              : Giới hạn dư lượng tối đa cho phép tồn tại trong nông sản để đảm bảo an toànsức khỏe.
-            </span>
+            <span style={{ color: token.colorText, marginLeft: 4 }}>: {t("mrl.description")}</span>
           </span>
         </Typography.Text>
       </Flex>

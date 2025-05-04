@@ -505,5 +505,9 @@
       "all": "No notifications 🤐",
       "unread": "No new notifications 🤐"
     }
-  }
+  },
+  "mrl": {
+  "label": "MRL (Maximum Residue Level)",
+  "description": "Maximum allowed residue level in agricultural products to ensure health safety."
+}
 }

@@ -504,5 +504,9 @@
       "all": "Không có thông báo nào 🤐",
       "unread": "Không có thông báo mới 🤐"
     }
-  }
+  },
+  "mrl": {
+  "label": "MRL (Mức dư lượng tối đa)",
+  "description": "Giới hạn dư lượng tối đa cho phép tồn tại trong nông sản để đảm bảo an toàn sức khỏe."
+}
 }

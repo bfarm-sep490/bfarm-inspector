@@ -1,5 +1,19 @@
-import React, { useMemo } from "react";
-import { Modal, Typography, Flex, Space, Card, Tag, Table, Tooltip, Tabs, theme } from "antd";
+import React, { useMemo, useState } from "react";
+import {
+  Modal,
+  Typography,
+  Flex,
+  Space,
+  Card,
+  Tag,
+  Table,
+  Tooltip,
+  Tabs,
+  theme,
+  Image,
+  Alert,
+  Button,
+} from "antd";
 import {
   CloseOutlined,
   ExperimentOutlined,
@@ -34,14 +48,52 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
   onCloseCriteriaModal,
 }) => {
   const { token } = theme.useToken();
+  const t = useTranslate();
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
 
   const kimloaichecked =
     contaminantBasedVegetableType[plantType as keyof typeof contaminantBasedVegetableType];
 
   const thresholdList = useMemo(() => getContaminantsByType(plantType), [plantType]);
-  let tooltipText: React.ReactNode;
 
-  const t = useTranslate();
+  const validImageExtensions = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".bmp",
+    ".webp",
+    ".pdf",
+    ".rar",
+    ".zip",
+    ".doc",
+    ".docx",
+  ];
+
+  const imageUrls = Array.isArray(inspectionResult?.inspect_images)
+    ? inspectionResult.inspect_images
+        .map((img) => {
+          const image = img as { url?: string };
+          return typeof image.url === "string" ? image.url : "";
+        })
+        .filter((url) =>
+          [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"].some((ext) =>
+            url.toLowerCase().endsWith(ext),
+          ),
+        )
+    : [];
+
+  const fileUrls = Array.isArray(inspectionResult?.inspect_images)
+    ? inspectionResult.inspect_images
+        .map((img) => {
+          const image = img as { url?: string };
+          return typeof image.url === "string" ? image.url : "";
+        })
+        .filter((url) =>
+          [".pdf", ".rar", ".zip", ".doc", ".docx"].some((ext) => url.toLowerCase().endsWith(ext)),
+        )
+    : [];
 
   return (
     <>
@@ -57,9 +109,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
             backgroundColor: "rgba(0, 0, 0, 0.45)",
             backdropFilter: "blur(4px)",
           },
-          body: {
-            padding: 24,
-          },
+          body: { padding: 24 },
         }}
         style={{ top: 20 }}
       >
@@ -90,12 +140,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
               <Typography.Text
                 type="secondary"
                 italic
-                style={{
-                  fontSize: 14,
-                  display: "block",
-                  marginTop: 4,
-                  color: token.colorError,
-                }}
+                style={{ fontSize: 14, display: "block", marginTop: 4, color: token.colorError }}
               >
                 {t("inspection.modal.note")}
               </Typography.Text>
@@ -119,6 +164,154 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
               {inspectionResult?.result_content || t("inspection.modal.noComment")}
             </Typography.Text>
           </Card>
+
+          <div>
+            <Typography.Title level={5}>Ảnh kiểm định</Typography.Title>
+            {imageUrls.length > 0 ? (
+              <Flex wrap="wrap" gap={16}>
+                {imageUrls.map((url, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      width: 140,
+                      textAlign: "center",
+                      boxShadow: token.boxShadow,
+                      borderRadius: 8,
+                      padding: 8,
+                      background: "#fff",
+                    }}
+                    onClick={() => {
+                      setPreviewUrl(url);
+                      setPreviewVisible(true);
+                    }}
+                  >
+                    <Image
+                      src={url}
+                      alt={`inspect-image-${index}`}
+                      width={120}
+                      height={100}
+                      style={{
+                        objectFit: "cover",
+                        borderRadius: 6,
+                        transition: "transform 0.3s ease",
+                        cursor: "pointer",
+                      }}
+                      preview={false}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "scale(1.05)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "scale(1)";
+                      }}
+                      onError={(e) => {
+                        console.error("Image failed to load:", url);
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                    <Typography.Text ellipsis style={{ fontSize: 12 }}>
+                      {`Hình ${index + 1}`}
+                    </Typography.Text>
+                  </div>
+                ))}
+              </Flex>
+            ) : (
+              <Alert type="error" showIcon message="Không có ảnh kiểm định nào được đính kèm." />
+            )}
+
+            <Modal
+              open={previewVisible}
+              onCancel={() => setPreviewVisible(false)}
+              footer={null}
+              centered
+              width={1000}
+              closeIcon={false}
+              style={{ backgroundColor: "rgba(0, 0, 0, 0.92)" }}
+              bodyStyle={{
+                padding: 0,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "90vh",
+                position: "relative",
+                backdropFilter: "blur(6px)",
+              }}
+            >
+              <Button
+                icon={<CloseOutlined />}
+                shape="circle"
+                size="large"
+                onClick={() => setPreviewVisible(false)}
+                style={{
+                  position: "absolute",
+                  top: 20,
+                  right: 20,
+                  zIndex: 10,
+                  backgroundColor: "rgba(255,255,255,0.85)",
+                  border: "2px solid #ddd",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+              />
+              <img
+                src={previewUrl}
+                alt="preview"
+                style={{
+                  maxWidth: "90%",
+                  maxHeight: "80vh",
+                  borderRadius: 20,
+                  boxShadow: "0 0 30px rgba(255,255,255,0.2)",
+                  border: "4px solid white",
+                  transition: "transform 0.3s ease",
+                }}
+              />
+            </Modal>
+          </div>
+
+          {fileUrls.length > 0 && (
+            <>
+              <Typography.Title level={5} style={{ marginTop: 32 }}>
+                Tài liệu đính kèm
+              </Typography.Title>
+              <Flex wrap="wrap" gap={16}>
+                {fileUrls.map((url, index) => {
+                  const fileName = url.split("/").pop();
+                  const ext = fileName?.split(".").pop()?.toLowerCase();
+
+                  const iconMap: Record<string, string> = {
+                    pdf: "📄",
+                    doc: "📄",
+                    docx: "📄",
+                    zip: "🗜️",
+                    rar: "🗜️",
+                  };
+                  const icon = iconMap[ext || ""] || "📁";
+
+                  return (
+                    <Card
+                      key={index}
+                      size="small"
+                      style={{ width: 160, textAlign: "center", borderRadius: 8 }}
+                    >
+                      <div style={{ fontSize: 32 }}>{icon}</div>
+                      <Typography.Text style={{ fontSize: 13 }} ellipsis>
+                        {fileName}
+                      </Typography.Text>
+                      <br />
+                      <a href={url} target="_blank" rel="noopener noreferrer">
+                        <Typography.Link>Tải về</Typography.Link>
+                      </a>
+                    </Card>
+                  );
+                })}
+              </Flex>
+            </>
+          )}
 
           <Tabs
             type="card"
@@ -145,9 +338,8 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                     dataSource={chemicalData.filter((item) => {
                       if (group.title === "chemicalGroups.heavyMetals") {
                         return kimloaichecked?.includes(item.key);
-                      } else {
-                        return group.keys.includes(item.key);
                       }
+                      return group.keys.includes(item.key);
                     })}
                     columns={[
                       {
@@ -179,7 +371,6 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                             typeof value === "string" ? parseFloat(value) : value;
 
                           const threshold = thresholdList.find((item) => item.key === record.key);
-
                           const warningLimit = parseFloat(threshold?.warning || "0");
                           const dangerLimit = parseFloat(threshold?.danger || "0");
                           const unit = UNITS[record.key] || "";
@@ -226,7 +417,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                                   alignItems: "center",
                                 }}
                               >
-                                {value} {UNITS[record.key] || ""}
+                                {value} {unit}
                               </Tag>
                               <Tooltip title={tooltipText}>
                                 <InfoCircleOutlined
