@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React from "react";
 import { Tag } from "antd";
 import { useTranslate } from "@refinedev/core";
@@ -7,9 +6,7 @@ interface InspectionStatusTagProps {
   value?: string;
 }
 
-export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({
-  value,
-}) => {
+export const InspectionStatusTag: React.FC<InspectionStatusTagProps> = ({ value }) => {
   const t = useTranslate();
 
   const normalizedValue = value === "Complete" ? "Completed" : value;

@@ -456,7 +456,8 @@
     "field": {
       "inputRequired": "Please enter a value for {{label}}",
       "resultContent": "Inspection Result Content",
-      "resultRequired": "Result content must not be empty"
+      "resultRequired": "Result content must not be empty",
+      "imageProof": "Image Evidence"
     },
     "warning": {
       "title": "Threshold exceeded:\n",
@@ -504,5 +505,9 @@
       "all": "No notifications 🤐",
       "unread": "No new notifications 🤐"
     }
-  }
+  },
+  "mrl": {
+  "label": "MRL (Maximum Residue Level)",
+  "description": "Maximum allowed residue level in agricultural products to ensure health safety."
+}
 }

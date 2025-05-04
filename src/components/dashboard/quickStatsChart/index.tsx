@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Column, type ColumnConfig } from "@ant-design/plots";
 import { useTranslate } from "@refinedev/core";
 import dayjs from "dayjs";
@@ -7,12 +6,7 @@ import { Suspense } from "react";
 import { useConfigProvider } from "../../../context";
 
 type TooltipDatum = {
-  state:
-    | "activeSeasons"
-    | "cultivatedArea"
-    | "estimatedYield"
-    | "qualityInspections"
-    | string;
+  state: "activeSeasons" | "cultivatedArea" | "estimatedYield" | "qualityInspections" | string;
   value: number;
 };
 
@@ -35,10 +29,7 @@ export const QuickStatsChart = ({ data, height }: Props) => {
     theme: mode,
     columnStyle: {
       radius: [4, 4, 0, 0],
-      fill:
-        mode === "dark"
-          ? "l(270) 0:#122849 1:#3C88E5"
-          : "l(270) 0:#BAE0FF 1:#1677FF",
+      fill: mode === "dark" ? "l(270) 0:#122849 1:#3C88E5" : "l(270) 0:#BAE0FF 1:#1677FF",
     },
     tooltip: {
       formatter: (datum: TooltipDatum) => {

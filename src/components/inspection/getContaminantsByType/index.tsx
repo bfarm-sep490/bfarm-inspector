@@ -88,9 +88,9 @@ export function getContaminantsByType(type?: string): Threshold[] {
     {
       key: "nano3_kno3",
       name: "NaNO3/KNO3",
-      unit: "mg/kg",
-      warning: "10",
-      danger: "15",
+      unit: "",
+      warning: "Không có dư lượng cụ thể",
+      danger: "Không có dư lượng cụ thể",
     },
   ];
 

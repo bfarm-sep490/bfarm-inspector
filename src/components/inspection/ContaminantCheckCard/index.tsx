@@ -1,32 +1,23 @@
-/* eslint-disable prettier/prettier */
 import React, { useMemo } from "react";
-import {
-  Card,
-  Flex,
-  Typography,
-  Space,
-  Table,
-  Tag,
-  Tooltip,
-  theme,
-} from "antd";
+import { Card, Flex, Typography, Space, Table, Tag, Tooltip, theme, Modal } from "antd";
 import { ExperimentOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { chemicalGroups, mustBeZeroKeys } from "../chemical/ChemicalConstants";
 import { getContaminantsByType } from "../getContaminantsByType";
 import { useTranslate } from "@refinedev/core";
+import { getChemicalExplanation } from "../chemicalExplanation";
 
 interface ContaminantCheckCardProps {
   type: string | undefined;
   style?: React.CSSProperties;
 }
 
-export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
-  style,
-  type,
-}) => {
+export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({ style, type }) => {
   const { token } = theme.useToken();
   const mustBeZero = mustBeZeroKeys;
   const contaminants = useMemo(() => getContaminantsByType(type), [type]);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [modalContent, setModalContent] = React.useState<string | null>(null);
+
   const t = useTranslate();
 
   return (
@@ -41,10 +32,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
     >
       <ExperimentOutlined style={{ color: token.colorPrimary, fontSize: 28 }} />
       <Flex vertical style={{ gap: 4 }}>
-        <Typography.Title
-          level={3}
-          style={{ margin: 0, color: token.colorPrimary }}
-        >
+        <Typography.Title level={3} style={{ margin: 0, color: token.colorPrimary }}>
           {t("contaminant.title")}
         </Typography.Title>
         {type && (
@@ -61,6 +49,24 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
             {t("contaminant.plantType")}: {type}
           </Tag>
         )}
+
+        <Typography.Text
+          style={{
+            fontSize: 14,
+            marginTop: 4,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <InfoCircleOutlined style={{ color: token.colorPrimary }} />
+          <span>
+            <span style={{ color: token.colorError, fontWeight: 500 }}>
+              MRL (Maximum Residue Level)
+            </span>
+            <span style={{ color: token.colorText, marginLeft: 4 }}>: {t("mrl.description")}</span>
+          </span>
+        </Typography.Text>
       </Flex>
 
       <Typography.Text
@@ -78,9 +84,7 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         {chemicalGroups.map((group) => {
-          const groupContaminants = contaminants.filter((item) =>
-            group.keys.includes(item.key)
-          );
+          const groupContaminants = contaminants.filter((item) => group.keys.includes(item.key));
           if (groupContaminants.length === 0) return null;
 
           return (
@@ -133,26 +137,41 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                       return (
                         <Flex align="center" gap={8}>
                           <Typography.Text strong>
-                            {text}
+                            {`${text} (MRL: ${isZero ? "0" : record.danger} ${record.unit})`}
                             {isZero && (
-                              <Typography.Text
-                                type="danger"
-                                strong
-                                style={{ marginLeft: 4 }}
-                              >
+                              <Typography.Text type="danger" strong style={{ marginLeft: 4 }}>
                                 (*)
                               </Typography.Text>
                             )}
                           </Typography.Text>
                           <Tooltip
-                            title={t("contaminant.table.thresholdTooltip", {
-                              value: isZero
-                                ? t("contaminant.table.mustBeZero")
-                                : t("contaminant.table.range", {
-                                    warning: record.warning,
-                                    danger: record.danger,
-                                  }),
-                            })}
+                            title={
+                              <div>
+                                <div>
+                                  {record.key === "nano3_kno3"
+                                    ? "Không có dư lượng cụ thể"
+                                    : isZero
+                                      ? "Bắt buộc bằng 0"
+                                      : `Cảnh báo: > ${record.warning} ${record.unit}, Nguy hiểm: ≥ ${record.danger} ${record.unit}`}
+                                </div>
+                                <div
+                                  style={{
+                                    color: token.colorLink,
+                                    cursor: "pointer",
+                                    marginTop: 4,
+                                    textDecoration: "underline",
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const explanation = getChemicalExplanation(record.key);
+                                    setModalContent(explanation);
+                                    setModalVisible(true);
+                                  }}
+                                >
+                                  Chi tiết
+                                </div>
+                              </div>
+                            }
                           >
                             <InfoCircleOutlined
                               style={{
@@ -171,42 +190,46 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
                     title: t("contaminant.table.warningLimit"),
                     dataIndex: "warning",
                     key: "warning",
-                    render: (value: string, record) => (
-                      <Tag
-                        color="blue"
-                        style={{
-                          fontSize: 14,
-                          padding: "4px 8px",
-                          borderRadius: token.borderRadiusSM,
-                        }}
-                      >
-                        {value.includes(">") || value.includes("<")
-                          ? value
-                          : `> ${value}`}{" "}
-                        {record.unit}
-                      </Tag>
-                    ),
+                    render: (value: string, record) => {
+                      const isNaNO3 = record.key === "nano3_kno3";
+                      return (
+                        <Tag
+                          color="gold"
+                          style={{
+                            fontSize: 14,
+                            padding: "4px 8px",
+                            borderRadius: token.borderRadiusSM,
+                          }}
+                        >
+                          {isNaNO3
+                            ? value
+                            : `${value.includes(">") || value.includes("<") ? value : `> ${value}`} ${record.unit}`}
+                        </Tag>
+                      );
+                    },
                     width: "25%",
                   },
                   {
                     title: t("contaminant.table.dangerLimit"),
                     dataIndex: "danger",
                     key: "danger",
-                    render: (value: string, record) => (
-                      <Tag
-                        color="red"
-                        style={{
-                          fontSize: 14,
-                          padding: "4px 8px",
-                          borderRadius: token.borderRadiusSM,
-                        }}
-                      >
-                        {value.includes(">") || value.includes("<")
-                          ? value
-                          : `≥ ${value}`}{" "}
-                        {record.unit}
-                      </Tag>
-                    ),
+                    render: (value: string, record) => {
+                      const isNaNO3 = record.key === "nano3_kno3";
+                      return (
+                        <Tag
+                          color="red"
+                          style={{
+                            fontSize: 14,
+                            padding: "4px 8px",
+                            borderRadius: token.borderRadiusSM,
+                          }}
+                        >
+                          {isNaNO3
+                            ? value
+                            : `${value.includes(">") || value.includes("<") ? value : `≥ ${value}`} ${record.unit}`}
+                        </Tag>
+                      );
+                    },
                     width: "25%",
                   },
                 ]}
@@ -225,6 +248,67 @@ export const ContaminantCheckCard: React.FC<ContaminantCheckCardProps> = ({
           );
         })}
       </Space>
+      <Modal
+        open={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+        centered
+        width={900}
+        styles={{
+          body: {
+            backgroundColor: token.colorBgContainer,
+            padding: 24,
+            borderRadius: token.borderRadiusLG,
+            boxShadow: token.boxShadowSecondary,
+          },
+        }}
+        title={
+          <Typography.Title
+            level={4}
+            style={{
+              margin: 0,
+              color: token.colorPrimary,
+              fontWeight: 600,
+            }}
+          >
+            🧪 Giải thích chi tiết về tiêu chí kiểm định
+          </Typography.Title>
+        }
+      >
+        <Typography.Paragraph
+          style={{
+            whiteSpace: "pre-line",
+            maxHeight: 500,
+            overflowY: "auto",
+            fontSize: 16,
+            lineHeight: 1.75,
+            color: token.colorText,
+            paddingRight: 8,
+          }}
+        >
+          {modalContent}
+        </Typography.Paragraph>
+
+        <Flex justify="end">
+          <button
+            onClick={() => setModalVisible(false)}
+            style={{
+              marginTop: 24,
+              padding: "8px 20px",
+              fontSize: 14,
+              fontWeight: 500,
+              borderRadius: 8,
+              backgroundColor: token.colorPrimary,
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+            }}
+          >
+            Đóng
+          </button>
+        </Flex>
+      </Modal>
     </Card>
   );
 };

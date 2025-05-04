@@ -7,18 +7,12 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
@@ -26,12 +20,7 @@
     "target": "ESNext",
     "useDefineForClassFields": true
   },
-  "include": [
-    "commitlint.config.ts",
-    "src",
-    "public/firebase-messaging-sw.js"
-
-  ],
+  "include": ["commitlint.config.ts", "src", "public/firebase-messaging-sw.js"],
   "references": [
     {
       "path": "./tsconfig.node.json"

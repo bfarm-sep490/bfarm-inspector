@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Modal,
   Typography,
@@ -11,6 +10,9 @@ import {
   Tooltip,
   Tabs,
   theme,
+  Image,
+  Alert,
+  Button,
 } from "antd";
 import {
   CloseOutlined,
@@ -20,11 +22,7 @@ import {
   CloseCircleOutlined,
 } from "@ant-design/icons";
 import { ContaminantCheckCard } from "../ContaminantCheckCard";
-import {
-  chemicalGroups,
-  UNITS,
-  mustBeZeroKeys,
-} from "../chemical/ChemicalConstants";
+import { chemicalGroups, UNITS, mustBeZeroKeys } from "../chemical/ChemicalConstants";
 import { IInspectingResult } from "@/interfaces";
 import { contaminantBasedVegetableType } from "@/utils/inspectingKind";
 import { getContaminantsByType } from "../getContaminantsByType";
@@ -36,7 +34,6 @@ interface InspectionModalsProps {
   inspectionResult?: IInspectingResult;
   chemicalData: any[];
   plantType?: string;
-
   isCriteriaModalVisible: boolean;
   onCloseCriteriaModal: () => void;
 }
@@ -51,17 +48,52 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
   onCloseCriteriaModal,
 }) => {
   const { token } = theme.useToken();
+  const t = useTranslate();
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
 
   const kimloaichecked =
-    contaminantBasedVegetableType[
-      plantType as keyof typeof contaminantBasedVegetableType
-    ];
+    contaminantBasedVegetableType[plantType as keyof typeof contaminantBasedVegetableType];
 
-  const thresholdList = useMemo(
-    () => getContaminantsByType(plantType),
-    [plantType]
-  );
-  const t = useTranslate();
+  const thresholdList = useMemo(() => getContaminantsByType(plantType), [plantType]);
+
+  const validImageExtensions = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".bmp",
+    ".webp",
+    ".pdf",
+    ".rar",
+    ".zip",
+    ".doc",
+    ".docx",
+  ];
+
+  const imageUrls = Array.isArray(inspectionResult?.inspect_images)
+    ? inspectionResult.inspect_images
+        .map((img) => {
+          const image = img as { url?: string };
+          return typeof image.url === "string" ? image.url : "";
+        })
+        .filter((url) =>
+          [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"].some((ext) =>
+            url.toLowerCase().endsWith(ext),
+          ),
+        )
+    : [];
+
+  const fileUrls = Array.isArray(inspectionResult?.inspect_images)
+    ? inspectionResult.inspect_images
+        .map((img) => {
+          const image = img as { url?: string };
+          return typeof image.url === "string" ? image.url : "";
+        })
+        .filter((url) =>
+          [".pdf", ".rar", ".zip", ".doc", ".docx"].some((ext) => url.toLowerCase().endsWith(ext)),
+        )
+    : [];
 
   return (
     <>
@@ -71,17 +103,13 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
         footer={null}
         width={1000}
         centered
-        closeIcon={
-          <CloseOutlined style={{ color: token.colorTextSecondary }} />
-        }
+        closeIcon={<CloseOutlined style={{ color: token.colorTextSecondary }} />}
         styles={{
           mask: {
             backgroundColor: "rgba(0, 0, 0, 0.45)",
             backdropFilter: "blur(4px)",
           },
-          body: {
-            padding: 24,
-          },
+          body: { padding: 24 },
         }}
         style={{ top: 20 }}
       >
@@ -94,9 +122,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
         footer={null}
         width={1000}
         centered
-        closeIcon={
-          <CloseOutlined style={{ color: token.colorTextSecondary }} />
-        }
+        closeIcon={<CloseOutlined style={{ color: token.colorTextSecondary }} />}
         styles={{
           mask: {
             backgroundColor: "rgba(0, 0, 0, 0.45)",
@@ -106,9 +132,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
         }}
         title={
           <Flex align="center" gap={12}>
-            <ExperimentOutlined
-              style={{ color: token.colorPrimary, fontSize: 20 }}
-            />
+            <ExperimentOutlined style={{ color: token.colorPrimary, fontSize: 20 }} />
             <div>
               <Typography.Title level={4} style={{ margin: 0 }}>
                 {t("inspection.modal.title")}
@@ -116,12 +140,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
               <Typography.Text
                 type="secondary"
                 italic
-                style={{
-                  fontSize: 14,
-                  display: "block",
-                  marginTop: 4,
-                  color: token.colorError,
-                }}
+                style={{ fontSize: 14, display: "block", marginTop: 4, color: token.colorError }}
               >
                 {t("inspection.modal.note")}
               </Typography.Text>
@@ -142,17 +161,162 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
               {t("inspection.modal.conclusion")}
             </Typography.Paragraph>
             <Typography.Text>
-              {inspectionResult?.result_content ||
-                t("inspection.modal.noComment")}
+              {inspectionResult?.result_content || t("inspection.modal.noComment")}
             </Typography.Text>
           </Card>
+
+          <div>
+            <Typography.Title level={5}>Ảnh kiểm định</Typography.Title>
+            {imageUrls.length > 0 ? (
+              <Flex wrap="wrap" gap={16}>
+                {imageUrls.map((url, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      width: 140,
+                      textAlign: "center",
+                      boxShadow: token.boxShadow,
+                      borderRadius: 8,
+                      padding: 8,
+                      background: "#fff",
+                    }}
+                    onClick={() => {
+                      setPreviewUrl(url);
+                      setPreviewVisible(true);
+                    }}
+                  >
+                    <Image
+                      src={url}
+                      alt={`inspect-image-${index}`}
+                      width={120}
+                      height={100}
+                      style={{
+                        objectFit: "cover",
+                        borderRadius: 6,
+                        transition: "transform 0.3s ease",
+                        cursor: "pointer",
+                      }}
+                      preview={false}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "scale(1.05)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "scale(1)";
+                      }}
+                      onError={(e) => {
+                        console.error("Image failed to load:", url);
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                    <Typography.Text ellipsis style={{ fontSize: 12 }}>
+                      {`Hình ${index + 1}`}
+                    </Typography.Text>
+                  </div>
+                ))}
+              </Flex>
+            ) : (
+              <Alert type="error" showIcon message="Không có ảnh kiểm định nào được đính kèm." />
+            )}
+
+            <Modal
+              open={previewVisible}
+              onCancel={() => setPreviewVisible(false)}
+              footer={null}
+              centered
+              width={1000}
+              closeIcon={false}
+              style={{ backgroundColor: "rgba(0, 0, 0, 0.92)" }}
+              bodyStyle={{
+                padding: 0,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "90vh",
+                position: "relative",
+                backdropFilter: "blur(6px)",
+              }}
+            >
+              <Button
+                icon={<CloseOutlined />}
+                shape="circle"
+                size="large"
+                onClick={() => setPreviewVisible(false)}
+                style={{
+                  position: "absolute",
+                  top: 20,
+                  right: 20,
+                  zIndex: 10,
+                  backgroundColor: "rgba(255,255,255,0.85)",
+                  border: "2px solid #ddd",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+              />
+              <img
+                src={previewUrl}
+                alt="preview"
+                style={{
+                  maxWidth: "90%",
+                  maxHeight: "80vh",
+                  borderRadius: 20,
+                  boxShadow: "0 0 30px rgba(255,255,255,0.2)",
+                  border: "4px solid white",
+                  transition: "transform 0.3s ease",
+                }}
+              />
+            </Modal>
+          </div>
+
+          {fileUrls.length > 0 && (
+            <>
+              <Typography.Title level={5} style={{ marginTop: 32 }}>
+                Tài liệu đính kèm
+              </Typography.Title>
+              <Flex wrap="wrap" gap={16}>
+                {fileUrls.map((url, index) => {
+                  const fileName = url.split("/").pop();
+                  const ext = fileName?.split(".").pop()?.toLowerCase();
+
+                  const iconMap: Record<string, string> = {
+                    pdf: "📄",
+                    doc: "📄",
+                    docx: "📄",
+                    zip: "🗜️",
+                    rar: "🗜️",
+                  };
+                  const icon = iconMap[ext || ""] || "📁";
+
+                  return (
+                    <Card
+                      key={index}
+                      size="small"
+                      style={{ width: 160, textAlign: "center", borderRadius: 8 }}
+                    >
+                      <div style={{ fontSize: 32 }}>{icon}</div>
+                      <Typography.Text style={{ fontSize: 13 }} ellipsis>
+                        {fileName}
+                      </Typography.Text>
+                      <br />
+                      <a href={url} target="_blank" rel="noopener noreferrer">
+                        <Typography.Link>Tải về</Typography.Link>
+                      </a>
+                    </Card>
+                  );
+                })}
+              </Flex>
+            </>
+          )}
 
           <Tabs
             type="card"
             items={chemicalGroups
-              .filter((group) =>
-                chemicalData.some((item) => group.keys?.includes(item.key))
-              )
+              .filter((group) => chemicalData.some((item) => group.keys?.includes(item.key)))
               .map((group) => ({
                 key: group.title,
                 label: (
@@ -174,9 +338,8 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                     dataSource={chemicalData.filter((item) => {
                       if (group.title === "chemicalGroups.heavyMetals") {
                         return kimloaichecked?.includes(item.key);
-                      } else {
-                        return group.keys.includes(item.key);
                       }
+                      return group.keys.includes(item.key);
                     })}
                     columns={[
                       {
@@ -184,39 +347,16 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                         dataIndex: "name",
                         key: "name",
                         render: (text, record) => {
-                          const mustBeZero = mustBeZeroKeys.includes(
-                            record.key
-                          );
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
                           return (
-                            <Flex align="center" gap={8}>
-                              <Typography.Text strong>
-                                {text}
-                                {mustBeZero && (
-                                  <Typography.Text
-                                    type="danger"
-                                    strong
-                                    style={{ marginLeft: 4 }}
-                                  >
-                                    (*)
-                                  </Typography.Text>
-                                )}
-                              </Typography.Text>
-                              <Tooltip
-                                title={t("inspection.table.safetyLimit", {
-                                  value: mustBeZero
-                                    ? t("inspection.table.limitZero")
-                                    : t("inspection.table.limitByCrop"),
-                                })}
-                              >
-                                <InfoCircleOutlined
-                                  style={{
-                                    color: token.colorPrimary,
-                                    cursor: "pointer",
-                                    fontSize: 14,
-                                  }}
-                                />
-                              </Tooltip>
-                            </Flex>
+                            <Typography.Text strong>
+                              {text}
+                              {mustBeZero && (
+                                <Typography.Text type="danger" strong style={{ marginLeft: 4 }}>
+                                  (*)
+                                </Typography.Text>
+                              )}
+                            </Typography.Text>
                           );
                         },
                         width: "40%",
@@ -226,85 +366,65 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                         dataIndex: "value",
                         key: "value",
                         render: (value, record) => {
-                          const mustBeZero = mustBeZeroKeys.includes(
-                            record.key
-                          );
+                          const mustBeZero = mustBeZeroKeys.includes(record.key);
                           const numericValue =
-                            typeof value === "string"
-                              ? parseFloat(value)
-                              : value;
+                            typeof value === "string" ? parseFloat(value) : value;
 
-                          const threshold = thresholdList.find(
-                            (item) => item.key === record.key
-                          );
+                          const threshold = thresholdList.find((item) => item.key === record.key);
+                          const warningLimit = parseFloat(threshold?.warning || "0");
+                          const dangerLimit = parseFloat(threshold?.danger || "0");
+                          const unit = UNITS[record.key] || "";
 
-                          const warningLimit = parseFloat(
-                            threshold?.warning || "0"
-                          );
-                          const isPassed = mustBeZero
-                            ? numericValue === 0
-                            : numericValue <= warningLimit;
+                          let tagColor = "green";
+                          let tooltipText: React.ReactNode = "Giá trị an toàn";
 
-                          return (
-                            <Tag
-                              color={isPassed ? "green" : "red"}
-                              icon={
-                                isPassed ? (
-                                  <CheckCircleOutlined />
-                                ) : (
-                                  <CloseCircleOutlined />
-                                )
-                              }
-                              style={{
-                                width: 120,
-                                textAlign: "center",
-                                display: "inline-flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              {value} {UNITS[record.key] || ""}
-                            </Tag>
-                          );
-                        },
-                        width: "30%",
-                      },
-                      {
-                        title: t("inspection.table.standard"),
-                        key: "standard",
-                        render: (_, record) => {
-                          const mustBeZero = mustBeZeroKeys.includes(
-                            record.key
-                          );
-                          const threshold = thresholdList.find(
-                            (item) => item.key === record.key
-                          );
+                          if (mustBeZero) {
+                            if (numericValue === 0) {
+                              tagColor = "green";
+                              tooltipText = "Giá trị an toàn (bằng 0)";
+                            } else {
+                              tagColor = "red";
+                              tooltipText = "Vượt ngưỡng – phải bằng 0";
+                            }
+                          } else if (numericValue > dangerLimit) {
+                            tagColor = "red";
+                            tooltipText = (
+                              <>
+                                Vượt ngưỡng nguy hiểm <br />({`> ${dangerLimit} ${unit}`})
+                              </>
+                            );
+                          } else if (numericValue > warningLimit) {
+                            tagColor = "gold";
+                            tooltipText = (
+                              <>
+                                Vượt ngưỡng cảnh báo <br />({`> ${warningLimit} ${unit}`})
+                              </>
+                            );
+                          }
+
+                          const isPassed = tagColor === "green";
 
                           return (
-                            <Flex align="center" gap={8}>
-                              <Typography.Text strong>
-                                {mustBeZero
-                                  ? t("inspection.table.limitZero")
-                                  : threshold
-                                    ? `≤ ${threshold.warning} ${threshold.unit}`
-                                    : t("inspection.table.noData")}
-                              </Typography.Text>
-                              <Tooltip
-                                title={
-                                  mustBeZero
-                                    ? t("inspection.table.limitZero")
-                                    : threshold
-                                      ? t("inspection.table.tooltipThreshold", {
-                                          warning: threshold.warning,
-                                          danger: threshold.danger,
-                                        })
-                                      : t("inspection.table.noData")
-                                }
+                            <Flex align="center" gap={6}>
+                              <Tag
+                                color={tagColor}
+                                icon={isPassed ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+                                style={{
+                                  width: 120,
+                                  textAlign: "center",
+                                  display: "inline-flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                }}
                               >
+                                {value} {unit}
+                              </Tag>
+                              <Tooltip title={tooltipText}>
                                 <InfoCircleOutlined
                                   style={{
+                                    fontSize: 16,
                                     color: token.colorPrimary,
-                                    fontSize: 14,
+                                    cursor: "pointer",
                                   }}
                                 />
                               </Tooltip>

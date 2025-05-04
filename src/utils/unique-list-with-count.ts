@@ -10,8 +10,11 @@ export const getUniqueListWithCount = <TData = any>(props: { list: TData[]; fiel
           count: 1,
         };
       } else {
-        (acc[item[field as keyof TData] as unknown as string] as TData & { count: number }).count +=
-          1;
+        (
+          acc[item[field as keyof TData] as unknown as string] as TData & {
+            count: number;
+          }
+        ).count += 1;
       }
       return acc;
     },

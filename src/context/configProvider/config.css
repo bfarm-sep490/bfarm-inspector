@@ -1,91 +1,90 @@
 .ant-table-wrapper .ant-table {
-    border-radius: 8px;
+  border-radius: 8px;
 }
 
-.ant-table-wrapper .ant-table-tbody>tr:last-child>td:first-child {
-    border-bottom-left-radius: 8px;
+.ant-table-wrapper .ant-table-tbody > tr:last-child > td:first-child {
+  border-bottom-left-radius: 8px;
 }
 
-.ant-table-wrapper .ant-table-tbody>tr:last-child>td:last-child {
-    border-bottom-right-radius: 8px;
+.ant-table-wrapper .ant-table-tbody > tr:last-child > td:last-child {
+  border-bottom-right-radius: 8px;
 }
 
 .ant-pagination {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .ant-table-pagination.ant-pagination {
-    border-radius: 0px;
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
+  border-radius: 0px;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 
 .ant-pagination-total-text {
-    margin-right: auto !important;
-    font-size: 14px !important;
-    margin-inline-end: auto !important;
+  margin-right: auto !important;
+  font-size: 14px !important;
+  margin-inline-end: auto !important;
 }
 
 .ant-col {
-    height: 100%;
+  height: 100%;
 }
 
-
 html[data-theme="dark"] {
-    .ant-table-filter-dropdown {
-        background-color: #000;
-    }
+  .ant-table-filter-dropdown {
+    background-color: #000;
+  }
 }
 
 /* 🔹 TÙY CHỈNH THANH CUỘN CHUNG (DÀNH CHO TOÀN BỘ TRANG) */
 html,
 body {
-    scrollbar-width: thin;
-    scrollbar-color: #bdbdbd transparent;
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd transparent;
 }
 
 /* Chrome, Edge */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #bdbdbd;
-    border-radius: 4px;
+  background: #bdbdbd;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 /* 🔹 TÙY CHỈNH THANH CUỘN TRONG ANT DESIGN TABLE */
 .ant-table-wrapper .ant-table-body {
-    scrollbar-width: thin;
-    scrollbar-color: #eaeaea transparent;
-    -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #eaeaea transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ant-table-wrapper .ant-table-body::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  width: 6px;
+  height: 6px;
 }
 
 .ant-table-wrapper .ant-table-body::-webkit-scrollbar-thumb {
-    background: #eaeaea;
-    border-radius: 4px;
+  background: #eaeaea;
+  border-radius: 4px;
 }
 
 .ant-table-wrapper .ant-table-body::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 /* 🔹 DARK MODE - ĐỔI MÀU THANH CUỘN KHI Ở CHẾ ĐỘ TỐI */
 html[data-theme="dark"] {
-    scrollbar-color: #666 transparent;
+  scrollbar-color: #666 transparent;
 }
 
 html[data-theme="dark"] ::-webkit-scrollbar-thumb {
-    background: #666;
+  background: #666;
 }

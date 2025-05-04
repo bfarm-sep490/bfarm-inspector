@@ -455,7 +455,8 @@
     "field": {
       "inputRequired": "Vui lòng nhập giá trị cho {{label}}",
       "resultContent": "Nội dung kết quả",
-      "resultRequired": "Nội dung không được để trống"
+      "resultRequired": "Nội dung không được để trống",
+      "imageProof": "Ảnh minh chứng"
     },
     "warning": {
       "title": "Cảnh báo vượt ngưỡng:\n",
@@ -503,5 +504,9 @@
       "all": "Không có thông báo nào 🤐",
       "unread": "Không có thông báo mới 🤐"
     }
-  }
+  },
+  "mrl": {
+  "label": "MRL (Mức dư lượng tối đa)",
+  "description": "Giới hạn dư lượng tối đa cho phép tồn tại trong nông sản để đảm bảo an toàn sức khỏe."
+}
 }

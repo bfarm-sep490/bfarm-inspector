@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   Form,
   InputNumber,
@@ -12,14 +11,19 @@ import {
   Typography,
   theme,
   Space,
+  Upload,
+  Col,
+  Row,
 } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined, DeleteOutlined, UploadOutlined } from "@ant-design/icons";
 import { BaseKey, useCustomMutation, useTranslate } from "@refinedev/core";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { chemicalGroups } from "../chemical/ChemicalConstants";
 import { getContaminantsByType } from "../getContaminantsByType";
 import { getContaminantLimitsByVegetableType } from "@/utils/inspectingKind";
+import { UploadProps } from "antd/lib";
+import { axiosInstance } from "@/rest-data-provider/utils";
 
 const { TabPane } = Tabs;
 
@@ -37,28 +41,26 @@ type Props = {
 export const InspectionModalForm: React.FC<Props> = (props) => {
   const [formLoading, setFormLoading] = useState(false);
   const [form] = Form.useForm();
-  const [imageList, setImageList] = useState<string[]>([]);
+  const [imageList, setImageList] = useState<{ url: string; name: string }[]>([]);
+
   const { token } = theme.useToken();
   const { mutate, isLoading } = useCustomMutation();
   const [missingMessage, setMissingMessage] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const t = useTranslate();
 
   const thresholds = getContaminantsByType(props.type);
-  const thresholdMap = Object.fromEntries(
-    thresholds.map((item) => [item.key, item])
-  );
+  const thresholdMap = Object.fromEntries(thresholds.map((item) => [item.key, item]));
 
   const filteredChemicalGroups = chemicalGroups
     .map((group: any) => {
       if (group.title === "Kim loại nặng" && props?.type) {
         const allowedKeys = getContaminantLimitsByVegetableType(
-          props.type as keyof typeof getContaminantLimitsByVegetableType
+          props.type as keyof typeof getContaminantLimitsByVegetableType,
         );
         return {
           title: group.title,
-          keys: group.keys.filter((k: string) =>
-            allowedKeys.includes(k.toLowerCase())
-          ),
+          keys: group.keys.filter((k: string) => allowedKeys.includes(k.toLowerCase())),
           color: group.color,
         };
       }
@@ -72,13 +74,9 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     })
     .filter((group) => group.keys.length > 0);
 
-  const checkThresholdStatus = (
-    key: string,
-    value: number
-  ): "ok" | "warning" | "danger" => {
+  const checkThresholdStatus = (key: string, value: number): "ok" | "warning" | "danger" => {
     const threshold = thresholdMap[key];
-    if (!threshold || value === null || value === undefined || isNaN(value))
-      return "ok";
+    if (!threshold || value === null || value === undefined || isNaN(value)) return "ok";
     const warning = parseFloat(threshold.warning);
     const danger = parseFloat(threshold.danger);
     if (!isNaN(danger) && value >= danger) return "danger";
@@ -87,20 +85,14 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     return "ok";
   };
 
-  const [fieldWarnings, setFieldWarnings] = useState<
-    Record<string, string | undefined>
-  >({});
+  const [fieldWarnings, setFieldWarnings] = useState<Record<string, string | undefined>>({});
 
   useEffect(() => {
     if (props.open && props.initialValues) {
       const formattedData = {
         ...props.initialValues,
-        start_date: props.initialValues.start_date
-          ? dayjs(props.initialValues.start_date)
-          : null,
-        end_date: props.initialValues.end_date
-          ? dayjs(props.initialValues.end_date)
-          : null,
+        start_date: props.initialValues.start_date ? dayjs(props.initialValues.start_date) : null,
+        end_date: props.initialValues.end_date ? dayjs(props.initialValues.end_date) : null,
       };
       form.setFieldsValue(formattedData);
     }
@@ -113,11 +105,12 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
     props?.onClose?.();
   };
 
-  const onFinish = async (
-    values: Record<string, number | string | undefined>
-  ) => {
+  const onFinish = async (values: Record<string, number | string | undefined>) => {
     setFormLoading(true);
-    const payload = { ...values, inspect_images: imageList };
+    const payload = {
+      ...values,
+      inspect_images: imageList.map((item) => item.url),
+    };
 
     const dangerKeys: string[] = [];
     const warningKeys: string[] = [];
@@ -143,7 +136,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
               t("inspectionForm.warning.warning", {
                 keys: warningKeys.join(", "),
               })
-            : "")
+            : ""),
       );
     }
 
@@ -165,8 +158,9 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
         onError: (error: unknown) => {
           const err = error as { message?: string };
           message.error(err?.message || t("inspectionForm.error"));
+          setFormLoading(false);
         },
-      }
+      },
     );
   };
 
@@ -176,13 +170,48 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       setMissingMessage(null);
       await onFinish(values);
     } catch (errorInfo: unknown) {
-      if (
-        typeof errorInfo === "object" &&
-        errorInfo !== null &&
-        "errorFields" in errorInfo
-      ) {
+      if (typeof errorInfo === "object" && errorInfo !== null && "errorFields" in errorInfo) {
         setMissingMessage(t("inspectionForm.missing"));
       }
+    }
+  };
+  const handleUpload: UploadProps["customRequest"] = async ({ file, onSuccess, onError }) => {
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("image", file as Blob);
+
+    try {
+      const res = await axiosInstance.post(
+        "https://api.outfit4rent.online/api/inspecting-results/documents/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      const data = res.data;
+
+      if (data.status === 200 && data.data) {
+        const fileName = (file as File).name;
+        const uploadedUrls = data.data.map((url: string) => ({
+          url,
+          name: fileName,
+        }));
+
+        setImageList((prev) => [...prev, ...uploadedUrls]);
+        message.success("Tải file lên thành công!");
+        onSuccess?.(data, new XMLHttpRequest());
+      } else {
+        throw new Error(data.message || "Upload failed");
+      }
+    } catch (err: any) {
+      message.error("Tải file lên thất bại!");
+      onError?.(err);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -199,6 +228,7 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       footer={null}
       width={1000}
       centered
+      maskClosable={false}
       closeIcon={<CloseOutlined style={{ color: token.colorTextSecondary }} />}
     >
       <Spin spinning={formLoading || isLoading}>
@@ -229,21 +259,14 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                       const value = form.getFieldValue(key);
                       const status = checkThresholdStatus(key, value);
                       const hasValue =
-                        value !== null &&
-                        value !== undefined &&
-                        value !== "" &&
-                        !isNaN(value);
+                        value !== null && value !== undefined && value !== "" && !isNaN(value);
 
                       return (
                         <Form.Item
                           key={key}
                           name={key}
-                          label={
-                            <Typography.Text strong>{label}</Typography.Text>
-                          }
-                          help={
-                            status === "ok" ? undefined : fieldWarnings[key]
-                          }
+                          label={<Typography.Text strong>{label}</Typography.Text>}
+                          help={status === "ok" ? undefined : fieldWarnings[key]}
                           validateStatus={
                             hasValue
                               ? status === "danger"
@@ -265,37 +288,23 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                           <InputNumber
                             style={{
                               width: "100%",
-                              borderColor:
-                                hasValue && status === "ok"
-                                  ? "#52c41a"
-                                  : undefined,
+                              borderColor: hasValue && status === "ok" ? "#52c41a" : undefined,
                               boxShadow:
                                 hasValue && status === "ok"
                                   ? "0 0 0 2px rgba(82, 196, 26, 0.2)"
                                   : undefined,
                               borderRadius: 6,
-                              borderWidth:
-                                hasValue && status === "ok" ? 1 : undefined,
-                              borderStyle:
-                                hasValue && status === "ok"
-                                  ? "solid"
-                                  : undefined,
+                              borderWidth: hasValue && status === "ok" ? 1 : undefined,
+                              borderStyle: hasValue && status === "ok" ? "solid" : undefined,
                             }}
                             addonAfter={thresholdMap[key]?.unit || ""}
                             onChange={(value) => {
                               const threshold = thresholdMap[key];
                               if (!threshold) return;
-                              if (
-                                value === null ||
-                                value === undefined ||
-                                isNaN(Number(value))
-                              )
+                              if (value === null || value === undefined || isNaN(Number(value)))
                                 return;
 
-                              const status = checkThresholdStatus(
-                                key,
-                                Number(value)
-                              );
+                              const status = checkThresholdStatus(key, Number(value));
                               const warningMessage =
                                 status === "danger"
                                   ? t("inspectionForm.warning.fieldDanger", {
@@ -352,19 +361,187 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                 >
                   <Input.TextArea rows={4} />
                 </Form.Item>
+                <Form.Item
+                  label={
+                    <Typography.Text strong>
+                      <span style={{ color: token.colorError }}> </span>
+                      {t("inspectionForm.field.imageProof")}
+                    </Typography.Text>
+                  }
+                  required
+                >
+                  <Upload
+                    multiple
+                    customRequest={handleUpload}
+                    showUploadList={false}
+                    accept="image/*,.pdf,.rar,.zip,.doc,.docx"
+                  >
+                    <Button
+                      icon={<UploadOutlined style={{ fontSize: 18 }} />}
+                      loading={uploading}
+                      type="default"
+                      size="large"
+                      style={{
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #d9d9d9",
+                        borderRadius: "10px",
+                        fontWeight: 500,
+                        color: "#141414",
+                        padding: "8px 20px",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+                        transition: "all 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        const btn = e.currentTarget;
+                        btn.style.borderColor = "#1890ff";
+                        btn.style.color = "#1890ff";
+                        btn.style.boxShadow = "0 4px 12px rgba(24, 144, 255, 0.15)";
+                        btn.style.transform = "translateY(-1px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        const btn = e.currentTarget;
+                        btn.style.borderColor = "#d9d9d9";
+                        btn.style.color = "#141414";
+                        btn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.08)";
+                        btn.style.transform = "translateY(0)";
+                      }}
+                    >
+                      Tải file lên
+                    </Button>
+                  </Upload>
+
+                  <Row gutter={[16, 16]} style={{ marginTop: 12 }}>
+                    {imageList.map((item, idx) => {
+                      const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.url);
+                      const ext = item.name.split(".").pop()?.toUpperCase() || "";
+
+                      const handleRemove = () => {
+                        setImageList((prev) => prev.filter((_, i) => i !== idx));
+                      };
+
+                      return (
+                        <Col key={idx} xs={24} sm={12} md={8} lg={6} xl={4}>
+                          <div
+                            style={{
+                              borderRadius: 12,
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                              background: "#fff",
+                              padding: 12,
+                              textAlign: "center",
+                              position: "relative",
+                              height: 160,
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <CloseOutlined
+                              onClick={handleRemove}
+                              style={{
+                                position: "absolute",
+                                top: 6,
+                                right: 6,
+                                fontSize: 16,
+                                color: "#f5222d",
+                                cursor: "pointer",
+                                backgroundColor: "rgba(255, 77, 79, 0.1)",
+                                borderRadius: "50%",
+                                padding: 4,
+                                transition: "all 0.3s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                const target = e.currentTarget;
+                                target.style.backgroundColor = "#ffccc7";
+                                target.style.transform = "scale(1.2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                const target = e.currentTarget;
+                                target.style.backgroundColor = "rgba(255, 77, 79, 0.1)";
+                                target.style.transform = "scale(1)";
+                              }}
+                            />
+
+                            {isImage ? (
+                              <img
+                                src={item.url}
+                                alt={item.name}
+                                style={{
+                                  width: "100%",
+                                  height: 100,
+                                  objectFit: "cover",
+                                  borderRadius: 8,
+                                }}
+                              />
+                            ) : (
+                              <div
+                                style={{
+                                  height: 100,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexDirection: "column",
+                                  border: "1px dashed #d9d9d9",
+                                  borderRadius: 8,
+                                }}
+                              >
+                                <div style={{ fontSize: 28, fontWeight: "bold" }}>{ext}</div>
+                                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                                  File
+                                </Typography.Text>
+                              </div>
+                            )}
+
+                            <Typography.Text
+                              ellipsis
+                              style={{
+                                display: "block",
+                                marginTop: 8,
+                                fontSize: 13,
+                                fontWeight: 500,
+                              }}
+                              title={item.name}
+                            >
+                              {item.name}
+                            </Typography.Text>
+                          </div>
+                        </Col>
+                      );
+                    })}
+                  </Row>
+                  <Button
+                    onClick={() => setImageList([])}
+                    icon={<DeleteOutlined />}
+                    style={{
+                      marginTop: 12,
+                      backgroundColor: "#ff4d4f",
+                      color: "#fff",
+                      fontWeight: 500,
+                      borderRadius: 20,
+                      padding: "4px 12px",
+                      fontSize: 13,
+                      border: "none",
+                      boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#d9363e";
+                      e.currentTarget.style.transform = "scale(1.03)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "#ff4d4f";
+                      e.currentTarget.style.transform = "scale(1)";
+                    }}
+                  >
+                    Xóa tất cả file đã tải
+                  </Button>
+                </Form.Item>
               </TabPane>
             </Tabs>
 
             <Flex justify="space-between" align="center" vertical>
               <Flex style={{ width: "100%" }} justify="space-between">
-                <Button onClick={onModalClose}>
-                  {t("inspectionForm.button.cancel")}
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  loading={formLoading}
-                  type="primary"
-                >
+                <Button onClick={onModalClose}>{t("inspectionForm.button.cancel")}</Button>
+                <Button onClick={handleSubmit} loading={formLoading} type="primary">
                   {t("inspectionForm.button.submit")}
                 </Button>
               </Flex>
