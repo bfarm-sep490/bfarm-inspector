@@ -1,6 +1,7 @@
 import { RefineThemes } from "@refinedev/antd";
 
 import "./config.css";
+import "./toast.css";
 
 import { ConfigProvider as AntdConfigProvider, theme, type ThemeConfig } from "antd";
 import { ThemeProvider } from "antd-style";
