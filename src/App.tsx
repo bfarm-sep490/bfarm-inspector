@@ -26,6 +26,7 @@ import { dataProvider } from "./rest-data-provider";
 import { InspectionEdit, InspectionShow, InspectionsList } from "./pages/inspections";
 import { liveProvider } from "@refinedev/ably";
 import { ablyClient } from "./utils/ablyClient";
+import { notificationProvider } from "./providers/notification-provider";
 
 interface TitleHandlerOptions {
   resource?: IResourceItem;
@@ -84,7 +85,7 @@ const App: React.FC = () => {
                 warnWhenUnsavedChanges: true,
                 liveMode: "auto",
               }}
-              notificationProvider={useNotificationProvider}
+              notificationProvider={notificationProvider}
               liveProvider={liveProvider(ablyClient)}
             >
               <Routes>
