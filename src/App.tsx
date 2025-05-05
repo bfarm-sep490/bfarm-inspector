@@ -1,7 +1,7 @@
 import { ScheduleOutlined } from "@ant-design/icons";
 import "dayjs/locale/vi";
 
-import { useNotificationProvider, ThemedLayoutV2 } from "@refinedev/antd";
+import { ThemedLayoutV2 } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
 import { Authenticated, IResourceItem, Refine } from "@refinedev/core";
 import { RefineKbarProvider, RefineKbar } from "@refinedev/kbar";
