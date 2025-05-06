@@ -125,9 +125,24 @@ const App: React.FC = () => {
                     </Authenticated>
                   }
                 >
-                  <Route path="/login" element={<AuthPage type="login" />} />
-
                   <Route
+                    path="/login"
+                    element={
+                      <AuthPage
+                        type="login"
+                        formProps={{
+                          initialValues: {
+                            email: "service.eurofins@gmail.com",
+                            password: "Eurofin@123",
+                          },
+                        }}
+                        registerLink={false}
+                        forgotPasswordLink={false}
+                      />
+                    }
+                  />
+
+                  {/* <Route
                     path="/register"
                     element={
                       <AuthPage
@@ -142,7 +157,7 @@ const App: React.FC = () => {
                     }
                   />
                   <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
-                  <Route path="/update-password" element={<AuthPage type="updatePassword" />} />
+                  <Route path="/update-password" element={<AuthPage type="updatePassword" />} /> */}
                 </Route>
               </Routes>
 
