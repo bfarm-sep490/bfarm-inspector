@@ -183,11 +183,21 @@ export const InspectionsShow: React.FC = () => {
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
             <Card
               title={
-                <Flex align="center" gap={12}>
-                  <InfoCircleOutlined style={{ color: token.colorPrimary, fontSize: 24 }} />
-                  <Typography.Title level={4} style={{ margin: 0, color: token.colorTextHeading }}>
-                    {t("inspection.title")}
-                  </Typography.Title>
+                <Flex align="center" justify="space-between">
+                  <Flex align="center" gap={12}>
+                    <InfoCircleOutlined style={{ color: token.colorPrimary, fontSize: 24 }} />
+                    <Typography.Title
+                      level={4}
+                      style={{ margin: 0, color: token.colorTextHeading }}
+                    >
+                      {t("inspection.title")}
+                    </Typography.Title>
+                  </Flex>
+
+                  <Flex align="center" gap={8}>
+                    {getStatusIcon(inspection?.status || "")}
+                    <InspectionStatusTag value={inspection?.status || ""} />
+                  </Flex>
                 </Flex>
               }
               styles={{
@@ -441,23 +451,6 @@ export const InspectionsShow: React.FC = () => {
                 </Row>
 
                 <Divider style={{ margin: "12px 0" }} />
-
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} md={12}>
-                    <Flex justify="space-between" align="center">
-                      <Typography.Text
-                        strong
-                        style={{ fontSize: 16, color: token.colorTextHeading }}
-                      >
-                        {t("inspection.status")}
-                      </Typography.Text>
-                      <Flex align="center" gap={8}>
-                        {getStatusIcon(inspection?.status || "")}
-                        <InspectionStatusTag value={inspection?.status || ""} />
-                      </Flex>
-                    </Flex>
-                  </Col>
-                </Row>
               </Space>
             </Card>
           </Space>

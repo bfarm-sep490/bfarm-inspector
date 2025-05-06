@@ -166,7 +166,7 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
           </Card>
 
           <div>
-            <Typography.Title level={5}>Ảnh kiểm định</Typography.Title>
+            <Typography.Title level={5}>Tài liệu kiểm định</Typography.Title>
             {imageUrls.length > 0 ? (
               <Flex wrap="wrap" gap={16}>
                 {imageUrls.map((url, index) => (
@@ -215,7 +215,11 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
                 ))}
               </Flex>
             ) : (
-              <Alert type="error" showIcon message="Không có ảnh kiểm định nào được đính kèm." />
+              <Alert
+                type="error"
+                showIcon
+                message="Không có tài liệu kiểm định nào được đính kèm."
+              />
             )}
 
             <Modal
@@ -226,14 +230,16 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
               width={1000}
               closeIcon={false}
               style={{ backgroundColor: "rgba(0, 0, 0, 0.92)" }}
-              bodyStyle={{
-                padding: 0,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "90vh",
-                position: "relative",
-                backdropFilter: "blur(6px)",
+              styles={{
+                body: {
+                  padding: 0,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "90vh",
+                  position: "relative",
+                  backdropFilter: "blur(6px)",
+                },
               }}
             >
               <Button

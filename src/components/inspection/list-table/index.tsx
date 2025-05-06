@@ -26,7 +26,11 @@ export const InspectionListTable: React.FC = () => {
   const { tableProps, filters, setFilters } = useTable<IInspectingForm, HttpError>({
     resource: "inspecting-forms",
     filters: {
-      permanent: [{ field: "inspector_id", operator: "eq", value: user?.id }],
+      permanent: [
+        { field: "inspector_id", operator: "eq", value: user?.id },
+        { field: "status", operator: "ne", value: "Draft" },
+        { field: "status", operator: "ne", value: "Pending" },
+      ],
       initial: [
         { field: "id", operator: "eq", value: "" },
         { field: "task_type", operator: "contains", value: "" },
@@ -46,9 +50,7 @@ export const InspectionListTable: React.FC = () => {
   return (
     <Table
       {...tableProps}
-      dataSource={tableProps.dataSource?.filter(
-        (item) => item.status !== "Draft" && item.status !== "Pending",
-      )}
+      dataSource={tableProps.dataSource}
       rowKey="id"
       scroll={{ x: true }}
       pagination={{
