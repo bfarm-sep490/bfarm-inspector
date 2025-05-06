@@ -144,6 +144,14 @@ export const dataProvider = (
     const requestMethod = (method as MethodTypes) ?? "get";
 
     const response = await httpClient[requestMethod](url, { headers });
+    if (
+      response.data?.status === 400 &&
+      response.data?.message === "Not found any inspecting results"
+    ) {
+      return {
+        data: null,
+      };
+    }
 
     const { data } = handleApiResponse(response);
 

@@ -25,8 +25,6 @@ import { getContaminantLimitsByVegetableType } from "@/utils/inspectingKind";
 import { UploadProps } from "antd/lib";
 import { axiosInstance } from "@/rest-data-provider/utils";
 
-const { TabPane } = Tabs;
-
 type Props = {
   type?: string;
   id?: BaseKey;
@@ -234,12 +232,13 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
       <Spin spinning={formLoading || isLoading}>
         <Form form={form} layout="vertical">
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
-            <Tabs type="card" destroyInactiveTabPane={false}>
-              {filteredChemicalGroups.map((group) => (
-                <TabPane
-                  forceRender
-                  key={group.title}
-                  tab={
+            <Tabs
+              type="card"
+              destroyInactiveTabPane={false}
+              items={[
+                ...filteredChemicalGroups.map((group) => ({
+                  key: group.title,
+                  label: (
                     <Flex align="center" gap={8}>
                       <div
                         style={{
@@ -251,292 +250,263 @@ export const InspectionModalForm: React.FC<Props> = (props) => {
                       />
                       <span>{t(group.title)}</span>
                     </Flex>
-                  }
-                >
-                  <Flex vertical gap={16}>
-                    {group.keys.map((key: string) => {
-                      const label = `${thresholdMap[key]?.name || key} (${(thresholdMap[key]?.unit || "").replace("/", "⁄")})`;
-                      const value = form.getFieldValue(key);
-                      const status = checkThresholdStatus(key, value);
-                      const hasValue =
-                        value !== null && value !== undefined && value !== "" && !isNaN(value);
+                  ),
+                  forceRender: true,
+                  children: (
+                    <Flex vertical gap={16}>
+                      {group.keys.map((key: string) => {
+                        const label = `${thresholdMap[key]?.name || key} (${(thresholdMap[key]?.unit || "").replace("/", "⁄")})`;
+                        const value = form.getFieldValue(key);
+                        const status = checkThresholdStatus(key, value);
+                        const hasValue =
+                          value !== null && value !== undefined && value !== "" && !isNaN(value);
 
-                      return (
-                        <Form.Item
-                          key={key}
-                          name={key}
-                          label={<Typography.Text strong>{label}</Typography.Text>}
-                          help={status === "ok" ? undefined : fieldWarnings[key]}
-                          validateStatus={
-                            hasValue
-                              ? status === "danger"
-                                ? "error"
-                                : status === "warning"
-                                  ? "warning"
-                                  : undefined
-                              : undefined
-                          }
-                          rules={[
-                            {
-                              required: true,
-                              message: t("inspectionForm.field.inputRequired", {
-                                label,
-                              }),
-                            },
-                          ]}
-                        >
-                          <InputNumber
-                            style={{
-                              width: "100%",
-                              borderColor: hasValue && status === "ok" ? "#52c41a" : undefined,
-                              boxShadow:
-                                hasValue && status === "ok"
-                                  ? "0 0 0 2px rgba(82, 196, 26, 0.2)"
-                                  : undefined,
-                              borderRadius: 6,
-                              borderWidth: hasValue && status === "ok" ? 1 : undefined,
-                              borderStyle: hasValue && status === "ok" ? "solid" : undefined,
-                            }}
-                            addonAfter={thresholdMap[key]?.unit || ""}
-                            onChange={(value) => {
-                              const threshold = thresholdMap[key];
-                              if (!threshold) return;
-                              if (value === null || value === undefined || isNaN(Number(value)))
-                                return;
-
-                              const status = checkThresholdStatus(key, Number(value));
-                              const warningMessage =
-                                status === "danger"
-                                  ? t("inspectionForm.warning.fieldDanger", {
-                                      name: threshold.name,
-                                    })
+                        return (
+                          <Form.Item
+                            key={key}
+                            name={key}
+                            label={<Typography.Text strong>{label}</Typography.Text>}
+                            help={status === "ok" ? undefined : fieldWarnings[key]}
+                            validateStatus={
+                              hasValue
+                                ? status === "danger"
+                                  ? "error"
                                   : status === "warning"
-                                    ? t("inspectionForm.warning.fieldWarning", {
+                                    ? "warning"
+                                    : undefined
+                                : undefined
+                            }
+                            rules={[
+                              {
+                                required: true,
+                                message: t("inspectionForm.field.inputRequired", {
+                                  label,
+                                }),
+                              },
+                            ]}
+                          >
+                            <InputNumber
+                              style={{
+                                width: "100%",
+                                borderColor: hasValue && status === "ok" ? "#52c41a" : undefined,
+                                boxShadow:
+                                  hasValue && status === "ok"
+                                    ? "0 0 0 2px rgba(82, 196, 26, 0.2)"
+                                    : undefined,
+                                borderRadius: 6,
+                                borderWidth: hasValue && status === "ok" ? 1 : undefined,
+                                borderStyle: hasValue && status === "ok" ? "solid" : undefined,
+                              }}
+                              addonAfter={thresholdMap[key]?.unit || ""}
+                              onChange={(value) => {
+                                const threshold = thresholdMap[key];
+                                if (!threshold) return;
+                                if (value === null || value === undefined || isNaN(Number(value)))
+                                  return;
+
+                                const status = checkThresholdStatus(key, Number(value));
+                                const warningMessage =
+                                  status === "danger"
+                                    ? t("inspectionForm.warning.fieldDanger", {
                                         name: threshold.name,
                                       })
-                                    : undefined;
+                                    : status === "warning"
+                                      ? t("inspectionForm.warning.fieldWarning", {
+                                          name: threshold.name,
+                                        })
+                                      : undefined;
 
-                              setFieldWarnings((prev) => ({
-                                ...prev,
-                                [key]: warningMessage,
-                              }));
-                            }}
-                          />
-                        </Form.Item>
-                      );
-                    })}
-                  </Flex>
-                </TabPane>
-              ))}
-              <TabPane
-                forceRender
-                key={overviewTab.key}
-                tab={
-                  <Flex align="center" gap={8}>
-                    <div
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        backgroundColor: overviewTab.color,
-                      }}
-                    />
-                    <span>{overviewTab.title}</span>
-                  </Flex>
-                }
-              >
-                <Form.Item
-                  label={
-                    <Typography.Text strong>
-                      {t("inspectionForm.field.resultContent")}
-                    </Typography.Text>
-                  }
-                  name="result_content"
-                  rules={[
-                    {
-                      required: true,
-                      message: t("inspectionForm.field.resultRequired"),
-                    },
-                  ]}
-                >
-                  <Input.TextArea rows={4} />
-                </Form.Item>
-                <Form.Item
-                  label={
-                    <Typography.Text strong>
-                      <span style={{ color: token.colorError }}> </span>
-                      {t("inspectionForm.field.imageProof")}
-                    </Typography.Text>
-                  }
-                  required
-                >
-                  <Upload
-                    multiple
-                    customRequest={handleUpload}
-                    showUploadList={false}
-                    accept="image/*,.pdf,.rar,.zip,.doc,.docx"
-                  >
-                    <Button
-                      icon={<UploadOutlined style={{ fontSize: 18 }} />}
-                      loading={uploading}
-                      type="default"
-                      size="large"
-                      style={{
-                        backgroundColor: "#ffffff",
-                        border: "1px solid #d9d9d9",
-                        borderRadius: "10px",
-                        fontWeight: 500,
-                        color: "#141414",
-                        padding: "8px 20px",
-                        boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-                        transition: "all 0.3s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        const btn = e.currentTarget;
-                        btn.style.borderColor = "#1890ff";
-                        btn.style.color = "#1890ff";
-                        btn.style.boxShadow = "0 4px 12px rgba(24, 144, 255, 0.15)";
-                        btn.style.transform = "translateY(-1px)";
-                      }}
-                      onMouseLeave={(e) => {
-                        const btn = e.currentTarget;
-                        btn.style.borderColor = "#d9d9d9";
-                        btn.style.color = "#141414";
-                        btn.style.boxShadow = "0 2px 6px rgba(0,0,0,0.08)";
-                        btn.style.transform = "translateY(0)";
-                      }}
-                    >
-                      Tải file lên
-                    </Button>
-                  </Upload>
-
-                  <Row gutter={[16, 16]} style={{ marginTop: 12 }}>
-                    {imageList.map((item, idx) => {
-                      const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.url);
-                      const ext = item.name.split(".").pop()?.toUpperCase() || "";
-
-                      const handleRemove = () => {
-                        setImageList((prev) => prev.filter((_, i) => i !== idx));
-                      };
-
-                      return (
-                        <Col key={idx} xs={24} sm={12} md={8} lg={6} xl={4}>
-                          <div
-                            style={{
-                              borderRadius: 12,
-                              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                              background: "#fff",
-                              padding: 12,
-                              textAlign: "center",
-                              position: "relative",
-                              height: 160,
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <CloseOutlined
-                              onClick={handleRemove}
-                              style={{
-                                position: "absolute",
-                                top: 6,
-                                right: 6,
-                                fontSize: 16,
-                                color: "#f5222d",
-                                cursor: "pointer",
-                                backgroundColor: "rgba(255, 77, 79, 0.1)",
-                                borderRadius: "50%",
-                                padding: 4,
-                                transition: "all 0.3s ease",
-                              }}
-                              onMouseEnter={(e) => {
-                                const target = e.currentTarget;
-                                target.style.backgroundColor = "#ffccc7";
-                                target.style.transform = "scale(1.2)";
-                              }}
-                              onMouseLeave={(e) => {
-                                const target = e.currentTarget;
-                                target.style.backgroundColor = "rgba(255, 77, 79, 0.1)";
-                                target.style.transform = "scale(1)";
+                                setFieldWarnings((prev) => ({
+                                  ...prev,
+                                  [key]: warningMessage,
+                                }));
                               }}
                             />
+                          </Form.Item>
+                        );
+                      })}
+                    </Flex>
+                  ),
+                })),
+                {
+                  key: overviewTab.key,
+                  label: (
+                    <Flex align="center" gap={8}>
+                      <div
+                        style={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: "50%",
+                          backgroundColor: overviewTab.color,
+                        }}
+                      />
+                      <span>{overviewTab.title}</span>
+                    </Flex>
+                  ),
+                  forceRender: true,
+                  children: (
+                    <>
+                      <Form.Item
+                        label={
+                          <Typography.Text strong>
+                            {t("inspectionForm.field.resultContent")}
+                          </Typography.Text>
+                        }
+                        name="result_content"
+                        rules={[
+                          {
+                            required: true,
+                            message: t("inspectionForm.field.resultRequired"),
+                          },
+                        ]}
+                      >
+                        <Input.TextArea rows={4} />
+                      </Form.Item>
+                      <Form.Item
+                        label={
+                          <Typography.Text strong>
+                            <span style={{ color: token.colorError }}> </span>
+                            {t("inspectionForm.field.imageProof")}
+                          </Typography.Text>
+                        }
+                        required
+                      >
+                        <Upload
+                          multiple
+                          customRequest={handleUpload}
+                          showUploadList={false}
+                          accept="image/*,.pdf,.rar,.zip,.doc,.docx"
+                        >
+                          <Button
+                            icon={<UploadOutlined style={{ fontSize: 18 }} />}
+                            loading={uploading}
+                            type="default"
+                            size="large"
+                            style={{
+                              backgroundColor: "#ffffff",
+                              border: "1px solid #d9d9d9",
+                              borderRadius: "10px",
+                              fontWeight: 500,
+                              color: "#141414",
+                              padding: "8px 20px",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+                            }}
+                          >
+                            Tải file lên
+                          </Button>
+                        </Upload>
 
-                            {isImage ? (
-                              <img
-                                src={item.url}
-                                alt={item.name}
-                                style={{
-                                  width: "100%",
-                                  height: 100,
-                                  objectFit: "cover",
-                                  borderRadius: 8,
-                                }}
-                              />
-                            ) : (
-                              <div
-                                style={{
-                                  height: 100,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  flexDirection: "column",
-                                  border: "1px dashed #d9d9d9",
-                                  borderRadius: 8,
-                                }}
-                              >
-                                <div style={{ fontSize: 28, fontWeight: "bold" }}>{ext}</div>
-                                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                                  File
-                                </Typography.Text>
-                              </div>
-                            )}
+                        <Row gutter={[16, 16]} style={{ marginTop: 12 }}>
+                          {imageList.map((item, idx) => {
+                            const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(item.url);
+                            const ext = item.name.split(".").pop()?.toUpperCase() || "";
 
-                            <Typography.Text
-                              ellipsis
-                              style={{
-                                display: "block",
-                                marginTop: 8,
-                                fontSize: 13,
-                                fontWeight: 500,
-                              }}
-                              title={item.name}
-                            >
-                              {item.name}
-                            </Typography.Text>
-                          </div>
-                        </Col>
-                      );
-                    })}
-                  </Row>
-                  <Button
-                    onClick={() => setImageList([])}
-                    icon={<DeleteOutlined />}
-                    style={{
-                      marginTop: 12,
-                      backgroundColor: "#ff4d4f",
-                      color: "#fff",
-                      fontWeight: 500,
-                      borderRadius: 20,
-                      padding: "4px 12px",
-                      fontSize: 13,
-                      border: "none",
-                      boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-                      transition: "all 0.3s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#d9363e";
-                      e.currentTarget.style.transform = "scale(1.03)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "#ff4d4f";
-                      e.currentTarget.style.transform = "scale(1)";
-                    }}
-                  >
-                    Xóa tất cả file đã tải
-                  </Button>
-                </Form.Item>
-              </TabPane>
-            </Tabs>
+                            const handleRemove = () => {
+                              setImageList((prev) => prev.filter((_, i) => i !== idx));
+                            };
+
+                            return (
+                              <Col key={idx} xs={24} sm={12} md={8} lg={6} xl={4}>
+                                <div
+                                  style={{
+                                    borderRadius: 12,
+                                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                    background: "#fff",
+                                    padding: 12,
+                                    textAlign: "center",
+                                    position: "relative",
+                                    height: 160,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <CloseOutlined
+                                    onClick={handleRemove}
+                                    style={{
+                                      position: "absolute",
+                                      top: 6,
+                                      right: 6,
+                                      fontSize: 16,
+                                      color: "#f5222d",
+                                      cursor: "pointer",
+                                      backgroundColor: "rgba(255, 77, 79, 0.1)",
+                                      borderRadius: "50%",
+                                      padding: 4,
+                                    }}
+                                  />
+
+                                  {isImage ? (
+                                    <img
+                                      src={item.url}
+                                      alt={item.name}
+                                      style={{
+                                        width: "100%",
+                                        height: 100,
+                                        objectFit: "cover",
+                                        borderRadius: 8,
+                                      }}
+                                    />
+                                  ) : (
+                                    <div
+                                      style={{
+                                        height: 100,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        flexDirection: "column",
+                                        border: "1px dashed #d9d9d9",
+                                        borderRadius: 8,
+                                      }}
+                                    >
+                                      <div style={{ fontSize: 28, fontWeight: "bold" }}>{ext}</div>
+                                      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                                        File
+                                      </Typography.Text>
+                                    </div>
+                                  )}
+
+                                  <Typography.Text
+                                    ellipsis
+                                    style={{
+                                      display: "block",
+                                      marginTop: 8,
+                                      fontSize: 13,
+                                      fontWeight: 500,
+                                    }}
+                                    title={item.name}
+                                  >
+                                    {item.name}
+                                  </Typography.Text>
+                                </div>
+                              </Col>
+                            );
+                          })}
+                        </Row>
+
+                        <Button
+                          onClick={() => setImageList([])}
+                          icon={<DeleteOutlined />}
+                          style={{
+                            marginTop: 12,
+                            backgroundColor: "#ff4d4f",
+                            color: "#fff",
+                            fontWeight: 500,
+                            borderRadius: 20,
+                            padding: "4px 12px",
+                            fontSize: 13,
+                            border: "none",
+                            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+                          }}
+                        >
+                          Xóa tất cả file đã tải
+                        </Button>
+                      </Form.Item>
+                    </>
+                  ),
+                },
+              ]}
+            />
 
             <Flex justify="space-between" align="center" vertical>
               <Flex style={{ width: "100%" }} justify="space-between">
