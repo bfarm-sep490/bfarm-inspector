@@ -182,7 +182,7 @@ export const InspectionListTable: React.FC = () => {
       />
 
       <Table.Column
-        title={t("fertilizers.actions")}
+        title={t("inspections.actions")}
         key="actions"
         fixed="right"
         align="center"
