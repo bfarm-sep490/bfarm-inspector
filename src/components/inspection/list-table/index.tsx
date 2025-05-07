@@ -28,8 +28,11 @@ export const InspectionListTable: React.FC = () => {
     filters: {
       permanent: [
         { field: "inspector_id", operator: "eq", value: user?.id },
-        { field: "status", operator: "ne", value: "Draft" },
-        { field: "status", operator: "ne", value: "Pending" },
+        {
+          field: "status",
+          operator: "in",
+          value: ["Ongoing", "Completed", "Incompleted"],
+        },
       ],
       initial: [
         { field: "id", operator: "eq", value: "" },
