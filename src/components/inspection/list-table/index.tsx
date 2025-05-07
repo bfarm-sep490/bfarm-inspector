@@ -31,7 +31,7 @@ export const InspectionListTable: React.FC = () => {
         {
           field: "status",
           operator: "in",
-          value: ["Ongoing", "Completed", "Incompleted"],
+          value: ["Ongoing", "Complete", "Completed", "Incomplete", "Incompleted"],
         },
       ],
       initial: [
