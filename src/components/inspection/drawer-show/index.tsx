@@ -61,21 +61,13 @@ export const InspectionsShow: React.FC = () => {
     [formQueryResult.data],
   );
 
-  const {
-    data: planData,
-    isLoading: isPlanLoading,
-    isFetching: isPlanFetching,
-  } = useOne({
+  const { data: planData } = useOne({
     resource: "plans",
     id: inspection?.plan_id,
   });
   const plan = planData?.data;
 
-  const {
-    data: plantData,
-    isLoading: isPlantLoading,
-    isFetching: isPlantFetching,
-  } = useOne({
+  const { data: plantData } = useOne({
     resource: "plants",
     id: plan?.plant_information?.plant_id,
   });
@@ -85,16 +77,6 @@ export const InspectionsShow: React.FC = () => {
     () => (resultQueryResult.data as { data: IInspectingResult[] } | undefined)?.data?.[0],
     [resultQueryResult.data],
   );
-
-  const isLoading =
-    formQueryResult?.isLoading ||
-    resultQueryResult?.isLoading ||
-    formQueryResult?.isFetching ||
-    resultQueryResult?.isFetching ||
-    isPlanFetching ||
-    isPlanLoading ||
-    isPlantLoading ||
-    isPlantFetching;
 
   const chemicalData = useMemo(() => {
     const data = getChemicalData(inspectionResult);
