@@ -71,28 +71,13 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
     ".docx",
   ];
 
-  const imageUrls = Array.isArray(inspectionResult?.inspect_images)
+  const allDocuments = Array.isArray(inspectionResult?.inspect_images)
     ? inspectionResult.inspect_images
         .map((img) => {
           const image = img as { url?: string };
           return typeof image.url === "string" ? image.url : "";
         })
-        .filter((url) =>
-          [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"].some((ext) =>
-            url.toLowerCase().endsWith(ext),
-          ),
-        )
-    : [];
-
-  const fileUrls = Array.isArray(inspectionResult?.inspect_images)
-    ? inspectionResult.inspect_images
-        .map((img) => {
-          const image = img as { url?: string };
-          return typeof image.url === "string" ? image.url : "";
-        })
-        .filter((url) =>
-          [".pdf", ".rar", ".zip", ".doc", ".docx"].some((ext) => url.toLowerCase().endsWith(ext)),
-        )
+        .filter((url) => validImageExtensions.some((ext) => url.toLowerCase().endsWith(ext)))
     : [];
 
   return (
@@ -167,59 +152,96 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
 
           <div>
             <Typography.Title level={5}>Tài liệu kiểm định</Typography.Title>
-            {imageUrls.length > 0 ? (
-              <Flex wrap="wrap" gap={16}>
-                {imageUrls.map((url, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      width: 140,
-                      textAlign: "center",
-                      boxShadow: token.boxShadow,
-                      borderRadius: 8,
-                      padding: 8,
-                      background: "#fff",
-                    }}
-                    onClick={() => {
-                      setPreviewUrl(url);
-                      setPreviewVisible(true);
-                    }}
-                  >
-                    <Image
-                      src={url}
-                      alt={`inspect-image-${index}`}
-                      width={120}
-                      height={100}
-                      style={{
-                        objectFit: "cover",
-                        borderRadius: 6,
-                        transition: "transform 0.3s ease",
-                        cursor: "pointer",
-                      }}
-                      preview={false}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "scale(1.05)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "scale(1)";
-                      }}
-                      onError={(e) => {
-                        console.error("Image failed to load:", url);
-                        e.currentTarget.style.display = "none";
-                      }}
-                    />
-                    <Typography.Text ellipsis style={{ fontSize: 12 }}>
-                      {`Hình ${index + 1}`}
-                    </Typography.Text>
-                  </div>
-                ))}
-              </Flex>
-            ) : (
+
+            {allDocuments.length === 0 ? (
               <Alert
                 type="error"
                 showIcon
                 message="Không có tài liệu kiểm định nào được đính kèm."
               />
+            ) : (
+              <Flex wrap="wrap" gap={16}>
+                {allDocuments.map((url, index) => {
+                  const fileName = url.split("/").pop() || `Tài liệu ${index + 1}`;
+                  const ext = fileName.split(".").pop()?.toLowerCase() || "";
+
+                  const isImage = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"].some((e) =>
+                    url.toLowerCase().endsWith(e),
+                  );
+
+                  const iconMap: Record<string, string> = {
+                    pdf: "📄",
+                    doc: "📄",
+                    docx: "📄",
+                    zip: "🗜️",
+                    rar: "🗜️",
+                  };
+
+                  if (isImage) {
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          width: 140,
+                          textAlign: "center",
+                          boxShadow: token.boxShadow,
+                          borderRadius: 8,
+                          padding: 8,
+                          background: "#fff",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          setPreviewUrl(url);
+                          setPreviewVisible(true);
+                        }}
+                      >
+                        <Image
+                          src={url}
+                          alt={fileName}
+                          width={120}
+                          height={100}
+                          style={{
+                            objectFit: "cover",
+                            borderRadius: 6,
+                            transition: "transform 0.3s ease",
+                          }}
+                          preview={false}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "scale(1.05)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "scale(1)";
+                          }}
+                          onError={(e) => {
+                            console.error("Image failed to load:", url);
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                        <Typography.Text ellipsis style={{ fontSize: 12 }}>
+                          {fileName}
+                        </Typography.Text>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <Card
+                      key={index}
+                      size="small"
+                      style={{ width: 160, textAlign: "center", borderRadius: 8 }}
+                    >
+                      <div style={{ fontSize: 32 }}>{iconMap[ext] || "📁"}</div>
+                      <Typography.Text style={{ fontSize: 13 }} ellipsis>
+                        {fileName}
+                      </Typography.Text>
+                      <br />
+                      <Typography.Link href={url} target="_blank" rel="noopener noreferrer">
+                        Tải về
+                      </Typography.Link>
+                    </Card>
+                  );
+                })}
+              </Flex>
             )}
 
             <Modal
@@ -278,46 +300,6 @@ export const InspectionModals: React.FC<InspectionModalsProps> = ({
               />
             </Modal>
           </div>
-
-          {fileUrls.length > 0 && (
-            <>
-              <Typography.Title level={5} style={{ marginTop: 32 }}>
-                Tài liệu đính kèm
-              </Typography.Title>
-              <Flex wrap="wrap" gap={16}>
-                {fileUrls.map((url, index) => {
-                  const fileName = url.split("/").pop();
-                  const ext = fileName?.split(".").pop()?.toLowerCase();
-
-                  const iconMap: Record<string, string> = {
-                    pdf: "📄",
-                    doc: "📄",
-                    docx: "📄",
-                    zip: "🗜️",
-                    rar: "🗜️",
-                  };
-                  const icon = iconMap[ext || ""] || "📁";
-
-                  return (
-                    <Card
-                      key={index}
-                      size="small"
-                      style={{ width: 160, textAlign: "center", borderRadius: 8 }}
-                    >
-                      <div style={{ fontSize: 32 }}>{icon}</div>
-                      <Typography.Text style={{ fontSize: 13 }} ellipsis>
-                        {fileName}
-                      </Typography.Text>
-                      <br />
-                      <a href={url} target="_blank" rel="noopener noreferrer">
-                        <Typography.Link>Tải về</Typography.Link>
-                      </a>
-                    </Card>
-                  );
-                })}
-              </Flex>
-            </>
-          )}
 
           <Tabs
             type="card"

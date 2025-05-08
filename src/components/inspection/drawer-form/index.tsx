@@ -24,6 +24,12 @@ import { getContaminantsByType } from "../getContaminantsByType";
 import { getContaminantLimitsByVegetableType } from "@/utils/inspectingKind";
 import { UploadProps } from "antd/lib";
 import { axiosInstance } from "@/rest-data-provider/utils";
+import { IInspectingForm } from "@/interfaces";
+
+type FormInitialValues = Omit<IInspectingForm, "start_date" | "end_date"> & {
+  start_date?: string | dayjs.Dayjs;
+  end_date?: string | dayjs.Dayjs;
+};
 
 type Props = {
   type?: string;
@@ -32,7 +38,7 @@ type Props = {
   open?: boolean;
   onClose?: () => void;
   onMutationSuccess?: () => void;
-  initialValues?: any;
+  initialValues?: FormInitialValues;
   refetch?: () => void;
 };
 
